@@ -12,7 +12,7 @@ $ npm install korex-server
 ```
 The server depends on [Node.js](http://nodejs.org/), [npm](http://npmjs.org/) and other packages that are downloaded and installed during the install process.
 
-## Deploying
+## Deploy
 This section will be available soon.
 
 ## Contributors
