@@ -9,6 +9,7 @@
     "coffee-script": "^1.8.0"
   },
   "devDependencies": {
+    "coffee-script": "^1.8.0",
     "wrench": "1.5.x",
     "which": "1.0.5"
   }
