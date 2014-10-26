@@ -1,0 +1,32 @@
+#!/usr/bin/env node
+
+var Korex, Application, devMode = true;
+
+Korex = function() {
+  setupCoffeeScript = function() {
+    var CoffeeScript;
+    CoffeeScript = null;
+    return require.extensions['.coffee'] = function(module, filePath) {
+      var coffee, js;
+      if (CoffeeScript == null) {
+        CoffeeScript = require('coffee-script');
+      }
+      coffee = require('fs').readFileSync(filePath, 'utf8');
+      js = CoffeeScript.compile(coffee, {
+        filename: filePath
+      });
+      return module._compile(js, filePath);
+    };
+  };
+
+  bootstrap = function() {
+    this.setupCoffeeScript();
+
+    if(devMode) Application = new (require('../src/application'));
+    else Application = new (require('../.src/application'));
+  };
+
+  return this.bootstrap();
+}
+
+Korex();
