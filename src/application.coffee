@@ -1,5 +1,4 @@
 logger = require "./util/logger"
-configuration = require "./storage/configuration"
 
 module.exports =
   class Application
@@ -8,10 +7,7 @@ module.exports =
     constructor: ->
       # Register
       @Logger = new logger(this)
-      @Configuration = new configuration({
-        test: 'k'
-        test2: 'x'
-      })
+      @Configuration = require "./config/environment"
 
       # Bootstrap
       @bootstrap()

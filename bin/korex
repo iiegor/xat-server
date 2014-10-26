@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var Korex, Application, devMode = true;
+var Korex, Application, compiled = false;
 
 Korex = function() {
   setupCoffeeScript = function() {
@@ -22,7 +22,7 @@ Korex = function() {
   bootstrap = function() {
     this.setupCoffeeScript();
 
-    if(devMode) Application = new (require('../src/application'));
+    if(!compiled) Application = new (require('../src/application'));
     else Application = new (require('../.src/application'));
   };
 
