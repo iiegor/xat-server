@@ -1,4 +1,5 @@
 net = require "net"
+Events = require "./events"
 
 module.exports =
   class Sockets
@@ -14,9 +15,6 @@ module.exports =
 
       # Server
       net.createServer((socket) ->
-        console.log "-> New client connected!"
+        new Events(socket).handle()
 
-        socket.on "data", (data) ->
-          console.log data.toString()
-          
       ).listen @port, -> return true
