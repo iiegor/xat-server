@@ -1,4 +1,5 @@
 crypto = require '../util/crypto'
+logger = require '../util/logger'
 
 module.exports =
   class Events
@@ -7,10 +8,13 @@ module.exports =
     socket: null
 
     constructor: (@socket) ->
+      @Logger = new logger(this)
+
     handle: ->
       return if @socket == null
 
-      console.log '-> Nuevo usuario conectado'
+      @Logger.log(@Logger.level.DEBUG, "-> New user connected!")
+
       parent = @socket
 
       @socket.on 'data', (data) ->

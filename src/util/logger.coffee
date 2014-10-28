@@ -7,6 +7,7 @@ module.exports =
     }
 
     constructor: (@caller) ->
+      @Configuration = require "../config/environment"
 
     log: (level, message) ->
       return console.log "[#{@caller.name}] [?] #{message}" if typeof level == "undefined"
@@ -17,4 +18,4 @@ module.exports =
         when @level.ERROR
           console.error "[#{@caller.name}] [#{level}] #{message} - #{arguments[2]}"
         when @level.DEBUG
-          console.warn "[#{@caller.name}] [#{level}] #{message}"
+          console.log "[#{@caller.name}] [#{level}] #{message}" if @Configuration['env'] is 'dev'
