@@ -1,20 +1,27 @@
 net = require "net"
-Events = require "./events"
+connectionPool = require "./pool"
 
 module.exports =
   class Sockets
     name: 'Sockets'
 
     isListening: false
-    server: null
+    socket: null
 
     constructor: (@port) ->
 
-    listen: ->
+    listen: (callback) ->
       return false if @isListening
 
       # Server
-      net.createServer((socket) ->
-        new Events(socket).handle()
+      server = net.createServer()
 
-      ).listen @port, -> return true
+      server.on 'connection', (socket) ->
+        @socket = socket
+
+        connectionPool.add(@socket)
+
+      server.listen @port, -> callback true
+
+    __dispose: ->
+      # Dispose the connection

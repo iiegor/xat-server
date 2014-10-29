@@ -16,22 +16,21 @@ module.exports =
       @bootstrap()
 
     bootstrap: ->
+      Application = this
       @Logger.log(@Logger.level.INFO, "Starting the server in #{@Configuration['env']} at port #{@Configuration['port']}...")
 
-      if @Sockets.listen()
-        @Logger.log(@Logger.level.INFO, "Server started and waiting for new connections!")
+      @Sockets.listen (status) ->
+        if status is true
+          Application.Logger.log(Application.Logger.level.INFO, "Server started and waiting for new connections!")
 
-        @handleEvents()
-      else
-        @Logger.log(@Logger.level.ERROR, "Failed to start the server!", "Exception from @Sockets.listen()")
-        @__dispose()
+          Application.handleEvents()
+        else
+          Application.Logger.log(Application.Logger.level.ERROR, "Failed to start the server!", "Exception from @Sockets.listen()")
+          Application.__dispose()
 
     handleEvents: ->
       # Registers all basic events of the application
-      @on 'application:quit', -> @__quit()
-
-    __quit: ->
-      # Exit killing all processes (for the future visual interface)
+      @on 'application:dispose', -> @__dispose()
 
     __dispose: ->
       # Exit with success code

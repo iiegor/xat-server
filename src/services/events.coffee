@@ -5,19 +5,19 @@ module.exports =
   class Events
     name: 'Events'
 
-    socket: null
-
-    constructor: (@socket) ->
+    constructor: (socket, id) ->
       @Logger = new logger(this)
 
-    handle: ->
-      return if @socket == null
+      @handle(socket)
+
+    handle: (socket) ->
+      return if socket == null
 
       @Logger.log(@Logger.level.DEBUG, "-> New user connected!")
 
-      parent = @socket
-
-      @socket.on 'data', (data) ->
+      socket.on 'data', (data) ->
         packet = crypto.getTagName(data.toString())
 
         console.log packet
+
+    send: (buffer) ->
