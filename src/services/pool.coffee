@@ -1,15 +1,13 @@
-eventHandler = require "./events"
+handshake = require "./handshake"
 
 module.exports =
     pool: {}
-    count: null
+    count: 0
 
     add: (socket) ->
       # Register
-      connection = new eventHandler(@, socket, @count++)
+      connection = new handshake(@, socket, @count++)
       @pool[socket] = connection
-
-      console.log 'new connection from ' + socket.remoteAddress + @count
 
     close: (socket) ->
       delete @pool[socket]

@@ -1,10 +1,10 @@
-crypto = require '../util/crypto'
 logger = require '../util/logger'
 pool = require "./pool"
+serializer = require "./serializer"
 
 module.exports =
-  class Events
-    name: 'Events'
+  class Handshake
+    name: 'Handshake'
 
     connectionPool: null
 
@@ -22,15 +22,22 @@ module.exports =
       @Logger.log(@Logger.level.DEBUG, "-> New user connected!")
 
       @socket.on 'data', (data) ->
-        packet = crypto.getTagName(data.toString())
+        # Remove this!!
+        parent.Logger.log parent.Logger.level.DEBUG, "-> #{data.toString()}"
 
-        console.log packet
+        # Serialize the packet
+        serializer.packet(parent, data.toString())
 
       @socket.once 'close', (err) ->
+        parent.Logger.log(parent.Logger.level.DEBUG, "-> User disconnected!")
         parent.__dispose()
 
     send: (buffer) ->
-      console.log "Sending to client: #{buffer}"
+      # Write
+      @socket.write(buffer + '\0')
+
+      # Log sent data
+      @Logger.log(@Logger.level.DEBUG, "-> Sent: #{buffer}")
 
     __dispose: ->
       @connectionPool.close(@socket)
