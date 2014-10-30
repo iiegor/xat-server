@@ -1,5 +1,5 @@
-crypto = require "../util/crypto.coffee"
-math = require "../util/math.coffee"
+crypto = require "../util/crypto"
+math = require "../util/math"
 logger = require "../util/logger"
 
 module.exports =
