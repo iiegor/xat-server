@@ -20,10 +20,11 @@ Korex = function() {
   };
 
   bootstrap = function() {
-    this.setupCoffeeScript();
+    if(!compiled) {
+      this.setupCoffeeScript();
 
-    if(!compiled) Application = new (require('../src/application'));
-    else Application = new (require('../.src/application'));
+      Application = new (require('../src/application'));
+    } else Application = new (require('../.src/application'));
   };
 
   return this.bootstrap();
