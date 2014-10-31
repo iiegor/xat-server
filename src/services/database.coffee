@@ -29,7 +29,7 @@ module.exports =
           mysql = require "mysql"
           @Driver = mysql.createConnection(
             host: @config['host']
-            username: @config['username']
+            user: @config['username']
             password: @config['password']
           )
 
