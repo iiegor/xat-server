@@ -1,6 +1,7 @@
 module.exports = {
-  username: 'user'
-  password: 'pass'
+  host: 'localhost'
+  username: 'root'
+  password: 'test'
   database: 'database'
-  driver: 'driver'
+  driver: 'mysql'
 }

@@ -1,5 +1,6 @@
 logger = require "./util/logger"
 socket = require "./services/sockets"
+database = require "./services/database"
 {EventEmitter} = require 'events'
 
 module.exports =
@@ -11,6 +12,7 @@ module.exports =
       @Logger = new logger(this)
       @Configuration = require "./config/environment"
       @Sockets = new socket(@Configuration['port'])
+      @Database = new database(@, require "./config/database")
 
       # Bootstrap
       @bootstrap()

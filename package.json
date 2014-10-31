@@ -7,11 +7,15 @@
   },
   "dependencies": {
     "coffee-script": "^1.8.0",
-    "elementtree": "^0.1.6"
+    "colors": "^1.0.3",
+    "elementtree": "^0.1.6",
+    "mysql": "^2.5.2"
   },
   "devDependencies": {
     "coffee-script": "^1.8.0",
+    "colors": "^1.0.3",
     "wrench": "1.5.x",
-    "which": "1.0.5"
+    "which": "1.0.5",
+    "mysql": "^2.5.2"
   }
 }

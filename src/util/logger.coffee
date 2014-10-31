@@ -1,3 +1,5 @@
+colors = require "colors"
+
 module.exports =
   class Logger
     level: {
@@ -14,8 +16,8 @@ module.exports =
 
       switch level
         when @level.INFO
-          console.info "[#{@caller.name}] [#{level}] #{message}"
+          console.info "[#{@caller.name}]".cyan + "[#{level}] ".green + "#{message}"
         when @level.ERROR
-          console.error "[#{@caller.name}] [#{level}] #{message} - #{arguments[2]}"
+          console.error "[#{@caller.name}]".cyan + "[#{level}] ".red + "#{message} - #{arguments[2]}"
         when @level.DEBUG
-          console.log "[#{@caller.name}] [#{level}] #{message}" if @Configuration['env'] is 'dev'
+          console.log "[#{@caller.name}]".cyan + "[#{level}] ".gray + "#{message}" if @Configuration['env'] is 'dev'
