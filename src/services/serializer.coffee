@@ -15,5 +15,8 @@ module.exports =
         loginTime = math.time()
 
         handshake.send "<y i=\"#{loginKey}\" c=\"12\" p=\"100_100_5_100\" />"
+      when "j2"
+        # Authenticate the client
+        (require "../workers/authentication").process(packet)
       else
         @logger.log @logger.level.ERROR, "Unrecognized packet by the server!", packetTag
