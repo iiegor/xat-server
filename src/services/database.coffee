@@ -26,8 +26,7 @@ module.exports =
           @app.__dispose()
         when 'mysql'
           # Configure
-          mysql = require "mysql"
-          @Driver = mysql.createConnection(
+          @Driver = (require "mysql").createConnection(
             host: @config['host']
             user: @config['username']
             password: @config['password']
@@ -40,11 +39,11 @@ module.exports =
 
               Parent.app.__dispose()
             else
-              console.log 'bien conectado!'
+              Parent.query("USE #{Parent.config['database']}")
         else
           @Logger.log @Logger.level.ERROR, 'The selected driver is not compatible', "(#{@config['driver']})"
 
           # Dispose the application
           @app.__dispose()
 
-    query: ->
+    query: (args) -> @Driver.query(args)

@@ -2,6 +2,6 @@ module.exports = {
   host: 'localhost'
   username: 'root'
   password: 'test'
-  database: 'database'
+  database: 'xat'
   driver: 'mysql'
 }
