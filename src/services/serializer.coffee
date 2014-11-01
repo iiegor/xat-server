@@ -11,6 +11,8 @@ module.exports =
   packet: (handshake, packet) ->
     packetTag = crypto.getTagName(packet)
 
+    return if packetTag is null
+
     switch packetTag
       when "y"
         loginKey = math.random(10000000, 99999999)

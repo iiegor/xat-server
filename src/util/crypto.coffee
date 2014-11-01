@@ -7,9 +7,11 @@ In this case the function of this file is parse packets.
 
 module.exports =
   getTagName: (packet) ->
-    packet = et.parse(packet)
-
-    return packet._root.tag
+    try
+      packet = et.parse(packet)
+      return packet._root.tag
+    catch ex
+      return null
 
   getAttributes: (packet) ->
     packet = et.parse(packet)
