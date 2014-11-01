@@ -39,5 +39,8 @@ module.exports =
       # Log sent data
       @Logger.log(@Logger.level.DEBUG, "-> Sent: #{buffer}")
 
+    __getSocket: ->
+      return @socket
+
     __dispose: ->
       @connectionPool.close(@socket)
