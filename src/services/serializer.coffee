@@ -14,6 +14,8 @@ module.exports =
     return if packetTag is null
 
     switch packetTag
+      when "policy-file-request"
+        handshake.send "<cross-domain-policy><allow-access-from domain=\"*\" to-ports=\"*\" /></cross-domain-policy>\0"
       when "y"
         loginKey = math.random(10000000, 99999999)
         loginShift = math.random(2, 5)
