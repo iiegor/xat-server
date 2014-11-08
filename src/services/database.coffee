@@ -40,10 +40,17 @@ module.exports =
               Parent.app.__dispose()
             else
               Parent.query("USE #{Parent.config['database']}")
+
+              # Emit successfull connection
+              Parent.app.emit('application:bootstrap')
         else
           @Logger.log @Logger.level.ERROR, 'The selected driver is not compatible', "(#{@config['driver']})"
 
           # Dispose the application
           @app.__dispose()
 
-    query: (args) -> @Driver.query(args)
+    query: (args) ->
+      try
+        return @Driver.query(args)
+      catch ex
+        return null

@@ -7,31 +7,30 @@ module.exports =
   class Application extends EventEmitter
     name: 'Application'
 
-    constructor: ->
-      # Register
-      @Logger = new logger(this)
-      @Configuration = require "./config/environment"
-      @Sockets = new socket(@Configuration['port'])
-      @Database = new database(@, require "./config/database")
+    Logger: new logger(this)
+    Configuration: require "./config/environment"
 
-      # Bootstrap
-      @bootstrap()
+    constructor: ->
+      @Logger.log(@Logger.level.INFO, "Starting the server in #{@Configuration['env']} at port #{@Configuration['port']}...")
+
+      # Handle app events and connect to database
+      @handleEvents()
+      @Database = new database(@, require "./config/database")
 
     bootstrap: ->
       Application = this
-      @Logger.log(@Logger.level.INFO, "Starting the server in #{@Configuration['env']} at port #{@Configuration['port']}...")
+      Sockets = new socket(@Configuration['port'])
 
-      @Sockets.listen (status) ->
+      Sockets.listen (status) ->
         if status is true
           Application.Logger.log(Application.Logger.level.INFO, "Server started and waiting for new connections!")
-
-          Application.handleEvents()
         else
-          Application.Logger.log(Application.Logger.level.ERROR, "Failed to start the server!", "Exception from @Sockets.listen()")
+          Application.Logger.log(Application.Logger.level.ERROR, "Failed to start the server!", "Exception from Sockets.listen()")
           Application.__dispose()
 
     handleEvents: ->
       # Registers all basic events of the application
+      @on 'application:bootstrap', -> @bootstrap()
       @on 'application:dispose', -> @__dispose()
 
     __dispose: ->

@@ -5,14 +5,11 @@ module.exports =
   class Sockets
     name: 'Sockets'
 
-    isListening: false
     socket: null
 
     constructor: (@port) ->
 
     listen: (callback) ->
-      return false if @isListening
-
       # Server
       server = net.createServer()
 

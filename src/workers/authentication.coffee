@@ -1,6 +1,4 @@
-database = require "../services/database"
 crypto = require "../util/crypto"
-
 chat = require "./chat"
 
 module.exports =
@@ -12,9 +10,11 @@ module.exports =
 
     # Set
     @user = packet
-    @user.authenticated = true
+    @resetDetails(@user.u)
 
     chat.joinRoom(this, @user.c)
+
+  resetDetails: (id) ->
 
   logout: ->
     @handshake.send '<dup />'
