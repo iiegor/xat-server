@@ -1,5 +1,4 @@
 net = require "net"
-connectionPool = require "./pool"
 
 module.exports =
   class Sockets
@@ -9,13 +8,23 @@ module.exports =
 
     constructor: (@port) ->
 
-    listen: (callback) ->
-      # Server
-      server = net.createServer()
+    bind: (callback) ->
+      Server = new net.Server(
+        allowHalfOpen: true
+        type: "tcp4"
+      )
 
-      server.on 'connection', (socket) ->
-        @socket = socket
+      Server.on 'connection', (socket) ->
+        socket.setNoDelay true
+        socket.setKeepAlive true
 
-        connectionPool.add(@socket)
+        handler = (require "./handler")(socket)
 
-      server.listen @port, -> callback true
+        socket.on 'data', (buffer) ->
+          handler.read buffer.toString()
+
+        socket.on 'end', ->
+          console.log "Se ha desconectado un usuario!"
+
+
+      Server.listen @port, -> callback true

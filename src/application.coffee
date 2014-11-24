@@ -1,5 +1,5 @@
 logger = require "./util/logger"
-socket = require "./services/sockets"
+sockets = require "./services/sockets"
 database = require "./services/database"
 {EventEmitter} = require 'events'
 
@@ -18,15 +18,10 @@ module.exports =
       @Database = new database(@, require "./config/database")
 
     bootstrap: ->
-      Application = this
-      Sockets = new socket(@Configuration['port'])
+      self = this
 
-      Sockets.listen (status) ->
-        if status is true
-          Application.Logger.log(Application.Logger.level.INFO, "Server started and waiting for new connections!")
-        else
-          Application.Logger.log(Application.Logger.level.ERROR, "Failed to start the server!", "Exception from Sockets.listen()")
-          Application.__dispose()
+      new sockets(@Configuration['port']).bind ->
+        self.Logger.log(self.Logger.level.INFO, "Server started and waiting for new connections!")
 
     handleEvents: ->
       # Registers all basic events of the application
