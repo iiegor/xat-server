@@ -14,16 +14,15 @@ module.exports =
       @Logger.log(@Logger.level.INFO, "Starting the server in #{@Configuration['env']} at port #{@Configuration['port']}...")
 
       # Handle app events and connect to database
-      @handleEvents()
-      @Database = new database(@, require "./config/database")
+      @registerEvents()
 
     bootstrap: ->
-      self = this
+      self = @
 
       new sockets(@Configuration['port']).bind ->
         self.Logger.log(self.Logger.level.INFO, "Server started and waiting for new connections!")
 
-    handleEvents: ->
+    registerEvents: ->
       # Registers all basic events of the application
       @on 'application:bootstrap', -> @bootstrap()
       @on 'application:dispose', -> @__dispose()
