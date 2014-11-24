@@ -9,6 +9,9 @@ module.exports = (socket) ->
   logger: new logger(name: 'Handler')
 
   read: (packet) ->
+    # Debug
+    @logger.log @logger.level.DEBUG, "-> #{packet}"
+
     packetTag = crypto.getTagName(packet)
 
     return if typeof socket is "undefined" or typeof socket is "null" or packetTag is null
@@ -38,3 +41,6 @@ module.exports = (socket) ->
 
   send: (packet) ->
     socket.write "#{packet}\0"
+
+    # Debug
+    @logger.log(@logger.level.DEBUG, "-> Sent: #{packet}")
