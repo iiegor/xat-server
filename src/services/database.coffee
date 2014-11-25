@@ -1,4 +1,4 @@
-logger = require "../util/logger"
+logger = new (require "../util/logger")(name: 'Database')
 mysql = require "mysql"
 settings = require "../config/database"
 genericPool = require "generic-pool"
@@ -24,11 +24,14 @@ Pool = genericPool.Pool(
 )
 
 exports.query = (sql) ->
-  Pool.acquire (err, db) ->
-    return console.error "Connection error: #{err}" if err
+  self = @
 
+  Pool.acquire (err, db) ->
     db.query sql, (err, rows) ->
-      throw console.log err if err
+      if err
+        logger.log logger.level.ERROR, 'Oops, an error ocurred', err
+
+        process.exit 0
 
       console.log rows
 

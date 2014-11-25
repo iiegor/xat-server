@@ -25,7 +25,7 @@ module.exports =
       new sockets(@Configuration['port']).bind ->
         self.Logger.log(self.Logger.level.INFO, "Server started and waiting for new connections!")
 
-    registerEvents: ->
+    handleEvents: ->
       # Registers all basic events of the application
       @on 'application:bootstrap', -> @bootstrap()
       @on 'application:dispose', -> @__dispose()
