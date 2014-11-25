@@ -14,7 +14,7 @@ module.exports =
       @Logger.log(@Logger.level.INFO, "Starting the server in #{@Configuration['env']} at port #{@Configuration['port']}...")
 
       # Handle app events and connect to database
-      @registerEvents()
+      @handleEvents()
 
       # Bootstrap the application
       @bootstrap()
