@@ -16,6 +16,9 @@ module.exports =
       # Handle app events and connect to database
       @registerEvents()
 
+      # Bootstrap the application
+      @bootstrap()
+
     bootstrap: ->
       self = @
 
