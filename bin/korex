@@ -23,8 +23,8 @@ Korex = function() {
     if(!compiled) {
       this.setupCoffeeScript();
 
-      Application = new (require('../src/application'));
-    } else Application = new (require('../.src/application'));
+      Application = new (require('../src/bootstrap'));
+    } else Application = new (require('../.src/bootstrap'));
   };
 
   return this.bootstrap();

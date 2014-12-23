@@ -7,13 +7,13 @@ module.exports =
   class Application extends EventEmitter
     name: 'Application'
 
-    Logger: new logger(this)
-    Configuration: require "./config/environment"
+    logger: new logger(this)
+    configuration: require "./config/environment"
 
     constructor: ->
-      @Logger.log(@Logger.level.INFO, "Starting the server in #{@Configuration['env']} at port #{@Configuration['port']}...")
+      @logger.log(@logger.level.INFO, "Starting the server in #{@configuration['env']} at port #{@configuration['port']}...")
 
-      # Handle app events and connect to database
+      # Handle app events
       @handleEvents()
 
       # Bootstrap the application
@@ -22,8 +22,8 @@ module.exports =
     bootstrap: ->
       self = @
 
-      new sockets(@Configuration['port']).bind ->
-        self.Logger.log(self.Logger.level.INFO, "Server started and waiting for new connections!")
+      new sockets(@configuration['port']).bind ->
+        self.logger.log(self.logger.level.INFO, "Server started and waiting for new connections!")
 
     handleEvents: ->
       # Registers all basic events of the application
