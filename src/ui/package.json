@@ -1,8 +1,0 @@
-{
-  "name": "korex-ui",
-  "description": "The visual interface of korex-server",
-  "dependencies": {
-    "korex-ui": "0.0.1"
-  },
-  "private": true
-}
