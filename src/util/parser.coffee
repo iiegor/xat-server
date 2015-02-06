@@ -1,7 +1,7 @@
 et = require 'elementtree'
 
 ###
-Crypto file
+Parser file
 In this case the function of this file is parse packets.
 ###
 
@@ -18,8 +18,8 @@ module.exports =
 
     return packet._root.attrib
 
-  getAttribute: (packet) ->
-    return et.parse(packet)._root_attrib[packet]
+  getAttribute: (packet, attr) ->
+    return @getAttributes(packet)[attr]
 
   getRoot: (packet) ->
     return et.parse(packet)._root

@@ -1,5 +1,5 @@
 logger = new (require "../util/logger")(name: 'Authentication')
-crypto = require "../util/crypto"
+parser = require "../util/parser"
 chat = require "./chat"
 
 module.exports =
@@ -20,7 +20,7 @@ module.exports =
 
   _auth: (packet) ->
     # Parse the packet
-    packet = crypto.getAttributes(packet)
+    packet = parser.getAttributes(packet)
 
     @user.id = packet['u']
     @user.d0 = packet['d0']
@@ -32,11 +32,11 @@ module.exports =
     while i <= 20
       @user["p#{i}v"] = null
       @user["m#{i}"] = null
-      @user.pStr += "p#{i}=\"" + @user["p#{i}v"] + "\" " 
+      @user.pStr += "p#{i}=\"" + @user["p#{i}v"] + "\" "
       i++
 
 
-    return chat.joinRoom(@handler, @user.c)
+    return chat.joinRoom(@handler, @user.chat)
 
   _logout: ->
     @handler.send '<dup />'

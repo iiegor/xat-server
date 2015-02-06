@@ -23,7 +23,7 @@ Pool = genericPool.Pool(
     client.end()
 )
 
-exports.query = (sql) ->
+exports.query = (sql, callback) ->
   self = @
 
   Pool.acquire (err, db) ->
@@ -33,6 +33,6 @@ exports.query = (sql) ->
 
         process.exit 0
 
-      console.log rows
+      callback rows
 
     Pool.release db

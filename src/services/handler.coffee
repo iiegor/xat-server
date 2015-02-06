@@ -1,4 +1,4 @@
-crypto = require "../util/crypto"
+parser = require "../util/parser"
 math = require "../util/math"
 logger = require "../util/logger"
 
@@ -12,7 +12,7 @@ module.exports = (socket) ->
     # Debug
     @logger.log @logger.level.DEBUG, "-> #{packet}"
 
-    packetTag = crypto.getTagName(packet)
+    packetTag = parser.getTagName(packet)
 
     return if typeof socket is "undefined" or typeof socket is "null" or packetTag is null
 
@@ -28,6 +28,9 @@ module.exports = (socket) ->
       when "j2"
         # Authenticate the client
         Authentication.process(@, packet)
+      when "m"
+        # Send message
+        msg = parser.getAttribute(packet, 't')
       else
         if packetTag.indexOf('w') is 0
           # Pool packet
