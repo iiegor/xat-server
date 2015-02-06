@@ -26,9 +26,20 @@ module.exports =
         self.logger.log(self.logger.level.INFO, "Server started and waiting for new connections!")
 
     handleEvents: ->
+      self = @
+
       # Registers all basic events of the application
       @on 'application:bootstrap', -> @bootstrap()
       @on 'application:dispose', -> @__dispose()
+
+      ### Uncaught exception
+      process.on('uncaughtException', (err) ->
+        if self.configuration['env'] is not 'dev'
+          err = "Uncaught exception!"
+
+        self.logger.log self.logger.level.ERROR, err
+      )
+      ###
 
     __dispose: ->
       # Exit with success code

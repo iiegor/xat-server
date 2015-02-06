@@ -18,6 +18,6 @@ module.exports =
         when @level.INFO
           console.info "[#{@caller.name}]".cyan + "[#{level}] ".green + "#{message}"
         when @level.ERROR
-          console.error "[#{@caller.name}]".cyan + "[#{level}] ".red + "#{message} - #{arguments[2]}"
+          console.error "[#{@caller.name}]".cyan + "[#{level}] ".red + "#{message} - ", arguments[2]
         when @level.DEBUG
           console.log "[#{@caller.name}]".cyan + "[#{level}] ".gray + "#{message}" if @Configuration['env'] is 'dev'

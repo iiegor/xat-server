@@ -8,7 +8,7 @@ Package: https://github.com/coopernurse/node-pool
 Documentation: http://nodejsdb.org/2011/05/connection-pooling-node-db-with-generic-pool/
 ###
 
-Pool = genericPool.Pool(
+module.exports = Pool = genericPool.Pool(
   name: 'mysql'
   max: 10
   idleTimeoutMillis: 30000
@@ -23,16 +23,5 @@ Pool = genericPool.Pool(
     client.end()
 )
 
-exports.query = (sql, callback) ->
-  self = @
-
-  Pool.acquire (err, db) ->
-    db.query sql, (err, rows) ->
-      if err
-        logger.log logger.level.ERROR, 'Oops, an error ocurred', err
-
-        process.exit 0
-
-      callback rows
-
-    Pool.release db
+exports.release = (db) ->
+  Pool.release db
