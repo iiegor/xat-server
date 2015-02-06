@@ -22,6 +22,3 @@ module.exports = Pool = genericPool.Pool(
   destroy: (client) ->
     client.end()
 )
-
-exports.release = (db) ->
-  Pool.release db

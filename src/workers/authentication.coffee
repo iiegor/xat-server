@@ -1,6 +1,7 @@
 logger = new (require "../util/logger")(name: 'Authentication')
 parser = require "../util/parser"
 chat = require "./chat"
+database = require "../services/database"
 
 module.exports =
   user: {}
@@ -36,7 +37,19 @@ module.exports =
       @user.pStr += "p#{i}=\"" + @user["p#{i}v"] + "\" "
       i++
 
+    if !@_resetDetails(@user.id)
+      logger.log logger.level.DEBUG, "Reset details failed for user with id #{@user.id}"
+      return
+
+    @user.homepage = packet['h']
+    @user.avatar = packet['a']
+
+    @user.authenticated = true
+
     return chat.joinRoom(@handler, @user.chat)
+
+  _resetDetails: (userId, callback) ->
+    return true
 
   _logout: ->
     @handler.send '<dup />'
