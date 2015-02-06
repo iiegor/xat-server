@@ -4,8 +4,6 @@ module.exports =
   class Sockets
     name: 'Sockets'
 
-    socket: null
-
     constructor: (@port) ->
 
     bind: (callback) ->
