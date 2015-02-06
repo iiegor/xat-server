@@ -11,6 +11,7 @@ module.exports =
     # Check
     if @user.authenticated == true
       logger.log logger.level.DEBUG, "The user is already authenticated!"
+      return @_logout()
 
     # Authenticate
     if @_auth(packet) == false
@@ -35,9 +36,9 @@ module.exports =
       @user.pStr += "p#{i}=\"" + @user["p#{i}v"] + "\" "
       i++
 
-
     return chat.joinRoom(@handler, @user.chat)
 
   _logout: ->
     @handler.send '<dup />'
     @user = {}
+    @handler.disconnect()
