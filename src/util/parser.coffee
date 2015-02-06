@@ -1,10 +1,5 @@
 et = require 'elementtree'
 
-###
-Parser file
-In this case the function of this file is parse packets.
-###
-
 module.exports =
   getTagName: (packet) ->
     try
@@ -23,3 +18,6 @@ module.exports =
 
   getRoot: (packet) ->
     return et.parse(packet)._root
+
+  escape: (str) ->
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')

@@ -21,6 +21,8 @@ module.exports =
 
 
   _auth: (packet) ->
+    self = @
+
     # Parse the packet
     packet = parser.getAttributes(packet)
 
@@ -28,6 +30,7 @@ module.exports =
     @user.d0 = packet['d0']
     @user.f = packet['f']
     @user.chat = packet['c']
+    @user.guest = true
     @user.pStr = ''
 
     i = 0
@@ -37,18 +40,67 @@ module.exports =
       @user.pStr += "p#{i}=\"" + @user["p#{i}v"] + "\" "
       i++
 
-    if !@_resetDetails(@user.id)
-      logger.log logger.level.DEBUG, "Reset details failed for user with id #{@user.id}"
-      return
+    @_resetDetails(@user.id, (res) ->
+      if !res
+        logger.log logger.level.DEBUG, "Reset details failed for user with id #{@user.id}"
+        return
 
-    @user.homepage = packet['h']
-    @user.avatar = packet['a']
+      self.user.url = packet['h']
+      self.user.avatar = packet['a']
 
-    @user.authenticated = true
+      self.user.nickname = packet['n']
+      self.user.nickname = self.user.nickname.split('##')
 
-    return chat.joinRoom(@handler, @user.chat)
+      if self.user.nickname.length > 1
+        self.user.nickname[1] = parser.escape(self.user.nickname[1])
+        self.user.nickname = self.user.nickname.join('##')
+      else
+        self.user.nickname = self.user.nickname[0]
+
+      ## Disabled at the moment for testing without register
+      #return if self.user.guest
+
+      self._updateDetails()
+      self.user.authenticated = true
+
+      return chat.joinRoom(self.handler, self.user.chat)
+    )
 
   _resetDetails: (userId, callback) ->
+    self = @
+
+    database.acquire (err, db) ->
+      db.query("SELECT * FROM users WHERE id = '#{userId}' ", (db, data) ->
+        if data.length < 1
+          # No user found
+          self.user.guest = true
+
+          callback(true)
+        else
+          # User verification
+          self.user.guest = false
+
+          callback(true)
+      )
+
+      database.release db
+
+  _updateDetails: () ->
+    self = @
+
+    if @user.id != 0
+      database.acquire (err, db) ->
+        db.query("UPDATE users SET nickname = '#{self.user.nickname}', avatar = '#{self.user.avatar}', url = '#{self.user.url}', connectedlast = 'self.user.remoteAddress' WHERE id = '#{self.user.id}'", (db, data) ->
+          # ...
+        )
+
+        database.release db
+
+
+  _getPowers: () ->
+    if @user.days < 1
+      return true
+
     return true
 
   _logout: ->
