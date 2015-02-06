@@ -6,17 +6,17 @@
     "start": "node bin/korex"
   },
   "dependencies": {
-    "coffee-script": "^1.8.0",
+    "coffee-script": "^1.9.0",
     "colors": "^1.0.3",
     "elementtree": "^0.1.6",
     "generic-pool": "^2.1.1",
     "mysql": "^2.5.2"
   },
   "devDependencies": {
-    "coffee-script": "^1.8.0",
+    "coffee-script": "^1.9.0",
     "colors": "^1.0.3",
-    "wrench": "1.5.x",
+    "mysql": "^2.5.2",
     "which": "1.0.5",
-    "mysql": "^2.5.2"
+    "wrench": "1.5.x"
   }
 }
