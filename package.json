@@ -10,7 +10,8 @@
     "colors": "^1.0.3",
     "elementtree": "^0.1.6",
     "generic-pool": "^2.1.1",
-    "mysql": "^2.5.2"
+    "mysql": "^2.5.2",
+    "which": "1.0.5"
   },
   "devDependencies": {
     "coffee-script": "^1.9.0",
