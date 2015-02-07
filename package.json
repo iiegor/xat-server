@@ -1,6 +1,6 @@
 {
   "name": "korex-server",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "scripts": {
     "install": "node node_modules/coffee-script/bin/cake build",
     "start": "node bin/korex"
@@ -16,7 +16,6 @@
     "coffee-script": "^1.9.0",
     "colors": "^1.0.3",
     "mysql": "^2.5.2",
-    "which": "1.0.5",
-    "wrench": "1.5.x"
+    "which": "1.0.5"
   }
 }

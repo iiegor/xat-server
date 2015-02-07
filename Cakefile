@@ -1,5 +1,4 @@
 fs            = require 'fs'
-wrench        = require 'wrench'
 {print}       = require 'util'
 which         = require 'which'
 {spawn, exec} = require 'child_process'
