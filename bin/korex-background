@@ -9,3 +9,5 @@ Korex = function(reporter) {
 
   return this.bootstrap();
 }
+
+module.exports = Korex
