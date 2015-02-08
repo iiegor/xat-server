@@ -1,6 +1,7 @@
 {
   "name": "korex-server",
-  "version": "0.1.54",
+  "version": "0.1.55",
+  "main": "bin/korex-background",
   "scripts": {
     "install": "node node_modules/coffee-script/bin/cake build",
     "start": "node bin/korex"

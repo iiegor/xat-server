@@ -3,10 +3,17 @@ database = require '../services/database'
 module.exports =
   chat: {}
 
-  joinRoom: (handler, roomId) ->
+  joinRoom: (parent, roomId) ->
+    return if roomId < 1 or isNaN(roomId) is true
+
+    handler = parent.handler
+    user = parent.user
+
     database.acquire (err, db) ->
       db.query("SELECT * FROM chats WHERE id = '#{roomId}' ", (db, data) ->
         @chat = data[0]
+
+        return false if !@chat
 
         ## Chat settings and info
         handler.send "<i b=\"#{@chat.bg};=#{@chat.attached};=1;=English;=http://87.230.56.15/;=#{@chat.button};=\" f=\"21233728\" v=\"1\" cb=\"2387\" />"

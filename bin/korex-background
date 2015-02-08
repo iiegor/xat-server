@@ -1,0 +1,11 @@
+#!/usr/bin/env node
+
+var Korex, Application;
+
+Korex = function(reporter) {
+  bootstrap = function() {
+    Application = new (require('../.src/bootstrap'));
+  };
+
+  return this.bootstrap();
+}

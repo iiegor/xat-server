@@ -63,7 +63,7 @@ module.exports =
       self._updateDetails()
       self.user.authenticated = true
 
-      return chat.joinRoom(self.handler, self.user.chat)
+      return chat.joinRoom(self, self.user.chat)
     )
 
   _resetDetails: (userId, callback) ->
