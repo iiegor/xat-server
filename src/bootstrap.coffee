@@ -2,7 +2,7 @@ logger = require './utils/logger'
 sockets = require './services/sockets'
 database = require './services/database'
 cmd = require './mixins/cmd-mixin'
-ga = require './services/googleAnalytics'
+ga = require './services/google-analytics'
 
 module.exports =
   class Application extends cmd
