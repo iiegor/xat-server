@@ -5,7 +5,7 @@ cmd = require './mixins/cmd-mixin'
 ga = require './services/google-analytics'
 
 module.exports =
-  class Application extends cmd
+  class Application
     name: 'Application'
 
     logger: new logger(this)
@@ -29,7 +29,7 @@ module.exports =
 
     handleEvents: ->
       # Registers all basic events of the application
-      Application.regCmd 'application:dispose', @__dispose
+      cmd.regCmd 'application:dispose', @__dispose
 
       # Google Analytics service
       ga.init()

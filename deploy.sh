@@ -1,2 +1,2 @@
-npm install
-npm start
+script/build
+script/bootstrap
