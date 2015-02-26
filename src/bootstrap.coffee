@@ -2,6 +2,7 @@ logger = require './utils/logger'
 sockets = require './services/sockets'
 database = require './services/database'
 cmd = require './mixins/cmd-mixin'
+ga = require './services/googleAnalytics'
 
 module.exports =
   class Application extends cmd
@@ -22,6 +23,7 @@ module.exports =
     bootstrap: ->
       self = @
 
+      # Initialize sockets service
       new sockets(@configuration['port']).bind ->
         self.logger.log(self.logger.level.INFO, "Server started and waiting for new connections!")
 
@@ -29,14 +31,8 @@ module.exports =
       # Registers all basic events of the application
       Application.regCmd 'application:dispose', @__dispose
 
-      ### Uncaught exception
-      process.on('uncaughtException', (err) ->
-        if self.configuration['env'] is not 'dev'
-          err = "Uncaught exception!"
-
-        self.logger.log self.logger.level.ERROR, err
-      )
-      ###
+      # Google Analytics service
+      ga.init()
 
     __dispose: ->
       # Exit with success code

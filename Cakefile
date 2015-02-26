@@ -11,7 +11,7 @@ reset = '\x1B[0m'
 
 pkg = JSON.parse fs.readFileSync('./package.json')
 testCmd = pkg.scripts.test
-startCmd = pkg.scripts.start
+startCmd = pkg.scripts.run
 
 
 log = (message, color, explanation) ->
@@ -28,4 +28,4 @@ build = (callback) ->
 
 
 task 'build', ->
-  build -> log "Compiled!\n> Change the compiled variable to true in the bin/korex file to use them.", green
+  build -> log "> The korex package was compiled", green
