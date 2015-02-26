@@ -1,5 +1,5 @@
-logger = new (require "../util/logger")(name: 'Authentication')
-parser = require "../util/parser"
+logger = new (require "../utils/logger")(name: 'Authentication')
+parser = require "../utils/parser"
 chat = require "./chat"
 database = require "../services/database"
 

@@ -1,10 +1,10 @@
-logger = require "./util/logger"
-sockets = require "./services/sockets"
-database = require "./services/database"
-{EventEmitter} = require 'events'
+logger = require './utils/logger'
+sockets = require './services/sockets'
+database = require './services/database'
+cmd = require './mixins/cmd-mixin'
 
 module.exports =
-  class Application extends EventEmitter
+  class Application extends cmd
     name: 'Application'
 
     logger: new logger(this)
@@ -26,11 +26,8 @@ module.exports =
         self.logger.log(self.logger.level.INFO, "Server started and waiting for new connections!")
 
     handleEvents: ->
-      self = @
-
       # Registers all basic events of the application
-      @on 'application:bootstrap', -> @bootstrap()
-      @on 'application:dispose', -> @__dispose()
+      Application.regCmd 'application:dispose', @__dispose
 
       ### Uncaught exception
       process.on('uncaughtException', (err) ->

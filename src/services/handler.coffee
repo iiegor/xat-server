@@ -1,6 +1,6 @@
-parser = require "../util/parser"
-math = require "../util/math"
-logger = require "../util/logger"
+parser = require "../utils/parser"
+math = require "../utils/math"
+logger = require "../utils/logger"
 
 Authentication = require "../workers/authentication"
 Pool = require "../workers/pool"

@@ -1,4 +1,4 @@
-logger = new (require "../util/logger")(name: 'Database')
+logger = new (require "../utils/logger")(name: 'Database')
 mysql = require "mysql"
 settings = require "../config/database"
 genericPool = require "generic-pool"
