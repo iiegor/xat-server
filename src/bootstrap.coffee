@@ -2,7 +2,6 @@ logger = require './utils/logger'
 sockets = require './services/sockets'
 database = require './services/database'
 cmd = require './mixins/cmd-mixin'
-ga = require './services/google-analytics'
 config = require 'config'
 
 module.exports =
@@ -34,11 +33,10 @@ module.exports =
       # Registers all basic events of the application
       cmd.regCmd 'application:dispose', @__dispose
 
-      # Google Analytics service
-      ga.init()
-
     loadPlugins: ->
-      
+      for pluginName in config['plugins']
+        plugin = require "../plugins/node_modules/#{pluginName}"
+        plugin.init()
 
     __dispose: ->
       # Exit with success code

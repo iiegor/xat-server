@@ -9,3 +9,6 @@ database:
 	user:     root 
 	password: test
 	driver: mysql
+
+plugins:
+	- korex-googleAnalytics
