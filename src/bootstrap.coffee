@@ -34,6 +34,8 @@ module.exports =
       cmd.regCmd 'application:dispose', @__dispose
 
     loadPlugins: ->
+      return if !config['plugins']
+
       for pluginName in config['plugins']
         plugin = require "../plugins/node_modules/#{pluginName}"
         plugin.init()

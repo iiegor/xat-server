@@ -11,4 +11,4 @@ database:
 	driver: mysql
 
 plugins:
-	- korex-googleAnalytics
+	#- korex-googleAnalytics
