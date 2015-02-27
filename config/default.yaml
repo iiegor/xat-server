@@ -3,12 +3,11 @@ env: 'dev'
 server:
 	port: 8080
 
-database:
+mysql:
 	server:   localhost
 	database: xat
 	user:     root 
 	password: test
-	driver: mysql
 
 plugins:
 	#- korex-googleAnalytics

@@ -14,7 +14,12 @@ module.exports = Pool = genericPool.Pool(
   idleTimeoutMillis: 30000
 
   create: (callback) ->
-    Connection = new mysql.createConnection(config.database)
+    Connection = new mysql.createConnection({
+    	host: config.server
+    	user: config.user
+    	password: config.password
+    	database: config.database
+    })
     Connection.connect()
 
     callback Connection
