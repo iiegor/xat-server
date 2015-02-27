@@ -1,4 +1,5 @@
 colors = require "colors"
+config = require "config"
 
 module.exports =
   class Logger
@@ -9,7 +10,6 @@ module.exports =
     }
 
     constructor: (@caller) ->
-      @Configuration = require "../config/environment"
 
     log: (level, message) ->
       return console.log "[#{@caller.name}] [?] #{message}" if typeof level == "undefined"
@@ -20,4 +20,4 @@ module.exports =
         when @level.ERROR
           console.error "[#{@caller.name}]".cyan + "[#{level}] ".red + "#{message} - ", arguments[2]
         when @level.DEBUG
-          console.log "[#{@caller.name}]".cyan + "[#{level}] ".gray + "#{message}" if @Configuration['env'] is 'dev'
+          console.log "[#{@caller.name}]".cyan + "[#{level}] ".gray + "#{message}" if config['env'] is 'dev'

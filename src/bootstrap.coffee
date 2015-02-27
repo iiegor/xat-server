@@ -3,19 +3,22 @@ sockets = require './services/sockets'
 database = require './services/database'
 cmd = require './mixins/cmd-mixin'
 ga = require './services/google-analytics'
+config = require 'config'
 
 module.exports =
   class Application
     name: 'Application'
 
     logger: new logger(this)
-    configuration: require "./config/environment"
 
     constructor: ->
-      @logger.log(@logger.level.INFO, "Starting the server in #{@configuration['env']} at port #{@configuration['port']}...")
+      @logger.log(@logger.level.INFO, "Starting the server in #{config['env']} at port #{config['port']}...")
 
       # Handle app events
       @handleEvents()
+
+      # Load plugins
+      @loadPlugins()
 
       # Bootstrap the application
       @bootstrap()
@@ -24,7 +27,7 @@ module.exports =
       self = @
 
       # Initialize sockets service
-      new sockets(@configuration['port']).bind ->
+      new sockets(config['port']).bind ->
         self.logger.log(self.logger.level.INFO, "Server started and waiting for new connections!")
 
     handleEvents: ->
@@ -33,6 +36,9 @@ module.exports =
 
       # Google Analytics service
       ga.init()
+
+    loadPlugins: ->
+      
 
     __dispose: ->
       # Exit with success code

@@ -1,6 +1,6 @@
 logger = new (require "../utils/logger")(name: 'Database')
 mysql = require "mysql"
-settings = require "../config/database"
+config = require "config"
 genericPool = require "generic-pool"
 
 ###
@@ -14,7 +14,7 @@ module.exports = Pool = genericPool.Pool(
   idleTimeoutMillis: 30000
 
   create: (callback) ->
-    Connection = new mysql.createConnection(settings)
+    Connection = new mysql.createConnection(config.database)
     Connection.connect()
 
     callback Connection
