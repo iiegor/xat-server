@@ -1,3 +1,4 @@
+pkg = require '../package'
 logger = require './utils/logger'
 sockets = require './services/sockets'
 database = require './services/database'
@@ -11,7 +12,8 @@ module.exports =
     logger: new logger(this)
 
     constructor: ->
-      @logger.log(@logger.level.INFO, "Starting the server in #{config['env']} at port #{config['port']}...")
+      @logger.log @logger.level.DEBUG, "You are running korex-server #{pkg.version}"
+      @logger.log @logger.level.INFO, "Starting the server in #{config['env']} at port #{config['port']}..."
 
       # Handle app events
       @handleEvents()
@@ -38,7 +40,6 @@ module.exports =
 
       for pluginName in config['plugins']
         plugin = require "../plugins/node_modules/#{pluginName}"
-        plugin.init()
 
     __dispose: ->
       # Exit with success code
