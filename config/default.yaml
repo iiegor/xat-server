@@ -10,4 +10,4 @@ mysql:
 	password: test
 
 plugins:
-	#- korex-googleAnalytics
+#- korex-googleAnalytics

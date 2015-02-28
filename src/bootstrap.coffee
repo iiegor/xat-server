@@ -1,4 +1,5 @@
 pkg = require '../package'
+path = require 'path'
 logger = require './utils/logger'
 sockets = require './services/sockets'
 database = require './services/database'
@@ -38,8 +39,7 @@ module.exports =
     loadPlugins: ->
       return if !config['plugins']
 
-      for pluginName in config['plugins']
-        plugin = require "../plugins/node_modules/#{pluginName}"
+      # TODO: Plugin loader / handler
 
     __dispose: ->
       # Exit with success code
