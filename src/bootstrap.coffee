@@ -35,7 +35,8 @@ module.exports =
       database.acquire (err, db) -> database.release db
 
       # Initialize server service
-      new server(config.port).bind ->
+      @server = new server(config.port)
+      @server.bind ->
         self.logger.log self.logger.level.INFO, "Server started and waiting for new connections!"
 
     handleEvents: ->
@@ -50,6 +51,7 @@ module.exports =
       ### Handle exceptions ###
       process.on 'uncaughtException', (err) ->
         self.logger.log self.logger.level.ERROR, "Uncaught exception", err.code
+        self.server.close()
 
         colors = require 'colors'
 
