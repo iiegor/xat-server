@@ -1,5 +1,5 @@
 colors = require "colors"
-config = require "config"
+config = require "../../config/default"
 
 module.exports =
   class Logger

@@ -1,6 +1,5 @@
-logger = new (require "../utils/logger")(name: 'Database')
 mysql = require "mysql"
-config = require "config"
+config = require "../../config/database"
 genericPool = require "generic-pool"
 
 ###
@@ -15,10 +14,10 @@ module.exports = Pool = genericPool.Pool(
 
   create: (callback) ->
     Connection = new mysql.createConnection({
-    	host: config.server
-    	user: config.user
-    	password: config.password
-    	database: config.database
+    	host: config.mysql.server
+    	user: config.mysql.user
+    	password: config.mysql.password
+    	database: config.mysql.database
     })
     Connection.connect()
 
