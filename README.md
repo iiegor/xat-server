@@ -1,4 +1,4 @@
-# korex-server
+# xat-server
 > Node.js server for xat.com swf files.
 
 ## Support
