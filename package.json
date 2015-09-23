@@ -1,11 +1,15 @@
 {
-  "name": "korex-server",
+  "name": "xat-server",
   "version": "0.1.57",
-  "main": "bin/korex-background",
-  "scripts": {
-    "install": "node node_modules/coffee-script/bin/cake build",
-    "start": "node bin/korex"
+  "main": "bin/xat",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iiegor/xat-server.git"
   },
+  "bugs": {
+    "url": "https://github.com/iiegor/xat-server/issues"
+  },
+  "license": "MIT",
   "dependencies": {
     "backbone-events-standalone": "^0.2.4",
     "coffee-script": "^1.9.0",
@@ -18,11 +22,6 @@
     "underscore": "^1.8.2",
     "which": "1.0.5"
   },
-  "devDependencies": {
-    "coffee-script": "^1.9.0",
-    "colors": "^1.0.3",
-    "mysql": "^2.5.2",
-    "open": "0.0.5",
-    "which": "1.0.5"
-  }
+  "packageDependencies": { },
+  "private": true
 }

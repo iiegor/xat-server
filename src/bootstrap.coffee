@@ -8,13 +8,17 @@ dispatcher = require './dispatcher'
 
 module.exports =
   class Application
-    name: 'Application'
-
+    ###
+    Section: Properties
+    ###
     logger: new logger(this)
     server: null
 
+    ###
+    Section: Construction
+    ###
     constructor: ->
-      @logger.log @logger.level.DEBUG, "You are running korex-server #{pkg.version}"
+      @logger.log @logger.level.DEBUG, "You are running #{pkg.name} #{pkg.version}"
       @logger.log @logger.level.INFO, "Starting the server in #{config.env} at port #{config.port}..."
 
       # Handle app events
@@ -26,6 +30,9 @@ module.exports =
       # Bootstrap the application
       @bootstrap()
 
+    ###
+    Section: Private
+    ###
     bootstrap: ->
       # TODO: First ping database and then initialize the server
       self = @
@@ -43,7 +50,7 @@ module.exports =
       self = @
 
       # Registers all basic events of the application
-      cmd.regCmd 'application:dispose', @__dispose
+      cmd.regCmd 'application:dispose', @dispose
 
       # If env is dev skip the uncaught exception handler
       return if config.env == 'dev'
@@ -79,10 +86,11 @@ module.exports =
           dispatcher.dispose()
 
     loadPlugins: ->
-      return if !config['plugins']
+      return
 
       # TODO: Plugin loader / handler
+      # plugins = pkg.packageDependencies
 
-    __dispose: ->
+    dispose: ->
       # Exit with success code
       process.exit(0)
