@@ -1,2 +1,1 @@
-script/build
-script/bootstrap
+script/run

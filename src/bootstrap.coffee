@@ -2,17 +2,19 @@ pkg = require '../package'
 logger = require './utils/logger'
 server = require './services/server'
 database = require './services/database'
-cmd = require './mixins/cmd-mixin'
 config = require '../config/default'
-dispatcher = require './dispatcher'
+
+{EventEmitter} = require 'events'
+_ = require 'underscore'
 
 module.exports =
   class Application
+    _.extend @prototype, EventEmitter.prototype
+
     ###
     Section: Properties
     ###
     logger: new logger(this)
-    server: null
 
     ###
     Section: Construction
@@ -42,48 +44,13 @@ module.exports =
       database.acquire (err, db) -> database.release db
 
       # Initialize server service
-      @server = new server(config.port)
-      @server.bind ->
+      server = new server(config.port)
+      server.bind ->
         self.logger.log self.logger.level.INFO, "Server started and waiting for new connections!"
 
     handleEvents: ->
-      self = @
-
-      # Registers all basic events of the application
-      cmd.regCmd 'application:dispose', @dispose
-
-      # If env is dev skip the uncaught exception handler
-      return if config.env == 'dev'
-
-      ### Handle exceptions ###
-      process.on 'uncaughtException', (err) ->
-        self.logger.log self.logger.level.ERROR, "Uncaught exception", err.code
-        self.server.close()
-
-        colors = require 'colors'
-
-        rl = (require 'readline').createInterface(
-          input: process.stdin
-          output: process.stdout
-        )
-
-        rl.question 'An uncaught exception ocurred, the server was closed. Do you want to report it?'.red + ' yes/no\n', (answer) ->
-          rl.close()
-
-          if answer in ['yes', 'y', 'ye', 'yess', 'yep']
-            open = require 'open'
-
-            title = encodeURIComponent(err.code)
-            body = encodeURIComponent("""
-            [Enter steps to reproduce below:]
-            1. ..
-            2. ..
-
-
-            """ + err.stack)
-            open "http://github.com/korex/korex-server/issues/new?title=#{title}&body=#{body}"
-
-          dispatcher.dispose()
+      # Register all application events
+      @on 'application:dispose', @dispose
 
     loadPlugins: ->
       return
