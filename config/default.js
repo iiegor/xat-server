@@ -1,4 +1,4 @@
 module.exports = {
 	'env': 'dev',
-	'port': 8080
+	'port': 1243
 }

@@ -3,13 +3,20 @@ logger = require "../utils/logger"
 
 module.exports =
   class Server
-    name: 'Server'
-
+    ###
+    Section: Properties
+    ###
     logger: new logger(this)
     server: null
 
+    ###
+    Section: Construction
+    ###
     constructor: (@port) ->
 
+    ###
+    Section: Private
+    ###
     bind: (callback) ->
       self = @
 
