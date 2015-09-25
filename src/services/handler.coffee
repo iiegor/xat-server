@@ -1,6 +1,7 @@
 parser = require "../utils/parser"
 math = require "../utils/math"
 logger = require "../utils/logger"
+config = require "../../config/default"
 
 Authentication = require "../workers/authentication"
 Pool = require "../workers/pool"
@@ -24,7 +25,7 @@ module.exports = (socket) ->
 
     switch packetTag
       when "policy-file-request"
-        @send "<?xml version=\"1.0\"?><!DOCTYPE cross-domain-policy SYSTEM \"http://www.adobe.com/xml/dtds/cross-domain-policy.dtd\"><cross-domain-policy><site-control permitted-cross-domain-policies=\"master-only\"/><allow-access-from domain=\"*.xat.dev\" to-ports=\"20,21,80,443,1243,10000-11000\"/></cross-domain-policy>\0"
+        @send "<?xml version=\"1.0\"?><!DOCTYPE cross-domain-policy SYSTEM \"http://www.adobe.com/xml/dtds/cross-domain-policy.dtd\"><cross-domain-policy><site-control permitted-cross-domain-policies=\"master-only\"/>#{config.allow}</cross-domain-policy>\0"
       when "y"
         loginKey = math.random(10000000, 99999999)
         loginShift = math.random(2, 5)
