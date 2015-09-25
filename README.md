@@ -7,7 +7,7 @@
 * **Mac**
 
 ## Install
-``$ npm install xat-server`` or `` $ git clone https://github.com/iiegor/xat-server ``
+`` $ git clone https://github.com/iiegor/xat-server ``
 
 The server depends on [Node.js](http://nodejs.org/), [npm](http://npmjs.org/) and other packages that are downloaded and installed during the install process.
 
