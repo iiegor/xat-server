@@ -1,8 +1,0 @@
-{
-  "name": "korex-plugins",
-  "description": "The korex-server plugins",
-  "dependencies": {
-    "korex-plugins": "0.0.1"
-  },
-  "private": true
-}
