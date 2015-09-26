@@ -1,3 +1,5 @@
+startTime = Date.now()
+
 pkg = require '../package'
 logger = require './utils/logger'
 server = require './services/server'
@@ -46,7 +48,7 @@ module.exports =
       # Initialize server service
       server = new server(config.port)
       server.bind =>
-        @logger.log @logger.level.INFO, "Server started and waiting for new connections!"
+        @logger.log @logger.level.INFO, "Server started in #{Date.now() - startTime}ms"
 
     handleEvents: ->
       # Register all application events
