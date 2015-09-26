@@ -1,10 +1,6 @@
 # xat-server
 > Node.js server for xat.com swf files.
-
-## Support
-* **Windows**
-* **Linux**
-* **Mac**
+This is supposed to be a xat private server that emulates the full functionality of the same built on top of Node.js
 
 ## Install
 ```sh
@@ -15,8 +11,8 @@ $ npm install
 
 The server depends on [Node.js](http://nodejs.org/), [npm](http://npmjs.org/) and other packages that are downloaded and installed during the install process.
 
-## Deploy
-Run this command to start the server.
+## Run
+Execute this command to start the server.
 ```sh
 $ script/run
 ```
