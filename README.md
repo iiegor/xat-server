@@ -17,6 +17,16 @@ Execute this command to start the server.
 ```sh
 $ script/run
 ```
+If you want to install a plugin, add it to ``packageDependencies`` in the package.json with the respective version.
+Example:
+```json
+{
+  ...
+  "packageDependencies": {
+    "my-plugin": "0.1.0"
+  }
+}
+```
 
 ## Contributors
 * **Iegor Azuaga** (dextrackmedia@gmail.com)
