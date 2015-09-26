@@ -58,7 +58,6 @@ class Handler
 
           # Pool packet structure
           # <w v="2 0 1 2"  /> -> this changes the pool order, we need to reconnect the user, send the <i> and <gp> packet and then the pool changed. Finally request only the actual pool messages and set the user actual pool.
-          # Pool.switch(@, packetTag.split('w')[1])
           @chat.onPool = packetTag.split('w')[1]
           Chat.joinRoom(@, @user.chat)
         else
