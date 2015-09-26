@@ -3,7 +3,7 @@
 var Xat, Application;
 
 Xat = function() {
-  setupCoffeeScript = function() {
+  setupCompiler = function() {
     var CoffeeScript;
     CoffeeScript = null;
     return require.extensions['.coffee'] = function(module, filePath) {
@@ -20,9 +20,7 @@ Xat = function() {
   };
 
   bootstrap = function() {
-    this.setupCoffeeScript();
-
-    Application = new (require('../src/bootstrap'));
+    require('coffee-script/register'), Application = new (require('../src/bootstrap'));
   };
 
   return this.bootstrap();
