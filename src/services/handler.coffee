@@ -51,6 +51,8 @@ class Handler
       when "m"
         # Send message
         msg = parser.getAttribute(packet, 't')
+
+        @broadcast '<u cb="1443256921" s="1" f="170" p0="2013264863" p1="2147483647" p2="4294836215" p3="4294967287" p4="2113929215" p5="2147479551" p6="2147352575" p7="2147483647" p8="2147483647" p9="2147483647" p10="2147483647" p11="119" u="869659734" d0="16794729" d2="1690000" q="3" N="Sevda" n="Sevda(glow#d#000000)" a="http://i.cubeupload.com/FOHlkL.png#glitter#http://i.hizliresim.com/1yRXm1.jpg" h="" v="0"  />'
       else
         if packetTag.indexOf('w') is 0
           # Pool packet
@@ -73,6 +75,12 @@ class Handler
 
     # Debug
     @logger.log(@logger.level.DEBUG, "-> Sent: #{packet}")
+
+  broadcast: (packet, sender={}) ->
+    for client in global.Server.clients
+      return if client is sender
+
+      client.write "#{packet}\0"
 
   getSocket: -> @socket
   
