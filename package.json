@@ -1,6 +1,6 @@
 {
   "name": "xat-server",
-  "version": "0.1.57",
+  "version": "0.1.58",
   "main": "bin/xat",
   "repository": {
     "type": "git",
