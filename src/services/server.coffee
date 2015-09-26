@@ -30,7 +30,6 @@ module.exports =
         socket.setKeepAlive true
 
         @clients.push(socket)
-
         handler = new (require "./handler")(socket)
 
         socket.on 'data', (buffer) ->
