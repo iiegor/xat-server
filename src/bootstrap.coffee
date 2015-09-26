@@ -57,10 +57,13 @@ class Application
     @on 'application:dispose', @dispose
 
   loadPlugins: ->
-    return
+    plugins = pkg.packageDependencies
 
-    # TODO: Plugin loader / handler
-    # plugins = pkg.packageDependencies
+    _.mapObject(plugins, (val, key) =>
+      try 
+        require key 
+      catch error then @logger.log @logger.level.ERROR, "Cannot load '#{key}' plugin", error
+    )
 
   dispose: ->
     # Exit with success code
