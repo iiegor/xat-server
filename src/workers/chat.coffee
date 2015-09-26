@@ -46,4 +46,6 @@ module.exports =
       )
 
       database.release db
-      
+
+  sendMessage: (@handler, user, msg) ->
+    return

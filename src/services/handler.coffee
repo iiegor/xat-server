@@ -57,7 +57,10 @@ class Handler
         Chat.joinRoom(@, @user.chat) if Authentication.process(@, packet) == true
       when "m"
         # Send message
+        user = parser.getAttribute(packet, 'u')
         msg = parser.getAttribute(packet, 't')
+
+        Chat.sendMessage(@, user, msg)
       else
         if packetTag.indexOf('w') is 0
           # Pool packet
