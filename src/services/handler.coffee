@@ -3,7 +3,6 @@ math = require "../utils/math"
 logger = require "../utils/logger"
 
 Authentication = require "../workers/authentication"
-Pool = require "../workers/pool"
 Chat = require "../workers/chat"
 
 {EventEmitter} = require 'events'
@@ -18,7 +17,7 @@ class Handler
   ###
   logger: new logger(name: 'Handler')
   user: {}
-  chat: {}
+  chat: null
 
   ###
   Section: Construction
@@ -59,7 +58,9 @@ class Handler
 
           # Pool packet structure
           # <w v="2 0 1 2"  /> -> this changes the pool order, we need to reconnect the user, send the <i> and <gp> packet and then the pool changed. Finally request only the actual pool messages and set the user actual pool.
-          Pool.switch(@, packetTag.split('w')[1])
+          # Pool.switch(@, packetTag.split('w')[1])
+          @chat.onPool = packetTag.split('w')[1]
+          Chat.joinRoom(@, @user.chat)
         else
           @logger.log @logger.level.ERROR, "Unrecognized packet by the server!", packetTag
 

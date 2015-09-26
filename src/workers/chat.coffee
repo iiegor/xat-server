@@ -6,12 +6,15 @@ module.exports =
 
     database.acquire (err, db) =>
       db.query("SELECT * FROM chats WHERE id = '#{roomId}' ", (db, data) =>
-        @chat = @handler.chat = data[0]
+        if @handler.chat is null
+          @handler.chat = data[0]
+
+        @chat = @handler.chat
 
         return false if !@chat
 
         @chat.attached = try JSON.parse(@chat.attached) catch error then {}
-        @chat.onPool = 0
+        @chat.onPool = @chat.onPool || 0
 
         # TODO: Broadcast new user to the room
         ## Chat settings and info
@@ -43,3 +46,4 @@ module.exports =
       )
 
       database.release db
+      
