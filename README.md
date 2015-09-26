@@ -27,6 +27,7 @@ Example:
   }
 }
 ```
+and run ``$ script/install``.
 
 ## Contributors
 * **Iegor Azuaga** (dextrackmedia@gmail.com)
