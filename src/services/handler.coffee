@@ -1,19 +1,31 @@
 parser = require "../utils/parser"
 math = require "../utils/math"
 logger = require "../utils/logger"
-config = require "../../config/default"
 
 Authentication = require "../workers/authentication"
 Pool = require "../workers/pool"
 
-module.exports = (socket) ->
+{EventEmitter} = require 'events'
+_ = require 'underscore'
+
+module.exports =
+class Handler
+  _.extend @prototype, EventEmitter.prototype
+
   ###
   Section: Properties
   ###
   logger: new logger(name: 'Handler')
+  user: {}
 
   ###
-  Section: Methods
+  Section: Construction
+  ###
+  constructor: (@socket) ->
+    @handleEvents()
+
+  ###
+  Section: Private
   ###
   read: (packet) ->
     # Debug
@@ -21,11 +33,11 @@ module.exports = (socket) ->
 
     packetTag = parser.getTagName(packet)
 
-    return if typeof socket is "undefined" or typeof socket is "null" or packetTag is null
+    return if packetTag is null
 
     switch packetTag
       when "policy-file-request"
-        @send "<?xml version=\"1.0\"?><!DOCTYPE cross-domain-policy SYSTEM \"http://www.adobe.com/xml/dtds/cross-domain-policy.dtd\"><cross-domain-policy><site-control permitted-cross-domain-policies=\"master-only\"/>#{config.allow}</cross-domain-policy>\0"
+        @send "<?xml version=\"1.0\"?><!DOCTYPE cross-domain-policy SYSTEM \"http://www.adobe.com/xml/dtds/cross-domain-policy.dtd\"><cross-domain-policy><site-control permitted-cross-domain-policies=\"master-only\"/>#{global.Application.config.allow}</cross-domain-policy>\0"
       when "y"
         loginKey = math.random(10000000, 99999999)
         loginShift = math.random(2, 5)
@@ -44,19 +56,23 @@ module.exports = (socket) ->
           @logger.log @logger.level.ERROR, "The pool packet is in development!", packetTag
 
           # Pool packet structure
-          # <w v="3 0 1 2 3"  /> -> this changes the pool order, we need to reconnect the user, send the <i> and <gp> packet and then the pool changed. Finally request only the actual pool messages and set the user actual pool.
+          # <w v="2 0 1 2"  /> -> this changes the pool order, we need to reconnect the user, send the <i> and <gp> packet and then the pool changed. Finally request only the actual pool messages and set the user actual pool.
           Pool.switch(@, packetTag.split('w')[1])
         else
           @logger.log @logger.level.ERROR, "Unrecognized packet by the server!", packetTag
 
+  handleEvents: ->
+    # TODO: If there is another socket close it
+    @socket.on 'end', => @user.authenticated = false
+
   send: (packet) ->
-    socket.write "#{packet}\0"
+    @socket.write "#{packet}\0"
 
     # Debug
     @logger.log(@logger.level.DEBUG, "-> Sent: #{packet}")
 
-  getSocket: -> socket
+  getSocket: -> @socket
   
-  disconnect: ->
-    socket.end()
-    socket.destroy()
+  dispose: ->
+    @socket.end()
+    @socket.destroy()

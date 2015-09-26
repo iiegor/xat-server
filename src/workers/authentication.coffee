@@ -4,15 +4,11 @@ chat = require "./chat"
 database = require "../services/database"
 
 module.exports =
-  user: {}
-
   process: (@handler, packet) ->
-    # TODO: If there is another socket close it
-    @handler.getSocket().on 'end', =>
-      @user.authenticated = false
+    @user = @handler.user
 
     # Check
-    if @user.authenticated == true
+    if @user.length > 1 and @user.authenticated == true
       logger.log logger.level.DEBUG, "The user is already authenticated!"
       return @logout()
 
@@ -108,4 +104,4 @@ module.exports =
   logout: ->
     @handler.send '<dup />'
     @user = {}
-    @handler.disconnect()
+    @handler.dispose()
