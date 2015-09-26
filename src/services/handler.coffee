@@ -23,7 +23,6 @@ class Handler
   Section: Construction
   ###
   constructor: (@socket) ->
-    @handleEvents()
 
   ###
   Section: Private
@@ -41,8 +40,12 @@ class Handler
         @send "<?xml version=\"1.0\"?><!DOCTYPE cross-domain-policy SYSTEM \"http://www.adobe.com/xml/dtds/cross-domain-policy.dtd\"><cross-domain-policy><site-control permitted-cross-domain-policies=\"master-only\"/>#{global.Application.config.allow}</cross-domain-policy>\0"
         
         # If the remote address already exists close the OLD socket
+        # TODO: Find a right to place to do this
         for client in global.Server.clients
+          return if client is @socket
+
           client.write '<dup />\0' if client.remoteAddress is @socket.remoteAddress
+            
       when "y"
         loginKey = math.random(10000000, 99999999)
         loginShift = math.random(2, 5)
@@ -66,9 +69,6 @@ class Handler
           Chat.joinRoom(@, @user.chat)
         else
           @logger.log @logger.level.ERROR, "Unrecognized packet by the server!", packetTag
-
-  handleEvents: ->
-    @socket.on 'end', => @user.authenticated = false
 
   send: (packet) ->
     @socket.write "#{packet}\0"
