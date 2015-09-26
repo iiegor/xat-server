@@ -1,6 +1,5 @@
 logger = new (require "../utils/logger")(name: 'Authentication')
 parser = require "../utils/parser"
-chat = require "./chat"
 database = require "../services/database"
 
 module.exports =
@@ -10,13 +9,11 @@ module.exports =
     # Check
     if @user.length > 1 and @user.authenticated == true
       logger.log logger.level.DEBUG, "The user is already authenticated!"
-      return @logout()
+      @logout()
+      return false
 
     # Authenticate
-    if @auth(packet) == false
-      logger.log logger.level.DEBUG, "Failed to authenticate the user."
-      return
-
+    return @auth(packet)
 
   auth: (packet) ->
     self = @
@@ -41,7 +38,7 @@ module.exports =
     @resetDetails(@user.id, (res) ->
       if !res
         logger.log logger.level.DEBUG, "Reset details failed for user with id #{@user.id}"
-        return
+        return false
 
       self.user.url = packet['h']
       self.user.avatar = packet['a']
@@ -61,7 +58,7 @@ module.exports =
       self.updateDetails()
       self.user.authenticated = true
 
-      return chat.joinRoom(self, self.user.chat)
+      return true
     )
 
   resetDetails: (userId, callback) ->

@@ -4,6 +4,7 @@ logger = require "../utils/logger"
 
 Authentication = require "../workers/authentication"
 Pool = require "../workers/pool"
+Chat = require "../workers/chat"
 
 {EventEmitter} = require 'events'
 _ = require 'underscore'
@@ -17,6 +18,7 @@ class Handler
   ###
   logger: new logger(name: 'Handler')
   user: {}
+  chat: {}
 
   ###
   Section: Construction
@@ -45,8 +47,8 @@ class Handler
 
         @send "<y i=\"#{loginKey}\" c=\"12\" p=\"100_100_5_102\" />"
       when "j2"
-        # Authenticate the client
-        Authentication.process(@, packet)
+        # Authenticate the client and join room
+        Chat.joinRoom(@, @user.chat) if Authentication.process(@, packet) == true
       when "m"
         # Send message
         msg = parser.getAttribute(packet, 't')
