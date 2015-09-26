@@ -17,6 +17,7 @@ module.exports =
 
         @chat.attached = try JSON.parse(@chat.attached) catch error then {}
 
+        # TODO: Broadcast new user to the room
         ## Chat settings and info
         handler.send "<i b=\"#{@chat.bg};=#{@chat.attached.name||''};=#{@chat.attached.id||''};=#{@chat.language};=#{@chat.radio};=#{@chat.button}\" f=\"21233728\" v=\"1\" cb=\"2387\" />"
         ## Chat group powers
