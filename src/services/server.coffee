@@ -21,7 +21,7 @@ module.exports =
       self = @
 
       @server = new net.Server(
-        allowHalfOpen: true
+        allowHalfOpen: false
         type: "tcp4"
       )
 

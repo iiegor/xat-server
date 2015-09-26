@@ -23,6 +23,8 @@ module.exports =
       @logger.log @logger.level.DEBUG, "You are running #{pkg.name} #{pkg.version}"
       @logger.log @logger.level.INFO, "Starting the server in #{config.env} at port #{config.port}..."
 
+      global.Application = this
+
       # Handle app events
       @handleEvents()
 
@@ -37,16 +39,14 @@ module.exports =
     ###
     bootstrap: ->
       # TODO: First ping database and then initialize the server
-      self = @
-
       # Initialize database service
       @logger.log @logger.level.INFO, "Checking connectivity with database..."
       database.acquire (err, db) -> database.release db
 
       # Initialize server service
       server = new server(config.port)
-      server.bind ->
-        self.logger.log self.logger.level.INFO, "Server started and waiting for new connections!"
+      server.bind =>
+        @logger.log @logger.level.INFO, "Server started and waiting for new connections!"
 
     handleEvents: ->
       # Register all application events

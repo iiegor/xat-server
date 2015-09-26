@@ -55,6 +55,8 @@ module.exports = (socket) ->
     # Debug
     @logger.log(@logger.level.DEBUG, "-> Sent: #{packet}")
 
+  getSocket: -> socket
+  
   disconnect: ->
     socket.end()
     socket.destroy()

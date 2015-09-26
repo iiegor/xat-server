@@ -9,18 +9,22 @@ module.exports =
   process: (@handler, packet) ->
     self = @
 
+    # TODO: If there is another socket close it
+    @handler.getSocket().on 'end', =>
+      @user.authenticated = false
+
     # Check
     if @user.authenticated == true
       logger.log logger.level.DEBUG, "The user is already authenticated!"
-      return @_logout()
+      return @logout()
 
     # Authenticate
-    if @_auth(packet) == false
+    if @auth(packet) == false
       logger.log logger.level.DEBUG, "Failed to authenticate the user."
       return
 
 
-  _auth: (packet) ->
+  auth: (packet) ->
     self = @
 
     # Parse the packet
@@ -40,7 +44,7 @@ module.exports =
       @user.pStr += "p#{i}=\"" + @user["p#{i}v"] + "\" "
       i++
 
-    @_resetDetails(@user.id, (res) ->
+    @resetDetails(@user.id, (res) ->
       if !res
         logger.log logger.level.DEBUG, "Reset details failed for user with id #{@user.id}"
         return
@@ -60,13 +64,13 @@ module.exports =
       ## Disabled at the moment for testing without register
       #return if self.user.guest
 
-      self._updateDetails()
+      self.updateDetails()
       self.user.authenticated = true
 
       return chat.joinRoom(self, self.user.chat)
     )
 
-  _resetDetails: (userId, callback) ->
+  resetDetails: (userId, callback) ->
     self = @
 
     database.acquire (err, db) ->
@@ -85,7 +89,7 @@ module.exports =
 
       database.release db
 
-  _updateDetails: () ->
+  updateDetails: () ->
     self = @
 
     if @user.id != 0
@@ -97,13 +101,13 @@ module.exports =
         database.release db
 
 
-  _getPowers: () ->
+  getPowers: () ->
     if @user.days < 1
       return true
 
     return true
 
-  _logout: ->
+  logout: ->
     @handler.send '<dup />'
     @user = {}
     @handler.disconnect()
