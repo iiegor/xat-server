@@ -1,7 +1,7 @@
 # xat-server
-> Node.js server for xat.com swf files.
+> A Node.js private server for xat.com 
 
-This is supposed to be a xat private server that emulates the full functionality of the same built on top of Node.js
+This is supposed to be a xat private server built on top of Node.js that emulates the full functionality of the original server.
 
 ## Install
 ```sh
