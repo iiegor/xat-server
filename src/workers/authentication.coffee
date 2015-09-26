@@ -7,8 +7,6 @@ module.exports =
   user: {}
 
   process: (@handler, packet) ->
-    self = @
-
     # TODO: If there is another socket close it
     @handler.getSocket().on 'end', =>
       @user.authenticated = false
