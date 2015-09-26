@@ -3,21 +3,19 @@ parser = require "../utils/parser"
 database = require "../services/database"
 
 module.exports =
-  process: (@handler, packet) ->
+  process: (@handler, packet, callback) ->
     @user = @handler.user
 
     # Check
     if @user.length > 1 and @user.authenticated == true
       logger.log logger.level.DEBUG, "The user is already authenticated!"
       @logout()
-      return false
+      callback(false)
 
     # Authenticate
-    return @auth(packet)
+    @auth(packet, callback)
 
-  auth: (packet) ->
-    self = @
-
+  auth: (packet, callback) ->
     # Parse the packet
     packet = parser.getAttributes(packet)
 
@@ -35,62 +33,53 @@ module.exports =
       @user.pStr += "p#{i}=\"" + @user["p#{i}v"] + "\" "
       i++
 
-    @resetDetails(@user.id, (res) ->
+    @resetDetails(@user.id, (res) =>
       if !res
         logger.log logger.level.DEBUG, "Reset details failed for user with id #{@user.id}"
-        return false
+        callback(false)
 
-      self.user.url = packet['h']
-      self.user.avatar = packet['a']
+      @user.url = packet['h']
+      @user.avatar = packet['a']
 
-      self.user.nickname = packet['n']
-      self.user.nickname = self.user.nickname.split('##')
+      @user.nickname = packet['n']
+      @user.nickname = @user.nickname.split('##')
 
-      if self.user.nickname.length > 1
-        self.user.nickname[1] = parser.escape(self.user.nickname[1])
-        self.user.nickname = self.user.nickname.join('##')
+      if @user.nickname.length > 1
+        @user.nickname[1] = parser.escape(@user.nickname[1])
+        @user.nickname = @user.nickname.join('##')
       else
-        self.user.nickname = self.user.nickname[0]
+        @user.nickname = @user.nickname[0]
 
       ## Disabled at the moment for testing without register
-      #return if self.user.guest
+      #return if @user.guest
 
-      self.updateDetails()
-      self.user.authenticated = true
+      @updateDetails()
+      @user.authenticated = true
 
-      return true
+      callback(true)
     )
 
   resetDetails: (userId, callback) ->
-    self = @
+    database.exec("SELECT * FROM users WHERE id = '#{userId}' ").then((data) =>
+      if data.length < 1
+        # No user found
+        @user.guest = true
 
-    database.acquire (err, db) ->
-      db.query("SELECT * FROM users WHERE id = '#{userId}' ", (db, data) ->
-        if data.length < 1
-          # No user found
-          self.user.guest = true
+        callback(true)
+      else
+        # User verification
+        @user.guest = false
 
-          callback(true)
-        else
-          # User verification
-          self.user.guest = false
-
-          callback(true)
-      )
-
-      database.release db
+        callback(true)
+    )
 
   updateDetails: () ->
     self = @
 
     if @user.id != 0
-      database.acquire (err, db) ->
-        db.query("UPDATE users SET nickname = '#{self.user.nickname}', avatar = '#{self.user.avatar}', url = '#{self.user.url}', connectedlast = 'self.user.remoteAddress' WHERE id = '#{self.user.id}'", (db, data) ->
-          # ...
-        )
-
-        database.release db
-
+      database.exec("UPDATE users SET nickname = '#{self.user.nickname}', avatar = '#{self.user.avatar}', url = '#{self.user.url}', connectedlast = 'self.user.remoteAddress' WHERE id = '#{self.user.id}'").then((data) ->
+        # ..
+      )
 
   getPowers: () ->
     if @user.days < 1

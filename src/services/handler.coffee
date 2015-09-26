@@ -54,7 +54,9 @@ class Handler
         @send "<y i=\"#{loginKey}\" c=\"12\" p=\"100_100_5_102\" />"
       when "j2"
         # Authenticate the client and join room
-        Chat.joinRoom(@, @user.chat) if Authentication.process(@, packet) == true
+        Authentication.process(@, packet, (res) =>
+          Chat.joinRoom(@, @user.chat) 
+        )
       when "m"
         # Send message
         user = parser.getAttribute(packet, 'u')

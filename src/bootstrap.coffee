@@ -45,7 +45,7 @@ class Application
     # TODO: First ping database and then initialize the server
     # Initialize database service
     @logger.log @logger.level.INFO, "Checking connectivity with database..."
-    database.acquire (err, db) -> database.release db
+    database.exec()
 
     # Initialize server service
     server = new server(@config.port)
