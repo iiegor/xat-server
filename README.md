@@ -3,6 +3,10 @@
 
 This is supposed to be a xat private server built on top of Node.js that emulates the full functionality of the original server.
 
+<div align="center">
+  <img src="http://i.imgur.com/9nxO0PA.png">
+</div>
+
 ## Install
 ```sh
 $ git clone https://github.com/iiegor/xat-server
