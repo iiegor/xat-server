@@ -1,7 +1,10 @@
 {
   "name": "xat-server",
   "version": "0.1.6-alpha",
-  "main": "bin/xat",
+  "main": "src/bootstrap",
+  "bin": {
+    "xat": "./bin/xat"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/iiegor/xat-server.git"
