@@ -21,6 +21,7 @@ module.exports =
       # TODO: Broadcast new user to the room
       ## Chat settings and info
       @handler.send "<i b=\"#{@chat.bg};=#{@chat.attached.name||''};=#{@chat.attached.id||''};=#{@chat.language};=#{@chat.radio};=#{@chat.button}\" f=\"21233728\" v=\"1\" cb=\"2387\" />"
+     
       ## Chat group powers
       @handler.send """
         <gp p="0|0|1163220288|1079330064|20975876|269549572|16645|4210689|1|4194304|0|0|0|"
@@ -35,18 +36,29 @@ module.exports =
           g74="d,waiting,astonished,swt,crs,un,redface,evil,rolleyes,what,aghast,omg,smirk" 
           g106="c#sloth" />
         """
+     
       ## Chat pools
       @handler.send "<w v=\"#{@chat.onPool} #{@chat.pool}\"  />"
+
       ## Fake user for testing (send here room users)
-      @handler.send '<u cb="1443256921" s="1" f="170" p0="2013264863" p1="2147483647" p2="4294836215" p3="4294967287" p4="2113929215" p5="2147479551" p6="2147352575" p7="2147483647" p8="2147483647" p9="2147483647" p10="2147483647" p11="119" u="869659734" d0="16794729" d2="1690000" q="3" N="Sevda" n="Sevda(glow#d#000000)" a="http://i.cubeupload.com/FOHlkL.png#glitter#http://i.hizliresim.com/1yRXm1.jpg" h="" v="0"  />'
-      @handler.send '<u cb="1443201972" s="1" f="8364" p0="1476393983" p1="2147483647" p2="4294967263" p3="4294967295" p4="2147483647" p5="2147483647" p6="2147352575" p7="2147483647" p8="2147483647" p9="2147483647" p10="2147483647" p11="127" u="23232323" d0="25165856" d2="358469415" q="3" N="FEXBot" n="$Chatbot(glow#000000#ffffff)##xat.chat#0#ffffff" a="#http://nobg" h="xat.com/Chat" v="0"  />'
-      @handler.send '<u cb="1414865425" s="1" f="172" p0="1979711487" p1="2147475455" p2="2147483647" p3="2147483647" p4="2113929211" p5="2147483647" p6="2147352575" p7="2147483647" p8="2147483647" p9="8372223" u="42" d0="151535720" q="3" N="Bot" n="42(glow#02000a#r)(hat#ht)##testing..#02000a#r" a="xatwebs.co/test.png" h="" v="0"  />'
+      # @handler.send '<u cb="1443256921" s="1" f="170" p0="2013264863" p1="2147483647" p2="4294836215" p3="4294967287" p4="2113929215" p5="2147479551" p6="2147352575" p7="2147483647" p8="2147483647" p9="2147483647" p10="2147483647" p11="119" u="869659734" d0="16794729" d2="1690000" q="3" N="Sevda" n="Sevda(glow#d#000000)" a="http://i.cubeupload.com/FOHlkL.png#glitter#http://i.hizliresim.com/1yRXm1.jpg" h="" v="0"  />'
+      # @handler.send '<u cb="1443201972" s="1" f="8364" p0="1476393983" p1="2147483647" p2="4294967263" p3="4294967295" p4="2147483647" p5="2147483647" p6="2147352575" p7="2147483647" p8="2147483647" p9="2147483647" p10="2147483647" p11="127" u="23232323" d0="25165856" d2="358469415" q="3" N="FEXBot" n="$Chatbot(glow#000000#ffffff)##xat.chat#0#ffffff" a="#http://nobg" h="xat.com/Chat" v="0"  />'
+      @handler.send '<u cb="1414865425" s="1" f="172" p0="1979711487" p1="2147475455" p2="2147483647" p3="2147483647" p4="2113929211" p5="2147483647" p6="2147352575" p7="2147483647" p8="2147483647" p9="8372223" u="42" d0="151535720" q="3" N="xat" n="server(glow#02000a#r)(hat#ht)##testing..#02000a#r" a="xatwebs.co/test.png" h="" v="0"  />'
+      () ->
+        for client in global.Server.clients
+          return if client.handler.user.id is @handler.user.id or client.handler.chat.id not roomId 
+
+          client.write "<u cb=\"1443256921\" s=\"1\" rank=\"guest\" f=\"#{@handler.user.f}\" #{@handler.user.pStr} u=\"#{@handler.user.id}\" d0=\"#{@handler.user.d0}\" d2=\"#{@handler.user.d2}\" q=\"3\" N=\"#{@handler.user.username}\" n=\"#{@handler.user.nickname}\" a=\"#{@handler.user.avatar}\" h=\"#{@handler.user.url}\" v=\"0\"  />\0"
+
       ## Room messages
-      database.exec("SELECT * FROM messages WHERE id = '#{roomId}' AND pool = '#{@chat.onPool}' ").then((data) =>
-        @handler.send "<m t=\"#{message.message}\" u=\"#{message.uid}\"  />" for message in data
+      # NOTE: Check if async is the best way to do this
+      database.exec("SELECT * FROM messages WHERE id = '#{roomId}' AND pool = '#{@chat.onPool}'").then((data) =>
+        data.forEach((message) => @handler.send "<m t=\"#{message.message}\" u=\"#{message.uid}\"  />")
       )
+
       ## Scroll message
       @handler.send "<m t=\"/s#{@chat.sc}\" d=\"1010208\"  />"
+
       ## Done packet
       @handler.send '<done  />'
     )

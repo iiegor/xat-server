@@ -6,13 +6,8 @@ Authentication = require "../workers/authentication"
 Chat = require "../workers/chat"
 Commander = require "../workers/commander"
 
-{EventEmitter} = require 'events'
-_ = require 'underscore'
-
 module.exports =
 class Handler
-  _.extend @prototype, EventEmitter.prototype
-
   ###
   Section: Properties
   ###
@@ -50,11 +45,12 @@ class Handler
         @send "<y i=\"#{loginKey}\" c=\"12\" p=\"100_100_5_102\" />"
 
         # If the remote address already exists close the OLD socket
+        # TODO: Find a better way to do this (need to move this j2 when the user is authenticated)
         # NOTE: Probably doing this non-blocking will be better
-        for client in global.Server.clients
+        ###for client in global.Server.clients
           return if client is @socket
 
-          client.write '<dup />\0' if client.remoteAddress is @socket.remoteAddress
+          client.write '<dup />\0' if client.remoteAddress is @socket.remoteAddress###
       when "j2"
         ###
         Authenticate the client and join room
@@ -71,26 +67,28 @@ class Handler
         user = parser.getAttribute(packet, 'u')
         msg = parser.getAttribute(packet, 't')
 
-        # TODO: Don't process command messages
-        Chat.sendMessage(@, user, msg)
+        Chat.sendMessage(@, user, msg) unless msg.indexOf(Commander.identifier) is 0
         Commander.process(@, user, msg)
       when "z"
         ###
         User profile
         @spec <z d="USER_ID_PROFILE(int)" u="USER_ID_ORIGIN(int)" t="TYPE(str)" />
         ###
-        userProfile = parser.getAttribute(packet, 'd')
+        userProfileId = parser.getAttribute(packet, 'd')
+        userProfile = global.Server.getClientById( userProfileId )?.handler.user || null
         userOrigin = parser.getAttribute(packet, 'u')
         type = parser.getAttribute(packet, 't')
 
+        return if userProfile is null
+
         # TODO: Move this to a new worker?
         if type is '/l'
-          room = "t=\"/a_Nofollow\"" # t=\"/a_on GROUP\"
-          @send "<z b=\"1\" d=\"#{@user.id}\" u=\"#{userProfile}\" #{room} po=\"0\" p0=\"2013264863\" p1=\"2147483647\" p2=\"4294836215\" x=\"12\" y=\"13\" q=\"3\" N=\"USERNAME\" n=\"NICKNAME\" a=\"1\" h=\"http://google.com\" v=\"2\" />"
+          status = "t=\"/a_Nofollow\"" # t=\"/a_on GROUP\"
+          @send "<z b=\"1\" d=\"#{@user.id}\" u=\"#{userProfile.id}\" #{status} po=\"0\" #{userProfile.pStr} x=\"#{userProfile.xats||0}\" y=\"#{userProfile.days||0}\" q=\"3\" #{userProfile.username ? 'N=\"#{userProfile.username}\"' : ''} n=\"#{userProfile.nickname}\" a=\"#{userProfile.avatar}\" h=\"#{userProfile.url}\" v=\"2\" />"
         else if type is '/a'
           return
         else
-          @send "<z u=\"#{@user.id}\" t=\"#{type}\" s=\"#{parser.getAttribute(packet, 's')}\" d=\"#{userProfile}\" />"
+          @send "<z u=\"#{@user.id}\" t=\"#{type}\" s=\"#{parser.getAttribute(packet, 's')}\" d=\"#{userProfileId}\" />"
       else
         if packetTag.indexOf('w') is 0
           ###
@@ -100,8 +98,10 @@ class Handler
           @chat.onPool = packetTag.split('w')[1]
           Chat.joinRoom(@, @user.chat)
         else
-          # NOTE: In a future we can emit a message with the unrecognized packet so a plugin will be able to handle it.
           @logger.log @logger.level.ERROR, "Unrecognized packet by the server!", packetTag
+
+          # INFO: We emit an event with the unrecognized packet so a plugin will be able to handle it in a future.
+          # global.Server.emit 'unrecognized-packet', packet
 
   send: (packet) ->
     @socket.write "#{packet}\0"

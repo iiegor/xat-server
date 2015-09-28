@@ -1,11 +1,11 @@
 startTime = Date.now()
 
-pkg = require '../package'
-server = require './services/server'
-database = require './services/database'
+pkg = require "../package"
+server = require "./services/server"
+database = require "./services/database"
 
-{EventEmitter} = require 'events'
-_ = require 'underscore'
+{EventEmitter} = require "events"
+_ = require "underscore"
 
 module.exports =
 class Application

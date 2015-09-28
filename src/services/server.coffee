@@ -1,8 +1,13 @@
 net = require "net"
 logger = require "../utils/logger"
 
+{EventEmitter} = require "events"
+_ = require "underscore"
+
 module.exports =
   class Server
+    _.extend @prototype, EventEmitter.prototype
+
     ###
     Section: Properties
     ###
@@ -30,10 +35,10 @@ module.exports =
         socket.setKeepAlive true
 
         @clients.push(socket)
-        handler = new (require "./handler")(socket)
+        socket.handler = new (require "./handler")(socket)
 
         socket.on 'data', (buffer) ->
-          handler.read buffer.toString()
+          socket.handler.read buffer.toString()
 
         socket.on 'end', =>
           @logger.log @logger.level.DEBUG, "A user has been disconnected!"
@@ -47,6 +52,10 @@ module.exports =
         @logger.log @logger.level.ERROR, "Server exception at server.coffee", err
 
       @server.listen @port, -> callback true
+
+    getClientById: (id) ->
+      for client in @clients
+        return client if client.handler.user.id is id
 
     close: ->
       @server.close()
