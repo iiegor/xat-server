@@ -113,8 +113,6 @@ class Handler
       return if client is sender
 
       client.write "#{packet}\0"
-
-  getSocket: -> @socket
   
   dispose: ->
     @socket.end()
