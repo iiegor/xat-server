@@ -14,7 +14,7 @@ $ cd xat-server
 $ npm install
 ```
 
-The server depends on [Node.js](http://nodejs.org/), [npm](http://npmjs.org/) and other packages that are downloaded and installed during the install process.
+The server depends on [Node.js](http://nodejs.org/), [npm](http://npmjs.org/) and other packages that are downloaded and installed during the installation process.
 
 ## Run
 Execute this command to start the server.
