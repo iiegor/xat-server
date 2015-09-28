@@ -6,6 +6,11 @@ Available commands
 ###
 
 module.exports =
+  identifier: '~'
+
   process: (@handler, user, msg) ->
-    if msg is '~hello'
-      @handler.send "<m t=\"Hello world\" u=\"#{user}\" />"
+    return unless msg.indexOf @identifier is 0
+
+    switch msg.slice(1)
+      when 'hello'
+        @handler.send "<m t=\"Hello world\" u=\"#{user}\" />"

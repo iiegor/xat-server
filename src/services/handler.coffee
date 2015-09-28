@@ -71,6 +71,7 @@ class Handler
         user = parser.getAttribute(packet, 'u')
         msg = parser.getAttribute(packet, 't')
 
+        # TODO: Don't process command messages
         Chat.sendMessage(@, user, msg)
         Commander.process(@, user, msg)
       when "z"
