@@ -36,7 +36,7 @@ module.exports =
           handler.read buffer.toString()
 
         socket.on 'end', =>
-          console.log "Se ha desconectado un usuario!"
+          @logger.log @logger.level.DEBUG, "A user has been disconnected!"
           @clients.splice(@clients.indexOf(socket), 1);
 
         socket.on 'error', (err) =>

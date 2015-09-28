@@ -10,6 +10,7 @@ module.exports =
 
     constructor: (@caller) ->
 
+    # TODO: Async log writer for ERROR messages.
     log: (level, message) ->
       return console.log "[#{@caller.name}] [?] #{message}" if typeof level == "undefined"
 
