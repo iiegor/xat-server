@@ -1,3 +1,5 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-node bin/xat
+set -e
+
+bin/xat "$@"
