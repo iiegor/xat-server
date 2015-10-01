@@ -3,17 +3,18 @@ parser = require "../utils/parser"
 database = require "../services/database"
 
 module.exports =
-  process: (@handler, packet, callback) ->
-    @user = @handler.user
+  process: (@handler, packet) -> new Promise((resolve, reject) =>
+      @user = @handler.user
 
-    # Check
-    if @user.length > 1 and @user.authenticated == true
-      logger.log logger.level.DEBUG, "The user is already authenticated!"
-      @logout()
-      callback(false)
+      # Check
+      if @user.length > 1 and @user.authenticated == true
+        logger.log logger.level.DEBUG, "The user is already authenticated!"
+        @logout()
+        callback(false)
 
-    # Authenticate
-    @auth(packet, callback)
+      # Authenticate
+      @auth(packet, (done, err) -> if done is true then resolve() else reject(err))
+    )
 
   auth: (packet, callback) ->
     # Parse the packet
@@ -34,9 +35,7 @@ module.exports =
       i++
 
     @resetDetails(@user.id, (res) =>
-      if !res
-        logger.log logger.level.DEBUG, "Reset details failed for user with id #{@user.id}"
-        callback(false)
+      callback(false, "Reset details failed for user with id #{@user.id}") if !res
 
       @user.url = packet['h']
       @user.avatar = packet['a']
@@ -56,7 +55,7 @@ module.exports =
       @updateDetails()
       @user.authenticated = true
 
-      callback(true)
+      callback(true, null)
     )
 
   resetDetails: (userId, callback) ->

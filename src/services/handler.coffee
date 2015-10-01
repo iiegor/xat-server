@@ -43,22 +43,18 @@ class Handler
         loginTime = math.time()
 
         @send "<y i=\"#{loginKey}\" c=\"12\" p=\"100_100_5_102\" />"
-
-        # If the remote address already exists close the OLD socket
-        # TODO: Find a better way to do this (need to move this j2 when the user is authenticated)
-        # NOTE: Probably doing this non-blocking will be better
-        ###for client in global.Server.clients
-          return if client is @socket
-
-          client.write '<dup />\0' if client.remoteAddress is @socket.remoteAddress###
       when "j2"
         ###
         Authenticate the client and join room
         @spec <j2 cb="0" l5="4288326302" l4="1400" l3="1267" l2="0" q="1" y="72226157" k="f13cee2b165605b4e400" k3="0" p="0" c="1" f="1" u="USER_ID(int)" d0="0" n="USERNAME(str)" a="91" h="" v="1" />
         ###
-        Authentication.process(@, packet, (res) =>
-          Chat.joinRoom(@, @user.chat) if res
-        )
+        Authentication.process(@, packet).then(() =>
+          for client in global.Server.clients
+            console.log client.handler.user
+            client.write '<dup />\0' if client.handler.user.id is @user.id and client.handler.socket != @socket
+
+          Chat.joinRoom(@, @user.chat)
+        ).catch((err) => @logger.log @logger.level.ERROR, err, null)
       when "m"
         ###
         Send message
@@ -79,12 +75,15 @@ class Handler
         userOrigin = parser.getAttribute(packet, 'u')
         type = parser.getAttribute(packet, 't')
 
+        # TODO: 
+        # - Move this to a new worker
+        # - If the user is not online then query it from the database
         return if userProfile is null
 
-        # TODO: Move this to a new worker?
         if type is '/l'
+          username = userProfile.username ? 'N=\"#{userProfile.username}\"' : ''
           status = "t=\"/a_Nofollow\"" # t=\"/a_on GROUP\"
-          @send "<z b=\"1\" d=\"#{@user.id}\" u=\"#{userProfile.id}\" #{status} po=\"0\" #{userProfile.pStr} x=\"#{userProfile.xats||0}\" y=\"#{userProfile.days||0}\" q=\"3\" #{userProfile.username ? 'N=\"#{userProfile.username}\"' : ''} n=\"#{userProfile.nickname}\" a=\"#{userProfile.avatar}\" h=\"#{userProfile.url}\" v=\"2\" />"
+          @send "<z b=\"1\" d=\"#{@user.id}\" u=\"#{userProfile.id}\" #{status} po=\"0\" #{userProfile.pStr} x=\"#{userProfile.xats||0}\" y=\"#{userProfile.days||0}\" q=\"3\" #{username} n=\"#{userProfile.nickname}\" a=\"#{userProfile.avatar}\" h=\"#{userProfile.url}\" v=\"2\" />"
         else if type is '/a'
           return
         else
@@ -107,12 +106,12 @@ class Handler
     @socket.write "#{packet}\0"
 
     # Debug
-    @logger.log(@logger.level.DEBUG, "-> Sent: #{packet}")
+    @logger.log @logger.level.DEBUG, "-> Sent: #{packet}"
 
-  broadcast: (packet, sender={}) ->
+  broadcast: (packet) ->
     for client in global.Server.clients
-      return if client is sender
-
+      return if client.handler.id is @user.id
+      
       client.write "#{packet}\0"
   
   dispose: ->
