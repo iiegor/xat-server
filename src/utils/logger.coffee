@@ -25,7 +25,7 @@ class Logger
           ERROR: #{@caller.name} #{message}
           MESSAGE: #{arguments[2]}
           \n
-          """
+          """ if global.Application.config['env'] != 'dev'
       when @level.DEBUG
         console.log "[#{@caller.name}]".cyan + "[#{level}] ".gray + "#{message}" if global.Application.config['env'] is 'dev'
 
