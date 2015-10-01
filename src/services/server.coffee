@@ -38,11 +38,11 @@ class Server
       socket.handler = new (require "./handler")(socket)
 
       socket.on 'data', (buffer) ->
-        socket.handler.read buffer.toString()
+        socket.handler.read buffer.toString('binary')
 
       socket.on 'end', =>
         @logger.log @logger.level.DEBUG, "A user has been disconnected!"
-        @clients.splice(@clients.indexOf(socket), 1);
+        @clients.splice @clients.indexOf(socket), 1
 
       socket.on 'error', (err) =>
         @logger.log @logger.level.ERROR, "Socket exception at server.coffee", err
