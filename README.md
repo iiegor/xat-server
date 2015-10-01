@@ -9,10 +9,11 @@ This is supposed to be a xat private server built on top of Node.js that emulate
 
 ## Install
 ```sh
-$ git clone https://github.com/iiegor/xat-server
+$ git clone -b stable https://github.com/iiegor/xat-server
 $ cd xat-server
 $ npm install
 ```
+Obviously, if you want to try the latest version of xat-server, you can clone the master branch but can have bugs because it's a development branch, so don't use it for production.
 
 The server depends on [Node.js](http://nodejs.org/), [npm](http://npmjs.org/) and other packages that are downloaded and installed during the installation process.
 
