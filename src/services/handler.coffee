@@ -50,7 +50,7 @@ class Handler
         ###
         Authentication.process(@, packet).then(() =>
           for client in global.Server.clients
-            console.log client.handler
+            console.log client.handler.user
             client.write '<dup />\0' if client.handler.user.id is @user.id and client.handler.socket != @socket
 
           Chat.joinRoom(@, @user.chat)
@@ -75,9 +75,11 @@ class Handler
         userOrigin = parser.getAttribute(packet, 'u')
         type = parser.getAttribute(packet, 't')
 
+        # TODO: 
+        # - Move this to a new worker
+        # - If the user is not online then query it from the database
         return if userProfile is null
 
-        # TODO: Move this to a new worker?
         if type is '/l'
           username = userProfile.username ? 'N=\"#{userProfile.username}\"' : ''
           status = "t=\"/a_Nofollow\"" # t=\"/a_on GROUP\"
