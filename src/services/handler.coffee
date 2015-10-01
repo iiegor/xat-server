@@ -83,8 +83,9 @@ class Handler
 
         # TODO: Move this to a new worker?
         if type is '/l'
+          username = userProfile.username ? 'N=\"#{userProfile.username}\"' : ''
           status = "t=\"/a_Nofollow\"" # t=\"/a_on GROUP\"
-          @send "<z b=\"1\" d=\"#{@user.id}\" u=\"#{userProfile.id}\" #{status} po=\"0\" #{userProfile.pStr} x=\"#{userProfile.xats||0}\" y=\"#{userProfile.days||0}\" q=\"3\" #{userProfile.username ? 'N=\"#{userProfile.username}\"' : ''} n=\"#{userProfile.nickname}\" a=\"#{userProfile.avatar}\" h=\"#{userProfile.url}\" v=\"2\" />"
+          @send "<z b=\"1\" d=\"#{@user.id}\" u=\"#{userProfile.id}\" #{status} po=\"0\" #{userProfile.pStr} x=\"#{userProfile.xats||0}\" y=\"#{userProfile.days||0}\" q=\"3\" #{username} n=\"#{userProfile.nickname}\" a=\"#{userProfile.avatar}\" h=\"#{userProfile.url}\" v=\"2\" />"
         else if type is '/a'
           return
         else
@@ -107,12 +108,10 @@ class Handler
     @socket.write "#{packet}\0"
 
     # Debug
-    @logger.log(@logger.level.DEBUG, "-> Sent: #{packet}")
+    @logger.log @logger.level.DEBUG, "-> Sent: #{packet}"
 
-  broadcast: (packet, sender={}) ->
+  broadcast: (packet) ->
     for client in global.Server.clients
-      return if client is sender
-
       client.write "#{packet}\0"
   
   dispose: ->
