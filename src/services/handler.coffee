@@ -110,6 +110,8 @@ class Handler
 
   broadcast: (packet) ->
     for client in global.Server.clients
+      return if client.handler.id is @user.id
+      
       client.write "#{packet}\0"
   
   dispose: ->
