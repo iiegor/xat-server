@@ -56,9 +56,9 @@ class Handler
         Authenticate the client and join room
         @spec <j2 cb="0" l5="4288326302" l4="1400" l3="1267" l2="0" q="1" y="72226157" k="f13cee2b165605b4e400" k3="0" p="0" c="1" f="1" u="USER_ID(int)" d0="0" n="USERNAME(str)" a="91" h="" v="1" />
         ###
-        Authentication.process(@, packet, (res) =>
-          Chat.joinRoom(@, @user.chat) if res
-        )
+        Authentication.process(@, packet).then(() =>
+          Chat.joinRoom(@, @user.chat)
+        ).catch((err) => @logger.log @logger.level.ERROR, err, null)
       when "m"
         ###
         Send message

@@ -29,7 +29,7 @@ class Server
       allowHalfOpen: false
       type: "tcp4"
     )
-
+  
     @server.on 'connection', (socket) =>
       socket.setNoDelay true
       socket.setKeepAlive true
@@ -38,6 +38,11 @@ class Server
       socket.handler = new (require "./handler")(socket)
 
       socket.on 'data', (buffer) ->
+        # Close the socket if it's a HTTP req
+        if buffer.toString().indexOf('HTTP/') != -1
+          socket.end()
+          return
+
         socket.handler.read buffer.toString('binary')
 
       socket.on 'end', =>
