@@ -56,6 +56,10 @@ class Application
     # Register all application events
     @on 'application:dispose', @dispose
 
+    unless process.platform is "win32"
+      process.on 'SIGTERM', ->
+        process.exit 0
+
   loadPlugins: ->
     plugins = pkg.packageDependencies
 
@@ -67,4 +71,4 @@ class Application
 
   dispose: ->
     # Exit with success code
-    process.exit(0)
+    process.exit 0
