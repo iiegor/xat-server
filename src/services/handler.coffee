@@ -50,7 +50,6 @@ class Handler
         ###
         Authentication.process(@, packet).then(() =>
           for client in global.Server.clients
-            console.log client.handler.user
             client.write '<dup />\0' if client.handler.user.id is @user.id and client.handler.socket != @socket
 
           Chat.joinRoom(@, @user.chat)
