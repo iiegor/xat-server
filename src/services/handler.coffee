@@ -5,6 +5,7 @@ logger = require "../utils/logger"
 Authentication = require "../workers/authentication"
 Chat = require "../workers/chat"
 Commander = require "../workers/commander"
+Profile = require "../workers/profile"
 
 module.exports =
 class Handler
@@ -74,15 +75,16 @@ class Handler
         userOrigin = parser.getAttribute(packet, 'u')
         type = parser.getAttribute(packet, 't')
 
-        # TODO: 
-        # - Move this to a new worker
-        # - If the user is not online then query it from the database
-        return if userProfile is null
-
-        if type is '/l'
+        if type is '/l' and userProfile != null
           username = userProfile.username ? 'N=\"#{userProfile.username}\"' : ''
           status = "t=\"/a_Nofollow\"" # t=\"/a_on GROUP\"
           @send "<z b=\"1\" d=\"#{@user.id}\" u=\"#{userProfile.id}\" #{status} po=\"0\" #{userProfile.pStr} x=\"#{userProfile.xats||0}\" y=\"#{userProfile.days||0}\" q=\"3\" #{username} n=\"#{userProfile.nickname}\" a=\"#{userProfile.avatar}\" h=\"#{userProfile.url}\" v=\"2\" />"
+        else if type is '/l'
+          Profile.getById(userProfileId)
+            .then((data) => 
+              @logger.log @logger.level.ERROR, "Unhandled null userProfile", null
+            )
+            .catch((err) => @logger.log @logger.level.ERROR, err, 'Profile.coffee - getById()')
         else if type is '/a'
           return
         else

@@ -7,7 +7,7 @@ module.exports =
   joinRoom: (@handler, roomId) ->
     return if roomId < 1 or isNaN(roomId) is true
 
-    database.exec("SELECT * FROM chats WHERE id = '#{roomId}' ").then((data) =>
+    database.exec("SELECT * FROM chats WHERE id = '#{roomId}' LIMIT 1 ").then((data) =>
       if @handler.chat is null
         @handler.chat = data[0]
 
