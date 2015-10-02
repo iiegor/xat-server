@@ -23,6 +23,7 @@ Execute this command to start the server.
 $ script/run
 ```
 If you want to install a plugin, add it to ``packageDependencies`` in the package.json with the respective version.
+
 Example:
 ```json
 {
