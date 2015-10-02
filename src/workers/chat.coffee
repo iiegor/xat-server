@@ -50,6 +50,7 @@ module.exports =
       @handler.send "<m t=\"/s#{@chat.sc}\" d=\"1010208\"  />"
 
       ## Room messages
+      # TODO: Limit messages; Bug using order desc and limit
       database.exec("SELECT * FROM messages WHERE id = '#{roomId}' AND pool = '#{@chat.onPool}'").then((data) =>
         data.forEach((message) => @handler.send "<m t=\"#{message.message}\" u=\"#{message.uid}\"  />")
 
