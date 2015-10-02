@@ -53,17 +53,16 @@ module.exports =
         client.write "<u cb=\"1443256921\" s=\"1\" rank=\"guest\" f=\"#{@handler.user.f}\" #{@handler.user.pStr} u=\"#{@handler.user.id}\" d0=\"#{@handler.user.d0}\" d2=\"#{@handler.user.d2}\" q=\"3\" N=\"#{@handler.user.username}\" n=\"#{@handler.user.nickname}\" a=\"#{@handler.user.avatar}\" h=\"#{@handler.user.url}\" v=\"0\"  />\0"
       ###
 
-      ## Room messages
-      # NOTE: Check if async is the best way to do this
-      database.exec("SELECT * FROM messages WHERE id = '#{roomId}' AND pool = '#{@chat.onPool}'").then((data) =>
-        data.forEach((message) => @handler.send "<m t=\"#{message.message}\" u=\"#{message.uid}\"  />")
-      )
-
       ## Scroll message
       @handler.send "<m t=\"/s#{@chat.sc}\" d=\"1010208\"  />"
 
-      ## Done packet
-      @handler.send '<done  />'
+      ## Room messages
+      database.exec("SELECT * FROM messages WHERE id = '#{roomId}' AND pool = '#{@chat.onPool}'").then((data) =>
+        data.forEach((message) => @handler.send "<m t=\"#{message.message}\" u=\"#{message.uid}\"  />")
+
+        ## Done packet
+        @handler.send '<done  />'
+      )
     )
 
   sendMessage: (@handler, user, message) ->
