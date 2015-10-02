@@ -45,13 +45,7 @@ module.exports =
       # @handler.send '<u cb="1443201972" s="1" f="8364" p0="1476393983" p1="2147483647" p2="4294967263" p3="4294967295" p4="2147483647" p5="2147483647" p6="2147352575" p7="2147483647" p8="2147483647" p9="2147483647" p10="2147483647" p11="127" u="23232323" d0="25165856" d2="358469415" q="3" N="FEXBot" n="$Chatbot(glow#000000#ffffff)##xat.chat#0#ffffff" a="#http://nobg" h="xat.com/Chat" v="0"  />'
       @handler.send '<u cb="1414865425" s="1" f="172" p0="1979711487" p1="2147475455" p2="2147483647" p3="2147483647" p4="2113929211" p5="2147483647" p6="2147352575" p7="2147483647" p8="2147483647" p9="8372223" u="42" d0="151535720" q="3" N="xat" n="server(glow#02000a#r)(hat#ht)##testing..#02000a#r" a="xatwebs.co/test.png" h="" v="0"  />'
 
-      ###
-      for client in global.Server.clients
-        console.log client.handler.user.id
-        return if client.handler.user.id is @handler.user.id or client.handler.chat.id not roomId
-
-        client.write "<u cb=\"1443256921\" s=\"1\" rank=\"guest\" f=\"#{@handler.user.f}\" #{@handler.user.pStr} u=\"#{@handler.user.id}\" d0=\"#{@handler.user.d0}\" d2=\"#{@handler.user.d2}\" q=\"3\" N=\"#{@handler.user.username}\" n=\"#{@handler.user.nickname}\" a=\"#{@handler.user.avatar}\" h=\"#{@handler.user.url}\" v=\"0\"  />\0"
-      ###
+      @handler.broadcast "<u cb=\"1443256921\" s=\"1\" rank=\"1\" f=\"#{@handler.user.f}\" #{@handler.user.pStr} u=\"#{@handler.user.id}\" d0=\"#{@handler.user.d0}\" d2=\"#{@handler.user.d2}\" q=\"3\" N=\"#{@handler.user.username}\" n=\"#{@handler.user.nickname}\" a=\"#{@handler.user.avatar}\" h=\"#{@handler.user.url}\" v=\"0\"  />\0"
 
       ## Scroll message
       @handler.send "<m t=\"/s#{@chat.sc}\" d=\"1010208\"  />"
