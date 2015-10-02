@@ -55,6 +55,15 @@ class Handler
 
           Chat.joinRoom(@, @user.chat)
         ).catch((err) => @logger.log @logger.level.ERROR, err, null)
+      when "v"
+        ###
+        Authenticate through chat.swf
+        @spec <v p="PASSWORD(str)" n="USERNAME(str)" />
+        ###
+        pw = parser.getAttribute(packet, 'p')
+        name = parser.getAttribute(packet, 'n')
+
+        # TODO: Authenticate the user and send a response
       when "m"
         ###
         Send message
@@ -76,7 +85,7 @@ class Handler
         type = parser.getAttribute(packet, 't')
 
         if type is '/l' and userProfile != null
-          username = userProfile.username ? 'N=\"#{userProfile.username}\"' : ''
+          username = if userProfile.username then 'N=\"#{userProfile.username}\"' else ''
           status = "t=\"/a_Nofollow\"" # t=\"/a_on GROUP\"
           @send "<z b=\"1\" d=\"#{@user.id}\" u=\"#{userProfile.id}\" #{status} po=\"0\" #{userProfile.pStr} x=\"#{userProfile.xats||0}\" y=\"#{userProfile.days||0}\" q=\"3\" #{username} n=\"#{userProfile.nickname}\" a=\"#{userProfile.avatar}\" h=\"#{userProfile.url}\" v=\"2\" />"
         else if type is '/l'
