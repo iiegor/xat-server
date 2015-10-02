@@ -8,8 +8,8 @@ This is supposed to be a xat private server built on top of Node.js that emulate
 </div>
 
 ## Install
+You can get the latest stable release from the [releases](https://github.com/iiegor/xat-server/releases) page. Once you've downloaded it, you are ready to run the following commands:
 ```sh
-$ git clone -b stable https://github.com/iiegor/xat-server
 $ cd xat-server
 $ npm install
 ```
