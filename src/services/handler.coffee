@@ -119,11 +119,11 @@ class Handler
     @logger.log @logger.level.DEBUG, "-> Sent: #{packet}"
 
   broadcast: (packet) ->
-    for client in global.Server.clients
-      return if client.handler.id is @user.id
-      
-      client.write "#{packet}\0"
-  
+    client.write "#{packet}\0" for client in global.Server.clients when client.handler.id isnt @user.id and client.writable
+    
+    # Debug
+    @logger.log @logger.level.DEBUG, "-> Broadcasted: #{packet}"
+
   dispose: ->
     @socket.end()
     @socket.destroy()
