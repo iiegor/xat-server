@@ -63,7 +63,7 @@ class Handler
         pw = parser.getAttribute(packet, 'p')
         name = parser.getAttribute(packet, 'n')
 
-        # TODO: Authenticate the user and send a response
+        Authentication.login(@, pw, name)
       when "m"
         ###
         Send message

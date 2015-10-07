@@ -3,6 +3,15 @@ parser = require "../utils/parser"
 database = require "../services/database"
 
 module.exports =
+  login: (@handler, pw, name) ->
+    # TODO: Replace with real data
+    @handler.send '<v d0="1056" d3="5641587" dx="1579" dt="1344072443" i="265826731" n="iegor" k2="1026729849" k3="3699176378" k1="939db96ca5561573d601"  />'
+    @handler.send '<c t="/bd"  />'
+    @handler.send '<c t="/b 265826731,5,,Returns,385,,0,0,0,0,0,0,0,0,0,0,0,0,0,0"  />'
+    @handler.send '<c t="/bf"  />'
+    @handler.send '<ldone  />'
+    @handler.send '<done  />'
+
   process: (@handler, packet) -> new Promise((resolve, reject) =>
       @user = @handler.user
 
