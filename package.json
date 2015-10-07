@@ -21,6 +21,6 @@
     "mysql": "^2.5.2",
     "underscore": "^1.8.2"
   },
-  "packageDependencies": { },
+  "packageDependencies": {},
   "private": true
 }
