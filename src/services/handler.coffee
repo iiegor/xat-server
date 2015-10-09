@@ -2,7 +2,7 @@ parser = require "../utils/parser"
 math = require "../utils/math"
 logger = require "../utils/logger"
 
-Authentication = require "../workers/authentication"
+User = require "../workers/user"
 Chat = require "../workers/chat"
 Commander = require "../workers/commander"
 Profile = require "../workers/profile"
@@ -49,7 +49,7 @@ class Handler
         Authenticate the client and join room
         @spec <j2 cb="0" l5="4288326302" l4="1400" l3="1267" l2="0" q="1" y="72226157" k="f13cee2b165605b4e400" k3="0" p="0" c="1" f="1" u="USER_ID(int)" d0="0" n="USERNAME(str)" a="91" h="" v="1" />
         ###
-        Authentication.process(@, packet).then(() =>
+        User.process(@, packet).then(() =>
           for client in global.Server.clients
             client.write '<dup />\0' if client.handler.user.id is @user.id and client.handler.socket != @socket
 
@@ -63,7 +63,7 @@ class Handler
         pw = parser.getAttribute(packet, 'p')
         name = parser.getAttribute(packet, 'n')
 
-        Authentication.login(@, pw, name)
+        User.login(@, pw, name)
       when "m"
         ###
         Send message

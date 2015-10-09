@@ -1,4 +1,4 @@
-logger = new (require "../utils/logger")(name: 'Authentication')
+logger = new (require "../utils/logger")(name: 'User')
 parser = require "../utils/parser"
 database = require "../services/database"
 
@@ -7,6 +7,8 @@ module.exports =
     # TODO: 
     #   Fix user days packet attr.
     #   Complete all the attrs with real data.
+    # INFO:
+    #   d2 - married id
     database.exec("SELECT * FROM users WHERE username = '#{name}' AND password = '#{pw}' LIMIT 1 ").then((data) =>
       return if data.length < 1
 
