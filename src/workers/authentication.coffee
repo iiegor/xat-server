@@ -4,6 +4,9 @@ database = require "../services/database"
 
 module.exports =
   login: (@handler, pw, name) ->
+    # TODO: 
+    #   Fix user days packet attr.
+    #   Complete all the attrs with real data.
     database.exec("SELECT * FROM users WHERE username = '#{name}' AND password = '#{pw}' LIMIT 1 ").then((data) =>
       return if data.length < 1
 
