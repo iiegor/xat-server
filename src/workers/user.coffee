@@ -9,7 +9,7 @@ module.exports =
     #   Complete all the attrs with real data.
     # INFO:
     #   d2 - married id
-    database.exec("SELECT * FROM users WHERE username = '#{name}' AND password = '#{pw}' LIMIT 1 ").then((data) =>
+    database.exec("SELECT * FROM users WHERE username = '#{name}' AND loginKey = '#{pw}' LIMIT 1 ").then((data) =>
       return if data.length < 1
 
       user = data[0]

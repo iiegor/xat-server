@@ -74,6 +74,12 @@ class Handler
 
         Chat.sendMessage(@, user, msg) unless msg.indexOf(Commander.identifier) is 0
         Commander.process(@, user, msg)
+      when "c"
+        ###
+        Save user profile data
+        @spec <c u="2" t="/b USER_ID(int),UNKNOWN(int),,USERNAME(str),AVATAR(str),HOME(str),0,0,0,0....." />
+        ###
+        @logger.log @logger.level.ERROR, "Unhandled user data update packet", null
       when "z"
         ###
         User profile
