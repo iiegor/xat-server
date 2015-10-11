@@ -1,4 +1,4 @@
-# xat-server ![npm-deps](https://david-dm.org/iiegor/xat-server.svg)
+# xat-server ![npm-deps](https://david-dm.org/iiegor/xat-server.svg) [![releases](https://img.shields.io/github/release/iiegor/xat-server.svg)](https://github.com/iiegor/xat-server/releases)
 > A Node.js private server for xat.com 
 
 This is supposed to be a xat private server built on top of Node.js that emulates the full functionality of the original server.
