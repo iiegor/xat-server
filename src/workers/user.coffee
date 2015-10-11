@@ -78,6 +78,7 @@ module.exports =
     )
 
   resetDetails: (userId, callback) ->
+    # TODO: Use the k1, k2 and k3 values to verify the user identity. See workers/commander.coffee#17
     database.exec("SELECT * FROM users WHERE id = '#{userId}' ").then((data) =>
       if data.length < 1
         # No user found
