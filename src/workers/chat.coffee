@@ -8,6 +8,12 @@ module.exports =
     return if roomId < 1 or isNaN(roomId) is true
 
     database.exec("SELECT * FROM chats WHERE id = '#{roomId}' LIMIT 1 ").then((data) =>
+      if roomId is 8
+        @handler.send '<i b="http://www.xat.com/web_gear/background/xat_stars.jpg;=;=;=- Cant ;=" f="932" v="1" cb="0"  />'
+        @handler.send '<w v="0 0 1"  />'
+        @handler.send '<done  />'
+        return
+
       if @handler.chat is null
         @handler.chat = data[0]
 

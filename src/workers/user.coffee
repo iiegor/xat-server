@@ -42,7 +42,7 @@ module.exports =
     @user.id = packet['u']
     @user.d0 = packet['d0']
     @user.f = packet['f']
-    @user.chat = packet['c']
+    @user.chat = parseInt(packet['c']) || 0
     @user.guest = true
     @user.pStr = ''
 
