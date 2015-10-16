@@ -1,9 +1,10 @@
 logger = new (require "../utils/logger")(name: 'User')
 parser = require "../utils/parser"
+math = require "../utils/math"
 database = require "../services/database"
 
 module.exports =
-  login: (@handler, pw, name) ->
+  login: (@handler, name, pw) ->
     # TODO: 
     #   Fix user days packet attr.
     #   Complete all the attrs with real data.
@@ -13,9 +14,12 @@ module.exports =
       return if data.length < 1
 
       user = data[0]
-      days = if parseInt(user.days) > 0 then "d1=\"#{user.days}\"" else ''
+      days = if parseInt(user.days) > 0 then "d1=\"1444750479\"" else ''
+      married = if parseInt(user.d2) > 0 then "d2=\"#{user.d2}\"" else ''
 
-      @handler.send "<v d0=\"#{user.d0}\" d3=\"#{user.d3}\" #{days} dx=\"#{user.xats}\" dt=\"1344072443\" i=\"#{user.id}\" n=\"#{user.username}\" k2=\"#{user.k2}\" k3=\"#{user.k3}\" k1=\"#{user.k}\"  />"
+      str = 'd4="2209282" d5="6292512" d6="2097193" d9="262144"'
+
+      @handler.send "<v #{days} d0=\"#{user.d0}\" #{married} d3=\"#{user.d3}\" #{str} dx=\"#{user.xats}\" dt=\"1344072443\" i=\"#{user.id}\" n=\"#{user.username}\" k2=\"#{user.k2}\" k3=\"#{user.k3}\" k1=\"#{user.k}\"  />"
       @handler.send '<c t="/bd"  />'
       @handler.send "<c t=\"/b #{user.id},5,,#{user.nickname},#{user.avatar},#{user.url},0,0,0,0,0,0,0,0,0,0,0,0,0,0\"  />"
       @handler.send '<c t="/bf"  />'
@@ -41,10 +45,13 @@ module.exports =
 
     @user.id = packet['u']
     @user.d0 = packet['d0']
+    @user.d3 = packet['d3']
     @user.f = packet['f']
     @user.chat = parseInt(packet['c']) || 0
     @user.guest = true
     @user.pStr = ''
+    @user.k = packet['k']
+    @user.k3 = packet['k3']
 
     i = 0
     while i <= 20
@@ -78,16 +85,23 @@ module.exports =
     )
 
   resetDetails: (userId, callback) ->
-    # TODO: Use the k1, k2 and k3 values to verify the user identity. See workers/commander.coffee#17
-    database.exec("SELECT * FROM users WHERE id = '#{userId}' ").then((data) =>
+    database.exec("SELECT * FROM users WHERE id = '#{userId}' AND k = '#{@user.k}' AND k3 = '#{@user.k3}' LIMIT 1 ").then((data) =>
       if data.length < 1
-        # No user found
+        callback(false)
+      else if data[0].username is 'unregistered'
         @user.guest = true
 
         callback(true)
       else
-        # User verification
+        user = data[0]
+
+        @user.username = user['username']
         @user.guest = false
+        @user.xats = user['xats']
+        @user.days = Math.floor((user['days'] - math.time()) / 86400)
+        @user.k2 = user['k2']
+        @user.d1 = user['d1']
+        @user.d2 = user['d2']
 
         callback(true)
     )

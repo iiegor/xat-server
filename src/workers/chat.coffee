@@ -9,7 +9,7 @@ module.exports =
 
     database.exec("SELECT * FROM chats WHERE id = '#{roomId}' LIMIT 1 ").then((data) =>
       if roomId is 8
-        @handler.send '<i b="http://www.xat.com/web_gear/background/xat_stars.jpg;=;=;=- Cant ;=" f="932" v="1" cb="0"  />'
+        @handler.send '<i b=";=;=;=- Cant ;=" f="932" v="1" cb="0"  />'
         @handler.send '<w v="0 0 1"  />'
         @handler.send '<done  />'
         return
@@ -50,7 +50,7 @@ module.exports =
       # @handler.send '<u cb="1443201972" s="1" f="8364" p0="1476393983" p1="2147483647" p2="4294967263" p3="4294967295" p4="2147483647" p5="2147483647" p6="2147352575" p7="2147483647" p8="2147483647" p9="2147483647" p10="2147483647" p11="127" u="23232323" d0="25165856" d2="358469415" q="3" N="FEXBot" n="$Chatbot(glow#000000#ffffff)##xat.chat#0#ffffff" a="#http://nobg" h="xat.com/Chat" v="0"  />'
       @handler.send '<u cb="1414865425" s="1" f="172" p0="1979711487" p1="2147475455" p2="2147483647" p3="2147483647" p4="2113929211" p5="2147483647" p6="2147352575" p7="2147483647" p8="2147483647" p9="8372223" u="42" d0="151535720" q="3" N="xat" n="server(glow#02000a#r)(hat#ht)##testing..#02000a#r" a="xatwebs.co/test.png" h="" v="0"  />'
 
-      username = if not @handler.user.guest and @handler.user.username then 'N=\"#{userProfile.username}\"' else ''
+      username = if not @handler.user.guest and @handler.user.username then "N=\"#{@handler.user.username}\"" else ''
       @handler.broadcast "<u cb=\"1443256921\" s=\"1\" rank=\"1\" f=\"#{@handler.user.f}\" #{@handler.user.pStr} u=\"#{@handler.user.id}\" d0=\"#{@handler.user.d0}\" d2=\"#{@handler.user.d2}\" q=\"3\" #{username} n=\"#{@handler.user.nickname}\" a=\"#{@handler.user.avatar}\" h=\"#{@handler.user.url}\" v=\"0\"  />\0"
 
       ## Scroll message

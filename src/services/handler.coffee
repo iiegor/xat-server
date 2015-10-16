@@ -60,10 +60,10 @@ class Handler
         Authenticate through chat.swf
         @spec <v p="PASSWORD(str)" n="USERNAME(str)" />
         ###
-        pw = parser.getAttribute(packet, 'p')
         name = parser.getAttribute(packet, 'n')
+        pw = parser.getAttribute(packet, 'p')
 
-        User.login(@, pw, name)
+        User.login(@, name, pw)
       when "m"
         ###
         Send message
