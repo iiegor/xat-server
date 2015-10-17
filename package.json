@@ -19,7 +19,7 @@
     "colors": "^1.0.3",
     "elementtree": "^0.1.6",
     "generic-pool": "^2.2.0",
-    "mysql": "^2.5.2",
+    "mysql": "^2.9.0",
     "underscore": "^1.8.2"
   },
   "packageDependencies": {},
