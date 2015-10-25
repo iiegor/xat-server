@@ -43,7 +43,7 @@ class Handler
         loginShift = math.random(2, 5)
         loginTime = math.time()
 
-        @send "<y i=\"#{loginKey}\" c=\"12\" p=\"100_100_5_102\" />"
+        @send "<y i=\"#{loginKey}\" c=\"#{loginTime}\" p=\"100_100_5_102\" />"
       when "j2"
         ###
         Authenticate the client and join room

@@ -14,7 +14,7 @@ module.exports =
       return if data.length < 1
 
       user = data[0]
-      days = if parseInt(user.days) > 0 then "d1=\"1444750479\"" else ''
+      days = if parseInt(user.days) > 0 then "d1=\"#{user.days}\"" else ''
       married = if parseInt(user.d2) > 0 then "d2=\"#{user.d2}\"" else ''
 
       str = 'd4="2209282" d5="6292512" d6="2097193" d9="262144"'
