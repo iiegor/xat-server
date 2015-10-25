@@ -38,5 +38,7 @@ and run ``$ script/install``.
 ## Contributors
 * **Iegor Azuaga** (dextrackmedia@gmail.com)
 
-### How to contribute
 You can contribute to the project by cloning, forking or starring it. If you have any bug, open an issue or if you have an interesting thing you want to implement into the official repository, open a pull request.
+
+## License
+MIT © [Iegor Azuaga](https://github.com/iiegor)
