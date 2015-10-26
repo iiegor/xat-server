@@ -51,7 +51,7 @@ module.exports =
       # 170 - mod
       # 171 - member
       # 172 - owner
-      @handler.send '<u cb="1414865425" s="1" f="168" p0="1979711487" p1="2147475455" p2="2147483647" p3="2147483647" p4="2113929211" p5="2147483647" p6="2147352575" p7="2147483647" p8="2147483647" p9="8372223" u="42" d0="151535720" q="3" N="xat" n="server(glow#02000a#r)(hat#ht)##testing..#02000a#r" a="xatwebs.co/test.png" h="" v="0"  />'
+      @handler.send '<u cb="1414865425" s="1" f="169" p0="1979711487" p1="2147475455" p2="2147483647" p3="2147483647" p4="2113929211" p5="2147483647" p6="2147352575" p7="2147483647" p8="2147483647" p9="8372223" u="42" d0="151535720" q="3" N="xat" n="server(glow#02000a#r)(hat#ht)##testing..#02000a#r" a="xatwebs.co/test.png" h="" v="0"  />'
 
       username = if not @handler.user.guest and @handler.user.username then "N=\"#{@handler.user.username}\"" else ''
       @handler.broadcast "<u cb=\"1443256921\" s=\"1\" rank=\"1\" f=\"#{@handler.user.f}\" #{@handler.user.pStr} u=\"#{@handler.user.id}\" d0=\"#{@handler.user.d0}\" d2=\"#{@handler.user.d2}\" q=\"3\" #{username} n=\"#{@handler.user.nickname}\" a=\"#{@handler.user.avatar}\" h=\"#{@handler.user.url}\" v=\"0\"  />\0"
