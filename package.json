@@ -20,6 +20,7 @@
     "elementtree": "^0.1.6",
     "generic-pool": "^2.2.0",
     "mysql": "^2.9.0",
+    "semver": "^5.0.3",
     "underscore": "^1.8.3"
   },
   "packageDependencies": {},

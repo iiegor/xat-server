@@ -4,6 +4,7 @@ pkg = require '../package'
 server = require './services/server'
 database = require './services/database'
 
+semver = require 'semver'
 {EventEmitter} = require 'events'
 _ = require 'underscore'
 
@@ -66,12 +67,13 @@ class Application
     _.mapObject(plugins, (val, key) =>
       try
         # Validate package
-        # TODO: Check plugin engine version
         depPkg = require "#{key}/package.json"
         depEngine = depPkg.engines['xat-server']
 
         if typeof depEngine is 'undefined'
-          throw new Error("Compatibility error")
+          return throw new Error('The plugin does not support this server')
+        else if !semver.satisfies(pkg.version, depEngine)
+          return throw new Error("Compatibility error (#{depEngine})")
         else
           dep = require key
           dep.initialize(@)
