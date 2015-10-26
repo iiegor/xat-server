@@ -24,12 +24,12 @@ class Server
   ###
   Section: Private
   ###
-  bind: (callback) ->
+  bind: ->
     @server = new net.Server(
       allowHalfOpen: false
       type: "tcp4"
     )
-  
+
     @server.on 'connection', (socket) =>
       socket.setNoDelay true
       socket.setKeepAlive true
@@ -56,7 +56,7 @@ class Server
     @server.on 'error', (err) =>
       @logger.log @logger.level.ERROR, "Server exception at server.coffee", err
 
-    @server.listen @port, -> callback true
+    @server.listen @port, -> global.Application.emit('application:started')
 
   getClientById: (id) ->
     for client in @clients
