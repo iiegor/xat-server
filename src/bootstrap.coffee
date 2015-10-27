@@ -43,17 +43,16 @@ class Application
   Section: Private
   ###
   bootstrap: ->
-    # TODO: First ping database and then initialize the server
-    # Initialize database service
     @logger.log @logger.level.INFO, 'Checking connectivity with database...'
-    database.exec()
 
-    # Initialize server service
-    server = new server(@config.port)
-    server.bind()
+    database.initialize (err) =>
+      return @logger.log @logger.level.ERROR, 'No connection with the database', err if err
 
+      server = new server @config.port
+      server.bind()
+
+  # Register all application events
   handleEvents: ->
-    # Register all application events
     @on 'application:started', -> @logger.log @logger.level.INFO, "Server started in #{Date.now() - startTime}ms"
     @on 'application:dispose', @dispose
 
@@ -61,6 +60,7 @@ class Application
       process.on 'SIGTERM', ->
         process.exit 0
 
+  # Load application plugins
   loadPlugins: ->
     plugins = pkg.packageDependencies
 
@@ -80,6 +80,6 @@ class Application
       catch error then @logger.log @logger.level.ERROR, "Cannot load '#{key}' plugin", error
     )
 
+  # Dispose with success code
   dispose: ->
-    # Exit with success code
     process.exit 0

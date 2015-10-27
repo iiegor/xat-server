@@ -1,44 +1,34 @@
-mysql = require "mysql"
-config = require "../../config/database"
-genericPool = require "generic-pool"
+config = require '../../config/database'
+mysql = require 'mysql'
 
 ###
-Package: https://github.com/coopernurse/node-pool
-Documentation: http://nodejsdb.org/2011/05/connection-pooling-node-db-with-generic-pool/
+Package documentation: https://github.com/felixge/node-mysql
 ###
 
-Pool = genericPool.Pool(
-  name: 'mysql'
-  max: 10
-  idleTimeoutMillis: 30000
-
-  create: (callback) ->
-    Connection = new mysql.createConnection({
-    	host: config.mysql.server
-    	user: config.mysql.user
-    	password: config.mysql.password
-    	database: config.mysql.database
-    })
-    Connection.connect()
-
-    callback Connection
-
-  destroy: (client) ->
-    client.end()
+Pool = mysql.createPool(
+  connectionLimit: 10
+  host: config.mysql.server
+  user: config.mysql.user
+  password: config.mysql.password
+  database: config.mysql.database
 )
 
 module.exports =
-  exec: (sql=null) ->
-    new Promise((resolve, reject) ->
-      Pool.acquire (err, db) ->
-        reject(err) if err
+  # Ping database
+  initialize: (cb) ->
+    Pool.getConnection (err) -> cb err
 
-        # Execute
-        if sql is null
-          resolve()
-        else
-          db.query(sql, (db, data) -> resolve(data))
+  # Execute sql
+  exec: (sql=null) -> new Promise((resolve, reject) ->
+    Pool.getConnection (err, connection) ->
+      reject(err) if err
 
-        # Release
-        Pool.release db
-    )
+      # Execute query
+      if sql is null
+        resolve()
+      else
+        connection.query(sql, (err, rows) -> resolve(rows))
+
+      # Release connection
+      connection.release()
+  )
