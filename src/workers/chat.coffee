@@ -60,8 +60,7 @@ module.exports =
       @handler.send "<m t=\"/s#{@chat.sc}\" d=\"1010208\"  />"
 
       ## Room messages
-      # TODO: Limit messages; Fix bug using order desc and limit
-      database.exec("SELECT message, uid FROM messages WHERE id = '#{roomId}' AND pool = '#{@chat.onPool}' ORDER BY time desc LIMIT 0,15").then((data) =>
+      database.exec("SELECT * FROM (SELECT * FROM messages ORDER BY time DESC LIMIT 15) sub ORDER BY time ASC LIMIT 0,15").then((data) =>
         data.forEach((message) => @handler.send "<m t=\"#{message.message}\" u=\"#{message.uid}\"  />")
 
         ## Done packet
