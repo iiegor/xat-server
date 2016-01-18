@@ -17,3 +17,5 @@ module.exports =
             str += " #{k}=\"#{v}\""
           str += " />"
           return str
+    CreatePacket: (type,data) ->
+      return this.CreatePacketFrom('array',type,data)
