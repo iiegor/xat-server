@@ -73,7 +73,7 @@ module.exports =
     MessageVars =
     't':message
     'u':user
-    MessagePacket = PacketCreator.CreatePacketFrom('array','m',MessageVars)
+    MessagePacket = PacketCreator.CreatePacket('m',MessageVars)
     @handler.broadcast MessagePacket
     database.exec("INSERT INTO messages (id, uid, message, name, registered, avatar, time, pool) values ('#{@handler.user.chat}', '#{@handler.user.id}', '#{message}', '#{@handler.user.nickname}', '#{@handler.user.username||'unregistered'}', '#{@handler.user.avatar}', '#{math.time()}', '#{@handler.chat.onPool}')").then((data) ->
       logger.log logger.level.DEBUG, 'New message sent'
