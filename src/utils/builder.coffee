@@ -1,3 +1,10 @@
+###
+Usage:
+  packet = packet.create('tagName')
+  packet.append('attrName', 'attrData')
+  packet.compose()
+###
+
 module.exports =
 class Packet
   ###
