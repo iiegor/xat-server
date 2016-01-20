@@ -1,6 +1,7 @@
 database = require "../services/database"
 parser = require "../utils/parser"
 math = require "../utils/math"
+PacketCreator = require "../utils/functions"
 logger = new (require "../utils/logger")(name: 'Chat')
 
 module.exports =
@@ -69,8 +70,11 @@ module.exports =
     )
 
   sendMessage: (@handler, user, message) ->
-    @handler.broadcast "<m t=\"#{message}\" u=\"#{user}\"  />"
-
+    MessageVars =
+    't':message
+    'u':user
+    MessagePacket = PacketCreator.CreatePacket('m',MessageVars)
+    @handler.broadcast MessagePacket
     database.exec("INSERT INTO messages (id, uid, message, name, registered, avatar, time, pool) values ('#{@handler.user.chat}', '#{@handler.user.id}', '#{message}', '#{@handler.user.nickname}', '#{@handler.user.username||'unregistered'}', '#{@handler.user.avatar}', '#{math.time()}', '#{@handler.chat.onPool}')").then((data) ->
       logger.log logger.level.DEBUG, 'New message sent'
     ).catch((err) -> logger.log logger.level.ERROR, 'Failed to send a message to the database', err)
