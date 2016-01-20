@@ -27,7 +27,7 @@ class Server
   bind: ->
     @server = new net.Server(
       allowHalfOpen: false
-      type: "tcp4"
+      type: 'tcp4'
     )
 
     @server.on 'connection', (socket) =>
@@ -59,6 +59,8 @@ class Server
     @server.listen @port, -> global.Application.emit('application:started')
 
   getClientById: (id) ->
+    # TODO: To avoid doing loops here maybe we can add each client with
+    # an identiefier so this way we only need to do clients[id].
     for client in @clients
       return client if client.handler.user.id is id
 
