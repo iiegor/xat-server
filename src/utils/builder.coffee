@@ -24,5 +24,7 @@ class Packet
   append: (key, value) ->
     @packet += " #{key}=\"#{value}\""
 
+    return @
+
   compose: -> "#{@packet} />"
 

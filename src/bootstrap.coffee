@@ -48,7 +48,7 @@ class Application
     database.initialize (err) =>
       return @logger.log @logger.level.ERROR, 'No connection with the database', err if err
 
-      server = new server @config.port
+      server = new server(@config.port, @config.host)
       server.bind()
 
   # Register all application events

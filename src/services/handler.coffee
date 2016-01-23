@@ -1,6 +1,7 @@
 parser = require "../utils/parser"
 math = require "../utils/math"
 logger = require "../utils/logger"
+builder = require "../utils/builder"
 
 User = require "../workers/user"
 Chat = require "../workers/chat"
@@ -12,14 +13,16 @@ class Handler
   ###
   Section: Properties
   ###
-  logger: new logger(name: 'Handler')
+  id: null
+  socket: null
   user: {}
   chat: null
+  logger: new logger(name: 'Handler')
 
   ###
   Section: Construction
   ###
-  constructor: (@socket) ->
+  constructor: ->
 
   ###
   Section: Private
@@ -43,17 +46,20 @@ class Handler
         loginShift = math.random(2, 5)
         loginTime = math.time()
 
-        @send "<y i=\"#{loginKey}\" c=\"#{loginTime}\" p=\"100_100_5_102\" />"
+        @send(builder.create('y')
+          .append('i', loginKey)
+          .append('c', loginTime)
+          .append('p', '100_100_5_102')
+          .compose())
       when "j2"
         ###
         Authenticate the client and join room
         @spec <j2 cb="0" l5="4288326302" l4="1400" l3="1267" l2="0" q="1" y="72226157" k="f13cee2b165605b4e400" k3="0" p="0" c="1" f="1" u="USER_ID(int)" d0="0" n="USERNAME(str)" a="91" h="" v="1" />
         ###
         User.process(@, packet).then(() =>
-          for client in global.Server.clients
-            client.write '<dup />\0' if client.handler.user.id is @user.id and client.handler.socket != @socket
+          @id = @user.id
 
-          Chat.joinRoom(@, @user.chat)
+          Chat.joinRoom.call(@)
         ).catch((err) => @logger.log @logger.level.ERROR, err, null)
       when "v"
         ###
@@ -72,8 +78,10 @@ class Handler
         user = parser.getAttribute(packet, 'u')
         msg = parser.getAttribute(packet, 't')
 
-        Chat.sendMessage(@, user, msg) unless msg.indexOf(Commander.identifier) is 0
-        Commander.process(@, user, msg)
+        if msg.indexOf(Commander.identifier) is 0
+          Commander.process(@, user, msg)
+        else
+          Chat.sendMessage.call(@, user, msg)
       when "c"
         ###
         Save user profile data
@@ -111,12 +119,9 @@ class Handler
           @spec <w v="ACTUAL_POOL(int) POOLS(int,int..)"  />
           ###
           @chat.onPool = packetTag.split('w')[1]
-          Chat.joinRoom(@, @user.chat)
+          Chat.joinRoom.call(@)
         else
           @logger.log @logger.level.ERROR, "Unrecognized packet by the server!", packetTag
-
-          # INFO: We emit an event with the unrecognized packet so a plugin will be able to handle it in a future.
-          # global.Server.emit 'unrecognized-packet', packet
 
   send: (packet) ->
     @socket.write "#{packet}\0"
@@ -125,10 +130,21 @@ class Handler
     @logger.log @logger.level.DEBUG, "-> Sent: #{packet}"
 
   broadcast: (packet) ->
-    client.write "#{packet}\0" for client in global.Server.clients when client.handler.id isnt @user.id and client.writable
+    client.write "#{packet}\0" for client in global.Server.clients when client.id isnt @user.id and client.writable
     
     # Debug
     @logger.log @logger.level.DEBUG, "-> Broadcasted: #{packet}"
+
+  setSocket: (socket) ->
+    @socket = socket
+
+    @socket.on 'data', (buffer) =>
+      # Close the socket if it's a HTTP req
+      if buffer.toString().indexOf('HTTP/') != -1
+        @socket.end()
+        return
+
+      @read buffer.toString('binary')
 
   dispose: ->
     @socket.end()
