@@ -77,10 +77,7 @@ module.exports =
       ## Disabled at the moment for testing without register
       #return if @user.guest
 
-      @updateDetails()
-      @user.authenticated = true
-
-      callback(true, null)
+      @updateDetails(callback)
     )
 
   resetDetails: (userId, callback) ->
@@ -105,11 +102,15 @@ module.exports =
         callback(true)
     )
 
-  updateDetails: () ->
+  updateDetails: (callback) ->
     if @user.id != 0
-      database.exec("UPDATE users SET nickname = '#{@user.nickname}', avatar = '#{@user.avatar}', url = '#{@user.url}', remoteAddress = '#{@handler.socket.remoteAddress}' WHERE id = '#{@user.id}'").then((data) ->
-        # ..
+      database.exec("UPDATE users SET nickname = '#{@user.nickname}', avatar = '#{@user.avatar}', url = '#{@user.url}', remoteAddress = '#{@handler.socket.remoteAddress}' WHERE id = '#{@user.id}'").then((data) =>
+        @user.authenticated = true
+
+        callback(true, null)
       )
+    else
+      callback(false, "Failed to updateDetails for user #{@user.id}")
 
   getPowers: () ->
     if @user.days < 1
