@@ -106,10 +106,8 @@ module.exports =
     )
 
   updateDetails: () ->
-    self = @
-
     if @user.id != 0
-      database.exec("UPDATE users SET nickname = '#{self.user.nickname}', avatar = '#{self.user.avatar}', url = '#{self.user.url}', connectedlast = 'self.user.remoteAddress' WHERE id = '#{self.user.id}'").then((data) ->
+      database.exec("UPDATE users SET nickname = '#{@user.nickname}', avatar = '#{@user.avatar}', url = '#{@user.url}', remoteAddress = '#{@handler.socket.remoteAddress}' WHERE id = '#{@user.id}'").then((data) ->
         # ..
       )
 
