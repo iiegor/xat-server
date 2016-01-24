@@ -64,7 +64,7 @@ module.exports =
       @send "<m t=\"/s#{@chat.sc}\" d=\"1010208\"  />"
 
       ## Room messages
-      database.exec("SELECT * FROM (SELECT * FROM messages ORDER BY time DESC LIMIT 15) sub ORDER BY time ASC LIMIT 0,15").then((data) =>
+      database.exec("SELECT * FROM (SELECT * FROM messages WHERE id='#{@user.chat}' ORDER BY time DESC LIMIT 15) sub ORDER BY time ASC LIMIT 0,15").then((data) =>
         data.forEach((message) => @send "<m t=\"#{message.message}\" u=\"#{message.uid}\"  />")
 
         ## Done packet

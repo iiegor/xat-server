@@ -69,7 +69,7 @@ class Handler
         name = parser.getAttribute(packet, 'n')
         pw = parser.getAttribute(packet, 'p')
 
-        User.login(@, name, pw)
+        User.login.call(@, name, pw)
       when "m"
         ###
         Send message
