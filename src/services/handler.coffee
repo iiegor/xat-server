@@ -37,7 +37,7 @@ class Handler
 
     switch packetTag
       when "policy-file-request"
-        @send "<?xml version=\"1.0\"?><!DOCTYPE cross-domain-policy SYSTEM \"http://www.adobe.com/xml/dtds/cross-domain-policy.dtd\"><cross-domain-policy><site-control permitted-cross-domain-policies=\"master-only\"/>#{global.Application.config.allow}</cross-domain-policy>\0"          
+        @send "<?xml version=\"1.0\"?><!DOCTYPE cross-domain-policy SYSTEM \"http://www.adobe.com/xml/dtds/cross-domain-policy.dtd\"><cross-domain-policy><site-control permitted-cross-domain-policies=\"master-only\"/>#{global.Application.config.allow}</cross-domain-policy>\0"
       when "y"
         ###
         @spec <y r="1" v="0" u="USER_ID(int)" />
@@ -104,7 +104,7 @@ class Handler
           @send "<z b=\"1\" d=\"#{@user.id}\" u=\"#{userProfile.id}\" #{status} po=\"0\" #{userProfile.pStr} x=\"#{userProfile.xats||0}\" y=\"#{userProfile.days||0}\" q=\"3\" #{username} n=\"#{userProfile.nickname}\" a=\"#{userProfile.avatar}\" h=\"#{userProfile.url}\" v=\"2\" />"
         else if type is '/l'
           Profile.getById(userProfileId)
-            .then((data) => 
+            .then((data) =>
               @logger.log @logger.level.ERROR, "Unhandled null userProfile", null
             )
             .catch((err) => @logger.log @logger.level.ERROR, err, 'Profile.coffee - getById()')

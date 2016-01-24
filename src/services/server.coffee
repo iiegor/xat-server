@@ -34,7 +34,7 @@ class Server
     clientId = 0
     @server.on 'connection', (socket) =>
       client = new handler
-      client.id = clientId++;
+      client.id = clientId++
 
       # NOTE: The client id is changed to the real one on authentication
       @clients[client.id] = client

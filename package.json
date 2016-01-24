@@ -1,7 +1,7 @@
 {
   "name": "xat-server",
-  "description": "A Node.js private server for xat.com",
   "version": "0.1.7",
+  "description": "A Node.js private server for xat.com",
   "main": "./src/bootstrap",
   "bin": {
     "xat": "./bin/xat"
@@ -22,6 +22,13 @@
     "semver": "^5.1.0",
     "underscore": "^1.8.3"
   },
+  "devDependencies": {
+    "coffeelint": "^1.14.2"
+  },
   "packageDependencies": {},
-  "private": true
+  "private": true,
+  "scripts": {
+    "start": "node bin/xat",
+    "lint": "coffeelint src"
+  }
 }

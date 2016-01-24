@@ -5,7 +5,7 @@ database = require "../services/database"
 
 module.exports =
   login: (name, pw) ->
-    # TODO: 
+    # TODO:
     #   Fix user days packet attr.
     #   Complete all the attrs with real data.
     # INFO:
@@ -23,21 +23,20 @@ module.exports =
       @send '<c t="/bd"  />'
       @send "<c t=\"/b #{user.id},5,,#{user.nickname},#{user.avatar},#{user.url},0,0,0,0,0,0,0,0,0,0,0,0,0,0\"  />"
       @send '<c t="/bf"  />'
-      @send '<ldone  />' 
+      @send '<ldone  />'
     )
 
-  process: (@handler, packet) -> new Promise((resolve, reject) =>
-      @user = @handler.user
+  process: (@handler, packet) -> new Promise (resolve, reject) =>
+    @user = @handler.user
 
-      # Check
-      if @user.length > 1 and @user.authenticated == true
-        logger.log logger.level.DEBUG, "The user is already authenticated!"
-        @logout()
-        callback(false)
+    # Check
+    if @user.length > 1 and @user.authenticated == true
+      logger.log logger.level.DEBUG, "The user is already authenticated!"
+      @logout()
+      callback(false)
 
-      # Authenticate
-      @auth(packet, (done, err) -> if done is true then resolve() else reject(err))
-    )
+    # Authenticate
+    @auth(packet, (done, err) -> if done is true then resolve() else reject(err))
 
   auth: (packet, callback) ->
     # Parse the packet
