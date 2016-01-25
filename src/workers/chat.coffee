@@ -73,7 +73,7 @@ module.exports =
         packet = builder.create('o')
         packet.append('u', user.id)
         packet.append('d0', user.d0)
-        packet.append('q', '3')
+        packet.append('q', '1')
         packet.append('N', user.username)
         packet.append('n', user.nickname)
         packet.append('a', user.avatar)

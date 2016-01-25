@@ -122,8 +122,20 @@ class Handler
         else if type is '/a'
           return
         else
-          # Private Chat
+          # NOTE: What is this?
+          # Maybe private chat packet for offline users
           @send "<z u=\"#{@user.id}\" t=\"#{type}\" s=\"#{parser.getAttribute(packet, 's')}\" d=\"#{userProfileId}\" />"
+      when "p"
+        ###
+        Private chat
+        @spec <p u="TO-USER_ID" t="MESSAGE" s="2" d="FROM-USER_ID" />
+        ###
+        toID = parser.getAttribute(packet, 'u')
+        fromID = parser.getAttribute(packet, 'd')
+        message = parser.getAttribute(packet, 't')
+        s = parser.getAttribute(packet, 's')
+
+        global.Server.getClientById(toID).send(builder.create('p').append('E', "#{Date.now()}").append('u', fromID).append('t', message).append('s', s).append('d', fromID).compose())
       else
         if packetTag.indexOf('w') is 0
           ###
@@ -144,10 +156,12 @@ class Handler
   broadcast: (packet) ->
     console.log global.Server.rooms
 
-    for client in global.Server.rooms[@user.chat] when client isnt @user.id
-      console.log "Broadcasting to: #{global.Server.rooms[@user.chat]}"
-      # NOTE: Maybe we can use the handler 'send' method
-      global.Server.getClientById(client).socket.write "#{packet}\0"
+    for client in global.Server.rooms[@user.chat]
+      break if @user.id == client
+
+      console.log "Broadcasting from #{@user.id} to #{client}"
+
+      global.Server.getClientById(client).send packet
 
     # Debug
     @logger.log @logger.level.DEBUG, "-> Broadcasted: #{packet}"
