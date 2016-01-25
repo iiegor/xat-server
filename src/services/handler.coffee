@@ -63,6 +63,7 @@ class Handler
             global.Server.clients[@user.id].send '<dup />'
             global.Server.clients[@user.id].dispose()
 
+          @id = @user.id
           global.Server.clients[@user.id] = @
 
           Chat.joinRoom.call(@)
@@ -121,6 +122,7 @@ class Handler
         else if type is '/a'
           return
         else
+          # Private Chat
           @send "<z u=\"#{@user.id}\" t=\"#{type}\" s=\"#{parser.getAttribute(packet, 's')}\" d=\"#{userProfileId}\" />"
       else
         if packetTag.indexOf('w') is 0

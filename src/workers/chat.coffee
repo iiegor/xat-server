@@ -82,6 +82,9 @@ module.exports =
 
         @send packet.compose()
 
+      ## Send 
+      @send '<o u="265826731" q="1" n="Returns" N="iegor" a="147" h="" v="1"  />'
+
       ## Broadcast the current user
       ## NOTE: Maybe this needs to be sent more earlier
       username = if not @user.guest and @user.username then "N=\"#{@user.username}\"" else ''
