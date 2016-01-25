@@ -37,8 +37,6 @@ class Server
       client = new handler
       client.id = clientId++
 
-      console.log @rooms
-
       # NOTE: The client id is changed to the real one on authentication
       @clients[client.id] = client
 
