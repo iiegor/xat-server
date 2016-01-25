@@ -20,6 +20,12 @@ module.exports =
 
       return false if !@chat
 
+      ## Push the user to the rooms object
+      if typeof global.Server.rooms[@user.chat] is 'object'
+        global.Server.rooms[@user.chat].push @user.id
+      else
+        global.Server.rooms[@user.chat] = new Array @user.id
+
       @chat.attached = try JSON.parse(@chat.attached) catch error then {}
       @chat.onPool = @chat.onPool || 0
 
@@ -55,16 +61,37 @@ module.exports =
       # 170 - mod
       # 171 - member
       # 172 - owner
-      @send '<u cb="1414865425" s="1" f="169" p0="1979711487" p1="2147475455" p2="2147483647" p3="2147483647" p4="2113929211" p5="2147483647" p6="2147352575" p7="2147483647" p8="2147483647" p9="8372223" u="42" d0="151535720" q="3" N="xat" n="server(glow#02000a#r)(hat#ht)##testing..#02000a#r" a="xatwebs.co/test.png" h="" v="0"  />'
+      # @send '<u cb="1414865425" s="1" f="169" p0="1979711487" p1="2147475455" p2="2147483647" p3="2147483647" p4="2113929211" p5="2147483647" p6="2147352575" p7="2147483647" p8="2147483647" p9="8372223" u="42" d0="151535720" q="3" N="xat" n="server(glow#02000a#r)(hat#ht)##testing..#02000a#r" a="xatwebs.co/test.png" h="" v="0"  />'
 
+      ## Send connected users to client
+      for userId in global.Server.rooms[@user.chat]
+        if userId is @user.id or !global.Server.clients[userId]
+          break
+
+        user = global.Server.clients[userId]
+        
+        packet = builder.create('o')
+        packet.append('u', user.id)
+        packet.append('d0', user.d0)
+        packet.append('q', '3')
+        packet.append('N', user.username)
+        packet.append('n', user.nickname)
+        packet.append('a', user.avatar)
+        packet.append('h', user.url)
+        packet.append('v', '1')
+
+        @send packet.compose()
+
+      ## Broadcast the current user
+      ## NOTE: Maybe this needs to be sent more earlier
       username = if not @user.guest and @user.username then "N=\"#{@user.username}\"" else ''
       @broadcast "<u cb=\"1443256921\" s=\"1\" rank=\"1\" f=\"#{@user.f}\" #{@user.pStr} u=\"#{@user.id}\" d0=\"#{@user.d0}\" d2=\"#{@user.d2}\" q=\"3\" #{username} n=\"#{@user.nickname}\" a=\"#{@user.avatar}\" h=\"#{@user.url}\" v=\"0\"  />\0"
 
       ## Scroll message
-      @send "<m t=\"/s#{@chat.sc}\" d=\"1010208\"  />"
+      @send builder.create('m').append('t', "/s#{@chat.sc}").append('d', '1010208').compose()
 
       ## Room messages
-      database.exec("SELECT * FROM (SELECT * FROM messages WHERE id='#{@user.chat}' ORDER BY time DESC LIMIT 15) sub ORDER BY time ASC LIMIT 0,15").then((data) =>
+      database.exec("SELECT * FROM (SELECT * FROM messages WHERE id='#{@user.chat}' AND pool='#{@chat.onPool}' ORDER BY time DESC LIMIT 15) sub ORDER BY time ASC LIMIT 0,15").then((data) =>
         data.forEach((message) => @send "<m t=\"#{message.message}\" u=\"#{message.uid}\"  />")
 
         ## Done packet

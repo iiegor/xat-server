@@ -16,6 +16,7 @@ class Server
   logger: new logger(this)
   server: null
   clients: {}
+  rooms: {}
 
   ###
   Section: Construction
@@ -36,6 +37,8 @@ class Server
       client = new handler
       client.id = clientId++
 
+      console.log @rooms
+
       # NOTE: The client id is changed to the real one on authentication
       @clients[client.id] = client
 
@@ -43,8 +46,18 @@ class Server
 
       socket.on 'end', =>
         @logger.log @logger.level.DEBUG, "A user has been disconnected!"
-        
+
+        if @rooms[client.user.chat]
+          clientIndex = @rooms[client.user.chat].indexOf(client.id)
+
+          @rooms[client.user.chat].splice(clientIndex, 1) if clientIndex > -1
+
+          #delete @rooms[client.user.chat] if @rooms[client.user.chat].length < 1
+
         delete @clients[client.id]
+
+      socket.on 'error', (err) =>
+        @logger.log @logger.level.ERROR, "Socket exception from #{socket.remoteAddress}", err
 
     @server.on 'error', (err) =>
       @logger.log @logger.level.ERROR, "Server exception at server.coffee", err

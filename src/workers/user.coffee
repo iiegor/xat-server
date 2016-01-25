@@ -119,6 +119,6 @@ module.exports =
     return true
 
   logout: ->
-    @handler.send '<dup />'
+    @send '<dup />'
     @user = {}
-    @handler.dispose()
+    @dispose()

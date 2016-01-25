@@ -57,7 +57,13 @@ class Handler
         @spec <j2 cb="0" l5="4288326302" l4="1400" l3="1267" l2="0" q="1" y="72226157" k="f13cee2b165605b4e400" k3="0" p="0" c="1" f="1" u="USER_ID(int)" d0="0" n="USERNAME(str)" a="91" h="" v="1" />
         ###
         User.process(@, packet).then(() =>
-          @id = @user.id
+          delete global.Server.clients[@id]
+
+          if global.Server.clients[@user.id]
+            global.Server.clients[@user.id].send '<dup />'
+            global.Server.clients[@user.id].dispose()
+
+          global.Server.clients[@user.id] = @
 
           Chat.joinRoom.call(@)
         ).catch((err) => @logger.log @logger.level.ERROR, err, null)
@@ -87,6 +93,10 @@ class Handler
         Save user profile data
         @spec <c u="2" t="/b USER_ID(int),UNKNOWN(int),,USERNAME(str),AVATAR(str),HOME(str),0,0,0,0....." />
         ###
+        type = parser.getAttribute(packet, 't')
+
+        return if type is '/KEEPALIVE'
+        
         @logger.log @logger.level.ERROR, "Unhandled user data update packet", null
       when "z"
         ###
@@ -94,12 +104,12 @@ class Handler
         @spec <z d="USER_ID_PROFILE(int)" u="USER_ID_ORIGIN(int)" t="TYPE(str)" />
         ###
         userProfileId = parser.getAttribute(packet, 'd')
-        userProfile = global.Server.getClientById( userProfileId )?.handler.user || null
+        userProfile = global.Server.getClientById( userProfileId )?.user || null
         userOrigin = parser.getAttribute(packet, 'u')
         type = parser.getAttribute(packet, 't')
 
         if type is '/l' and userProfile != null
-          username = if userProfile.username then 'N=\"#{userProfile.username}\"' else ''
+          username = if userProfile.username then "N=\"#{userProfile.username}\"" else ''
           status = "t=\"/a_Nofollow\"" # t=\"/a_on GROUP\"
           @send "<z b=\"1\" d=\"#{@user.id}\" u=\"#{userProfile.id}\" #{status} po=\"0\" #{userProfile.pStr} x=\"#{userProfile.xats||0}\" y=\"#{userProfile.days||0}\" q=\"3\" #{username} n=\"#{userProfile.nickname}\" a=\"#{userProfile.avatar}\" h=\"#{userProfile.url}\" v=\"2\" />"
         else if type is '/l'
@@ -130,8 +140,13 @@ class Handler
     @logger.log @logger.level.DEBUG, "-> Sent: #{packet}"
 
   broadcast: (packet) ->
-    client.write "#{packet}\0" for client in global.Server.clients when client.id isnt @user.id and client.writable
-    
+    console.log global.Server.rooms
+
+    for client in global.Server.rooms[@user.chat] when client isnt @user.id
+      console.log "Broadcasting to: #{global.Server.rooms[@user.chat]}"
+      # NOTE: Maybe we can use the handler 'send' method
+      global.Server.getClientById(client).socket.write "#{packet}\0"
+
     # Debug
     @logger.log @logger.level.DEBUG, "-> Broadcasted: #{packet}"
 
