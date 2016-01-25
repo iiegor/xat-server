@@ -11,6 +11,6 @@ for (dep in deps) {
     version = deps[dep];
 
   safeExec('npm install ' + name + '@' + version, function() {
-    console.log('> Package dependencies installed!')
+    console.log('> Package dependencies installed!');
   });
 }
