@@ -26,6 +26,7 @@ module.exports =
       @send '<ldone  />'
     )
 
+  # TODO: Improve this
   process: (@handler, packet) -> new Promise (resolve, reject) =>
     @user = @handler.user
 
