@@ -29,12 +29,6 @@ module.exports =
   process: (@handler, packet) -> new Promise (resolve, reject) =>
     @user = @handler.user
 
-    # Check
-    if @user.length > 1 and @user.authenticated == true
-      logger.log logger.level.DEBUG, "The user is already authenticated!"
-      @logout()
-      callback(false)
-
     # Authenticate
     @auth(packet, (done, err) -> if done is true then resolve() else reject(err))
 

@@ -61,7 +61,7 @@ class Handler
 
           if global.Server.clients[@user.id]
             global.Server.clients[@user.id].send '<dup />'
-            global.Server.clients[@user.id].dispose()
+            global.Server.clients[@user.id].socket.end()
 
           @id = @user.id
           global.Server.clients[@user.id] = @
