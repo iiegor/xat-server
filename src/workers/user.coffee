@@ -19,7 +19,7 @@ module.exports =
 
       str = 'd4="2209282" d5="6292512" d6="2097193" d9="262144"'
 
-      @send "<v #{days} d0=\"#{user.d0}\" #{married} d3=\"#{user.d3}\" #{str} dx=\"#{user.xats}\" dt=\"1344072443\" i=\"#{user.id}\" n=\"#{user.username}\" k2=\"#{user.k2}\" k3=\"#{user.k3}\" k1=\"#{user.k}\"  />"
+      @send "<v d0=\"#{user.d0}\" #{days} #{married} d3=\"#{user.d3}\" #{str} dx=\"#{user.xats}\" dt=\"#{Date.now()}\" i=\"#{user.id}\" n=\"#{user.username}\" k2=\"#{user.k2}\" k3=\"#{user.k3}\" k1=\"#{user.k}\"  />"
       @send '<c t="/bd"  />'
       @send "<c t=\"/b #{user.id},5,,#{user.nickname},#{user.avatar},#{user.url},0,0,0,0,0,0,0,0,0,0,0,0,0,0\"  />"
       @send '<c t="/bf"  />'
@@ -49,13 +49,16 @@ module.exports =
 
     i = 0
     while i <= 20
-      @user["p#{i}v"] = null
-      @user["m#{i}"] = null
+      @user["p#{i}v"] = 0
+      @user["m#{i}"] = 0
       @user.pStr += "p#{i}=\"" + @user["p#{i}v"] + "\" "
       i++
 
     @resetDetails(@user.id, (res) =>
-      callback(false, "Reset details failed for user with id #{@user.id}") if !res
+      if !res
+        @handler.send "<logout e=\"F036\" />"
+        callback(false, "Reset details failed for user with id #{@user.id}")
+        return
 
       @user.url = packet['h']
       @user.avatar = packet['a']
@@ -68,9 +71,6 @@ module.exports =
         @user.nickname = @user.nickname.join('##')
       else
         @user.nickname = @user.nickname[0]
-
-      ## Disabled at the moment for testing without register
-      #return if @user.guest
 
       @updateDetails(callback)
     )
@@ -92,10 +92,12 @@ module.exports =
         @user.days = Math.floor((user['days'] - math.time()) / 86400)
         @user.k2 = user['k2']
         @user.d0 = user['d0']
-        @user.d1 = user['d1']
+        @user.d1 = user['days']
         @user.d2 = user['d2']
         @user.d3 = user['d3']
         @user.dt = user['dt']
+
+        @user.dO = user['dO'] if @getPowers()
 
         callback(true)
     )
@@ -112,7 +114,8 @@ module.exports =
 
   getPowers: () ->
     if @user.days < 1
-      return true
+      return false
+
 
     return true
 
