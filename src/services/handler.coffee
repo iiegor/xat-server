@@ -23,6 +23,8 @@ class Handler
   Section: Construction
   ###
   constructor: ->
+      # NOTE: I don't know why it's helps. Need to fix later.
+      @user = {}
 
   ###
   Section: Private
