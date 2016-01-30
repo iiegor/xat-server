@@ -57,7 +57,7 @@ module.exports =
     @resetDetails(@user.id, (res) =>
       if !res
         @handler.send "<logout e=\"F036\" />"
-        callback(false, "Reset details failed for user with id #{@user.id}") 
+        callback(false, "Reset details failed for user with id #{@user.id}")
         return
 
       @user.url = packet['h']

@@ -80,7 +80,7 @@ module.exports =
 
         @send packet.compose()
 
-      ## Send 
+      ## Send
       # @send '<o u="265826731" q="1" n="Returns" N="iegor" a="147" h="" v="1"  />'
 
       ## Broadcast the current user
