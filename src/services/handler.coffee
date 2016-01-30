@@ -89,6 +89,7 @@ class Handler
           Commander.process(@, user, msg)
         else
           Chat.sendMessage.call(@, user, msg)
+
       when "c"
         ###
         Save user profile data
@@ -157,7 +158,7 @@ class Handler
     console.log global.Server.rooms
 
     for client in global.Server.rooms[@user.chat]
-      break if @user.id == client
+      continue if @user.id == client
 
       console.log "Broadcasting from #{@user.id} to #{client}"
 
