@@ -55,7 +55,10 @@ module.exports =
       i++
 
     @resetDetails(@user.id, (res) =>
-      callback(false, "Reset details failed for user with id #{@user.id}") if !res
+      if !res
+        @handler.send "<logout e=\"F036\" />"
+        callback(false, "Reset details failed for user with id #{@user.id}") 
+        return
 
       @user.url = packet['h']
       @user.avatar = packet['a']
@@ -68,9 +71,6 @@ module.exports =
         @user.nickname = @user.nickname.join('##')
       else
         @user.nickname = @user.nickname[0]
-
-      ## Disabled at the moment for testing without register
-      #return if @user.guest
 
       @updateDetails(callback)
     )
