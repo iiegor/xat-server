@@ -30,6 +30,8 @@ module.exports =
       @chat.onPool = @chat.onPool || 0
 
       ## Chat settings and info
+      ## r: 1 - (All main owner) / 2 - (All moderator) / 3 - (All member) / 4 (All owner)
+      ## v: 1 - (Normal) / 3 - (w_VIP) / 4 - (w_ALLP) / other - (All unregistered)
       packet = builder.create('i')
       packet.append('b', "#{@chat.bg};=#{@chat.attached.name||''};=#{@chat.attached.id||''};=#{@chat.language};=#{@chat.radio};=#{@chat.button}")
       packet.append('f', '21233728')
@@ -55,35 +57,31 @@ module.exports =
       ## Chat pools
       @send builder.create('w').append('v', "#{@chat.onPool} #{@chat.pool}").compose()
 
-      ## Fake user for testing (send here room users)
-      # f:
-      # 169 - main owner
-      # 170 - mod
-      # 171 - member
-      # 172 - owner
-      # @send '<u cb="1414865425" s="1" f="169" p0="1979711487" p1="2147475455" p2="2147483647" p3="2147483647" p4="2113929211" p5="2147483647" p6="2147352575" p7="2147483647" p8="2147483647" p9="8372223" u="42" d0="151535720" q="3" N="xat" n="server(glow#02000a#r)(hat#ht)##testing..#02000a#r" a="xatwebs.co/test.png" h="" v="0"  />'
-
       ## Send connected users to client
       for userId in global.Server.rooms[@user.chat]
-        if userId is @user.id or !global.Server.clients[userId]
+        if userId is @user.id or !global.Server.clients[userId] or global.Server.clients[userId].chat.onPool != @chat.onPool
           break
 
-        user = global.Server.clients[userId]
+        user = global.Server.clients[userId].user
         
-        packet = builder.create('o')
+        packet = builder.create('u')
+        packet.append('cb', '1414865425')
+        packet.append('s', '1')
+        packet.append('f', '169')
+        packet.append('p0', '1979711487')
         packet.append('u', user.id)
         packet.append('d0', user.d0)
-        packet.append('q', '1')
+        packet.append('q', '3')
         packet.append('N', user.username)
         packet.append('n', user.nickname)
         packet.append('a', user.avatar)
         packet.append('h', user.url)
-        packet.append('v', '1')
+        packet.append('v', '0')
 
         @send packet.compose()
 
       ## Send 
-      @send '<o u="265826731" q="1" n="Returns" N="iegor" a="147" h="" v="1"  />'
+      # @send '<o u="265826731" q="1" n="Returns" N="iegor" a="147" h="" v="1"  />'
 
       ## Broadcast the current user
       ## NOTE: Maybe this needs to be sent more earlier

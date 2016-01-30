@@ -19,7 +19,7 @@ module.exports =
 
       str = 'd4="2209282" d5="6292512" d6="2097193" d9="262144"'
 
-      @send "<v #{days} d0=\"#{user.d0}\" #{married} d3=\"#{user.d3}\" #{str} dx=\"#{user.xats}\" dt=\"1344072443\" i=\"#{user.id}\" n=\"#{user.username}\" k2=\"#{user.k2}\" k3=\"#{user.k3}\" k1=\"#{user.k}\"  />"
+      @send "<v d0=\"#{user.d0}\" #{days} #{married} d3=\"#{user.d3}\" #{str} dx=\"#{user.xats}\" dt=\"#{Date.now()}\" i=\"#{user.id}\" n=\"#{user.username}\" k2=\"#{user.k2}\" k3=\"#{user.k3}\" k1=\"#{user.k}\"  />"
       @send '<c t="/bd"  />'
       @send "<c t=\"/b #{user.id},5,,#{user.nickname},#{user.avatar},#{user.url},0,0,0,0,0,0,0,0,0,0,0,0,0,0\"  />"
       @send '<c t="/bf"  />'

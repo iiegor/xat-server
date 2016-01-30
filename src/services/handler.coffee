@@ -32,7 +32,9 @@ class Handler
 
     packetTag = parser.getTagName(packet)
 
-    # TODO: Kick when the user is spamming packets
+    # TODO:
+    #  Kick when the user is spamming packets
+    #  Implement <idle />
     return if packetTag is null
 
     switch packetTag
@@ -57,8 +59,10 @@ class Handler
         @spec <j2 cb="0" l5="4288326302" l4="1400" l3="1267" l2="0" q="1" y="72226157" k="f13cee2b165605b4e400" k3="0" p="0" c="1" f="1" u="USER_ID(int)" d0="0" n="USERNAME(str)" a="91" h="" v="1" />
         ###
         User.process(@, packet).then(() =>
+          # Delete user with fake id
           delete global.Server.clients[@id]
 
+          # Close opened connection
           if global.Server.clients[@user.id]
             global.Server.clients[@user.id].send '<dup />'
             global.Server.clients[@user.id].socket.end()
@@ -175,7 +179,7 @@ class Handler
         @socket.end()
         return
 
-      @read buffer.toString('binary')
+      @read buffer.toString('utf8')
 
   dispose: ->
     @socket.end()
