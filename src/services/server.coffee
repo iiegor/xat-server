@@ -42,9 +42,8 @@ class Server
       # NOTE: The client id is changed to the real one on authentication
       @clients[client.id] = client
 
-      client.setSocket(socket)
-
-      socket.on 'end', =>
+      socket._end = socket.end
+      socket.end = =>
         @logger.log @logger.level.DEBUG, "A user has been disconnected!"
 
         if @rooms[client.user.chat]
@@ -58,8 +57,11 @@ class Server
 
         delete @clients[client.id]
 
-      socket.on 'error', (err) =>
-        @logger.log @logger.level.ERROR, "Socket exception from #{socket.remoteAddress}", err
+        socket._end()
+
+      socket.on 'error', (err) => @logger.log @logger.level.ERROR, "Socket exception from #{socket.remoteAddress}", err
+
+      client.setSocket(socket)
 
     @server.on 'error', (err) =>
       @logger.log @logger.level.ERROR, "Server exception at server.coffee", err

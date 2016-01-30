@@ -70,7 +70,7 @@ class Handler
             global.Server.clients[@user.id].socket.end()
 
           @id = @user.id
-          global.Server.clients[@user.id] = @
+          global.Server.clients[@id] = @
 
           Chat.joinRoom.call(@)
         ).catch((err) => @logger.log @logger.level.ERROR, err, null)

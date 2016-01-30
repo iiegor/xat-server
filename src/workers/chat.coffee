@@ -59,26 +59,12 @@ module.exports =
 
       ## Send connected users to client
       for userId in global.Server.rooms[@user.chat]
-        if userId is @user.id or !global.Server.clients[userId] or global.Server.clients[userId].chat.onPool != @chat.onPool
-          break
+        continue if userId is @user.id or !global.Server.clients[userId] or global.Server.clients[userId].chat.onPool != @chat.onPool
 
         user = global.Server.clients[userId].user
-        
-        packet = builder.create('u')
-        packet.append('cb', '1414865425')
-        packet.append('s', '1')
-        packet.append('f', '169')
-        packet.append('p0', '1979711487')
-        packet.append('u', user.id)
-        packet.append('d0', user.d0)
-        packet.append('q', '3')
-        packet.append('N', user.username)
-        packet.append('n', user.nickname)
-        packet.append('a', user.avatar)
-        packet.append('h', user.url)
-        packet.append('v', '0')
 
-        @send packet.compose()
+        username = if not user.guest and user.username then "N=\"#{user.username}\"" else ''
+        @send "<u cb=\"1414865425\" s=\"1\" f=\"#{user.f}\" #{user.pStr} u=\"#{user.id}\" d0=\"#{user.d0}\" q=\"3\" #{username} n=\"#{user.nickname}\" a=\"#{user.avatar}\" h=\"#{user.url}\" v=\"0\"  />"
 
       ## Send
       # @send '<o u="265826731" q="1" n="Returns" N="iegor" a="147" h="" v="1"  />'
@@ -86,7 +72,7 @@ module.exports =
       ## Broadcast the current user
       ## NOTE: Maybe this needs to be sent more earlier
       username = if not @user.guest and @user.username then "N=\"#{@user.username}\"" else ''
-      @broadcast "<u cb=\"1443256921\" s=\"1\" rank=\"1\" f=\"#{@user.f}\" #{@user.pStr} u=\"#{@user.id}\" d0=\"#{@user.d0}\" d2=\"#{@user.d2}\" q=\"3\" #{username} n=\"#{@user.nickname}\" a=\"#{@user.avatar}\" h=\"#{@user.url}\" v=\"0\"  />\0"
+      @broadcast "<u cb=\"1443256921\" s=\"1\" f=\"#{@user.f}\" #{@user.pStr} u=\"#{@user.id}\" d0=\"#{@user.d0}\" d2=\"#{@user.d2}\" q=\"3\" #{username} n=\"#{@user.nickname}\" a=\"#{@user.avatar}\" h=\"#{@user.url}\" v=\"0\"  />"
 
       ## Scroll message
       @send builder.create('m').append('t', "/s#{@chat.sc}").append('d', '1010208').compose()
