@@ -23,8 +23,8 @@ class Handler
   Section: Construction
   ###
   constructor: ->
-      # NOTE: I don't know why it's helps. Need to fix later.
-      @user = {}
+    # NOTE: I don't know why it's helps. Need to fix later.
+    @user = {}
 
   ###
   Section: Private
@@ -133,16 +133,27 @@ class Handler
           # Maybe private chat packet for offline users
           @send "<z u=\"#{@user.id}\" t=\"#{type}\" s=\"#{parser.getAttribute(packet, 's')}\" d=\"#{userProfileId}\" />"
       when "p"
-        ###
-        Private chat
-        @spec <p u="TO-USER_ID" t="MESSAGE" s="2" d="FROM-USER_ID" />
-        ###
         toID = parser.getAttribute(packet, 'u')
         fromID = parser.getAttribute(packet, 'd')
         message = parser.getAttribute(packet, 't')
         s = parser.getAttribute(packet, 's')
 
-        global.Server.getClientById(toID).send(builder.create('p').append('E', "#{Date.now()}").append('u', fromID).append('t', message).append('s', s).append('d', fromID).compose())
+        # NOTE: Maybe there is another way to identify the type of the packet?
+        if s is '2'
+          ###
+          Private chat
+          @spec <p u="TO-USER_ID" t="MESSAGE" s="2" d="FROM-USER_ID" />
+          ###
+
+          global.Server.getClientById(toID).send(builder.create('p').append('E', "#{Date.now()}").append('u', @user.id).append('t', message).append('s', s).append('d', @user.id).compose())
+        else
+          ###
+          Private message
+          @spec <p u="TO-USER_ID" t="MESSAGE" />
+          ###
+
+          global.Server.getClientById(toID).send(builder.create('p').append('u', @user.id).append('t', message).compose())
+
       else
         if packetTag.indexOf('w') is 0
           ###
