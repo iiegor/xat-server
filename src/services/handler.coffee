@@ -152,7 +152,7 @@ class Handler
           @spec <p u="TO-USER_ID" t="MESSAGE" />
           ###
 
-          global.Server.getClientById(toID).send(builder.create('p').append('u', @user.id).append('t', message).compose())
+          global.Server.getClientById(toID).send(builder.create('p').append('E', "#{Date.now()}").append('u', @user.id).append('t', message).compose())
 
       else
         if packetTag.indexOf('w') is 0
