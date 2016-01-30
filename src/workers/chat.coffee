@@ -35,7 +35,7 @@ module.exports =
       packet = builder.create('i')
       packet.append('b', "#{@chat.bg};=#{@chat.attached.name||''};=#{@chat.attached.id||''};=#{@chat.language};=#{@chat.radio};=#{@chat.button}")
       packet.append('f', '21233728')
-      packet.append('v', '1')
+      packet.append('v', '3')
       packet.append('cb', '2387')
       @send packet.compose()
 

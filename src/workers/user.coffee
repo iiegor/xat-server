@@ -49,8 +49,8 @@ module.exports =
 
     i = 0
     while i <= 20
-      @user["p#{i}v"] = null
-      @user["m#{i}"] = null
+      @user["p#{i}v"] = 0
+      @user["m#{i}"] = 0
       @user.pStr += "p#{i}=\"" + @user["p#{i}v"] + "\" "
       i++
 
@@ -91,8 +91,10 @@ module.exports =
         @user.xats = user['xats']
         @user.days = Math.floor((user['days'] - math.time()) / 86400)
         @user.k2 = user['k2']
-        @user.d1 = user['d1']
+        @user.d1 = user['days']
         @user.d2 = user['d2']
+
+        @user.dO = user['dO'] if @getPowers()
 
         callback(true)
     )
@@ -109,7 +111,8 @@ module.exports =
 
   getPowers: () ->
     if @user.days < 1
-      return true
+      return false
+
 
     return true
 

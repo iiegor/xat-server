@@ -174,11 +174,6 @@ class Handler
     @socket = socket
 
     @socket.on 'data', (buffer) =>
-      # Close the socket if it's a HTTP req
-      if buffer.toString().indexOf('HTTP/') != -1
-        @socket.end()
-        return
-
       @read buffer.toString('utf8')
 
   dispose: ->
