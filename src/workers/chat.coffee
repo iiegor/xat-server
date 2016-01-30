@@ -68,7 +68,7 @@ module.exports =
         if userId is @user.id or !global.Server.clients[userId]
           break
 
-        user = global.Server.clients[userId]
+        user = global.Server.clients[userId].user
         
         packet = builder.create('o')
         packet.append('u', user.id)
