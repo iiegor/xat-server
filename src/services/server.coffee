@@ -2,6 +2,7 @@ net = require "net"
 
 logger = require "../utils/logger"
 handler = require "./handler"
+builder = require "../utils/builder"
 
 {EventEmitter} = require "events"
 _ = require "underscore"
@@ -35,7 +36,8 @@ class Server
     clientId = 0
     @server.on 'connection', (socket) =>
       client = new handler
-      client.id = clientId++
+      client.id = clientId--
+      clientId %= 1 << 31
 
       # NOTE: The client id is changed to the real one on authentication
       @clients[client.id] = client
@@ -47,6 +49,8 @@ class Server
 
         if @rooms[client.user.chat]
           clientIndex = @rooms[client.user.chat].indexOf(client.id)
+
+          client.broadcast(builder.create('l').append('u', client.user.id).compose())
 
           @rooms[client.user.chat].splice(clientIndex, 1) if clientIndex > -1
 

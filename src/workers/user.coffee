@@ -91,8 +91,11 @@ module.exports =
         @user.xats = user['xats']
         @user.days = Math.floor((user['days'] - math.time()) / 86400)
         @user.k2 = user['k2']
+        @user.d0 = user['d0']
         @user.d1 = user['days']
         @user.d2 = user['d2']
+        @user.d3 = user['d3']
+        @user.dt = user['dt']
 
         @user.dO = user['dO'] if @getPowers()
 
