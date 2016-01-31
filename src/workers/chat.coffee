@@ -59,9 +59,11 @@ module.exports =
       @send builder.create('w').append('v', "#{@chat.onPool} #{@chat.pool}").compose()
 
       ## Send connected users to client
-      for _, user of global.Server.rooms[@user.chat]
-        if user.id is @user.id or !global.Server.clients[user.id] or user.chat.onPool != @chat.onPool
+      for _, client of global.Server.rooms[@user.chat]
+        if client.id is @user.id or !global.Server.clients[client.id] or client.chat.onPool != @chat.onPool
           continue
+
+        user = client.user
 
         packet = builder.create('u')
         packet.append('cb', '1414865425')
