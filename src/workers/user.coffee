@@ -63,8 +63,11 @@ module.exports =
 
     i = 0
     while i <= 20
-      @user["p#{i}v"] = 0
-      @user["m#{i}"] = 0
+      if !packet["d#{i + 4}"]
+        i++
+        continue
+
+      @user["p#{i}v"] = packet["d#{i + 4}"]
       @user.pStr += "p#{i}=\"" + @user["p#{i}v"] + "\" "
       i++
 
@@ -112,7 +115,7 @@ module.exports =
         @user.d3 = user['d3']
         @user.dt = user['dt']
 
-        @user.dO = user['dO'] if @getPowers()
+        @user.dO = user['dO'] if @user.days < 1
 
         callback(true)
     )
@@ -127,14 +130,8 @@ module.exports =
     else
       callback(false, "Failed to updateDetails for user #{@user.id}")
 
-  getPowers: () ->
-    if @user.days < 1
-      return false
-
-
-    return true
-
   logout: ->
     @send builder.create('dup').compose()
     @user = {}
     @dispose()
+

@@ -87,7 +87,7 @@ module.exports =
       ## Broadcast the current user
       ## NOTE: Maybe this needs to be sent more earlier
       username = if not @user.guest and @user.username then "N=\"#{@user.username}\"" else ''
-      @broadcast "<u cb=\"1443256921\" s=\"1\" rank=\"1\" f=\"#{@user.f}\" #{@user.pStr} u=\"#{@user.id}\" d0=\"#{@user.d0}\" d2=\"#{@user.d2}\" q=\"3\" #{username} n=\"#{@user.nickname}\" a=\"#{@user.avatar}\" h=\"#{@user.url}\" v=\"0\"  />\0"
+      @broadcast "<u cb=\"1443256921\" s=\"1\" f=\"#{@user.f}\" #{@user.pStr} u=\"#{@user.id}\" d0=\"#{@user.d0}\" d2=\"#{@user.d2}\" q=\"3\" #{username} n=\"#{@user.nickname}\" a=\"#{@user.avatar}\" h=\"#{@user.url}\" v=\"0\"  />"
 
       ## Scroll message
       @send builder.create('m').append('t', "/s#{@chat.sc}").append('d', '1010208').compose()

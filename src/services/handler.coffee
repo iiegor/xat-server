@@ -23,8 +23,7 @@ class Handler
   Section: Construction
   ###
   constructor: ->
-      # NOTE: I don't know why it's helps. Need to fix later.
-      @user = {}
+    @user = {}
 
   ###
   Section: Private
@@ -74,7 +73,7 @@ class Handler
             dupUser.socket.end()
 
           @id = @user.id
-          global.Server.clients[@user.id] = @
+          global.Server.clients[@id] = @
 
 
           Chat.joinRoom.call(@)
