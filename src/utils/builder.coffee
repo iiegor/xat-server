@@ -26,5 +26,10 @@ class Packet
 
     return @
 
+  appendRaw: (str) ->
+    @packet += " #{str}"
+
+    return @
+
   compose: -> "#{@packet} />"
 
