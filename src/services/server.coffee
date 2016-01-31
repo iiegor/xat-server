@@ -49,11 +49,10 @@ class Server
 
         if @clients[client.id] == client
           if @rooms[client.user.chat]
-            clientIndex = @rooms[client.user.chat].indexOf(client.id)
 
             client.broadcast(builder.create('l').append('u', client.user.id).compose())
 
-            @rooms[client.user.chat].splice(clientIndex, 1) if clientIndex > -1
+            delete @rooms[client.user.chat][client.user.id]
 
             #delete @rooms[client.user.chat] if @rooms[client.user.chat].length < 1
           delete @clients[client.id]

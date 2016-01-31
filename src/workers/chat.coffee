@@ -22,9 +22,10 @@ module.exports =
 
       ## Push the user to the rooms object
       if typeof global.Server.rooms[@user.chat] is 'object'
-        global.Server.rooms[@user.chat].push @user.id
+        global.Server.rooms[@user.chat][@user.id] = @
       else
-        global.Server.rooms[@user.chat] = new Array @user.id
+        global.Server.rooms[@user.chat] = { }
+        global.Server.rooms[@user.chat][@user.id] = @
 
       @chat.attached = try JSON.parse(@chat.attached) catch error then {}
       @chat.onPool = @chat.onPool || 0
@@ -58,12 +59,10 @@ module.exports =
       @send builder.create('w').append('v', "#{@chat.onPool} #{@chat.pool}").compose()
 
       ## Send connected users to client
-      for userId in global.Server.rooms[@user.chat]
-        if userId is @user.id or !global.Server.clients[userId] or global.Server.clients[userId].chat.onPool != @chat.onPool
-          break
+      for _, user of global.Server.rooms[@user.chat]
+        if user.id is @user.id or !global.Server.clients[user.id] or user.chat.onPool != @chat.onPool
+          continue
 
-        user = global.Server.clients[userId].user
-        
         packet = builder.create('u')
         packet.append('cb', '1414865425')
         packet.append('s', '1')

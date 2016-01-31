@@ -67,12 +67,15 @@ class Handler
           delete global.Server.clients[@id]
 
           # Close opened connection
-          if global.Server.clients[@user.id]
-            global.Server.clients[@user.id].send '<dup />'
-            global.Server.clients[@user.id].socket.end()
+          dupUser = global.Server.rooms[@user.chat]?[@user.id]
+
+          if dupUser
+            dupUser.send '<dup />'
+            dupUser.socket.end()
 
           @id = @user.id
           global.Server.clients[@user.id] = @
+
 
           Chat.joinRoom.call(@)
         ).catch((err) => @logger.log @logger.level.ERROR, err, null)
@@ -172,14 +175,14 @@ class Handler
     @logger.log @logger.level.DEBUG, "-> Sent: #{packet}"
 
   broadcast: (packet) ->
-    console.log global.Server.rooms
 
-    for client in global.Server.rooms[@user.chat]
-      continue if @user.id == client
+    for _, client of global.Server.rooms[@user.chat]
+      continue if @user.id == client.user.id
 
-      console.log "Broadcasting from #{@user.id} to #{client}"
+      console.log "Broadcasting from #{@user.id} to #{client.id}"
 
-      global.Server.getClientById(client).send packet
+      client.send packet
+
 
     # Debug
     @logger.log @logger.level.DEBUG, "-> Broadcasted: #{packet}"
