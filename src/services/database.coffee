@@ -18,17 +18,15 @@ module.exports =
   initialize: (cb) ->
     Pool.getConnection (err) -> cb err
 
-  # Execute sql
-  exec: (sql=null) -> new Promise((resolve, reject) ->
+  exec: (sql, values) -> new Promise((resolve, reject) ->
     Pool.getConnection (err, connection) ->
       reject(err) if err
 
-      # Execute query
-      if sql is null
-        resolve()
-      else
-        connection.query(sql, (err, rows) -> resolve(rows))
+      values = values || []
 
-      # Release connection
-      connection.release()
+      connection.query(sql, values, (err, rows) ->
+        connection.release()
+        reject(err) if err
+        resolve(rows)
+      )
   )
