@@ -151,9 +151,9 @@ class Handler
 
         msg = builder.create(packetTag).append('E', "#{Date.now()}").append('u', fromID).append('t', message)
         if s & 2
-            msg.append('s', s)
+          msg.append('s', s)
         if packetTag == 'z' or s & 2
-            msg.append('d', if packetTag == 'z' then toID else fromID)
+          msg.append('d', if packetTag == 'z' then toID else fromID)
 
         global.Server.getClientById(toID)?.send(msg.compose())
       when packetTag.indexOf('w') is 0
