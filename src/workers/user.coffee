@@ -49,8 +49,11 @@ module.exports =
 
     i = 0
     while i <= 20
-      @user["p#{i}v"] = if packet["d#{i + 4}"] then packet["d#{i + 4}"] else 0
-      @user["m#{i}"] = 0
+      if !packet["d#{i + 4}"]
+        i++
+        continue
+
+      @user["p#{i}v"] = packet["d#{i + 4}"]
       @user.pStr += "p#{i}=\"" + @user["p#{i}v"] + "\" "
       i++
 
