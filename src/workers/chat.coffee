@@ -64,7 +64,7 @@ module.exports =
         user = global.Server.clients[userId].user
 
         username = if not user.guest and user.username then "N=\"#{user.username}\"" else ''
-        @send "<u cb=\"1414865425\" s=\"1\" f=\"#{user.f}\" #{user.pStr} u=\"#{user.id}\" d0=\"#{user.d0}\" q=\"3\" #{username} n=\"#{user.nickname}\" a=\"#{user.avatar}\" h=\"#{user.url}\" v=\"0\"  />"
+        @send "<u cb=\"1414865425\" s=\"1\" f=\"#{user.f}\" #{user.pStr} u=\"#{user.id}\" d0=\"#{user.d0}\" d2=\"#{user.d2}\" q=\"3\" #{username} n=\"#{user.nickname}\" a=\"#{user.avatar}\" h=\"#{user.url}\" v=\"0\"  />"
 
       ## Send
       # @send '<o u="265826731" q="1" n="Returns" N="iegor" a="147" h="" v="1"  />'
