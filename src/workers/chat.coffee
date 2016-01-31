@@ -9,7 +9,7 @@ module.exports =
   joinRoom: ->
     return if @user.chat < 1 or isNaN(@user.chat) is true
 
-    database.execp('SELECT * FROM chats WHERE id = ? LIMIT 1', [@user.id]).then((data) =>
+    database.execp('SELECT * FROM chats WHERE id = ? LIMIT 1', [@user.chat]).then((data) =>
       if @user.chat is 8
         @send '<i b=";=;=;=- Cant ;=" f="932" v="1" cb="0"  />'
         @send '<w v="0 0 1"  />'
