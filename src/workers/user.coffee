@@ -35,7 +35,7 @@ module.exports =
 
       @send v.compose()
       @send builder.create('c').append('t', '/bd').compose()
-      @send builder.create('c').append('t', '/b #{user.id},5,,#{user.nickname},#{user.avatar},#{user.url},0,0,0,0,0,0,0,0,0,0,0,0,0,0').compose()
+      @send builder.create('c').append('t', "/b #{user.id},5,,#{user.nickname},#{user.avatar},#{user.url},0,0,0,0,0,0,0,0,0,0,0,0,0,0").compose()
       @send builder.create('c').append('t', 'bf').compose()
       @send builder.create('ldone').compose()
     )
