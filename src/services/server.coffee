@@ -53,7 +53,8 @@ class Server
 
           delete @rooms[client.user.chat][client.user.id]
 
-            #delete @rooms[client.user.chat] if @rooms[client.user.chat].length < 1
+          #delete @rooms[client.user.chat] if @rooms[client.user.chat].length < 1
+
         delete @clients[client.id]
 
         socket._end()
