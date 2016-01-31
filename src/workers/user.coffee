@@ -2,6 +2,7 @@ logger = new (require "../utils/logger")(name: 'User')
 parser = require "../utils/parser"
 math = require "../utils/math"
 database = require "../services/database"
+builder = require "../utils/builder"
 
 module.exports =
   login: (name, pw) ->
@@ -14,16 +15,29 @@ module.exports =
       return if data.length < 1
 
       user = data[0]
-      days = if parseInt(user.days) > 0 then "d1=\"#{user.days}\"" else ''
-      married = if parseInt(user.d2) > 0 then "d2=\"#{user.d2}\"" else ''
+      v = builder.create('v')
+      v.append('d1', user.days) if parseInt(user.days) > 0
+      v.append('d2', user.d2) if parseInt(user.d2) > 0
 
-      str = 'd4="2209282" d5="6292512" d6="2097193" d9="262144"'
+      v.append('d4', 2209282)
+        .append('d5', '6292512')
+        .append('d6', '2097193')
+        .append('d9', '262144')
+        .append('d0', user.d0)
+        .append('d3', user.d3)
+        .append('dx', user.xats)
+        .append('dt', Date.now())
+        .append('i', user.id)
+        .append('n', user.username)
+        .append('k2', user.k2)
+        .append('k3', user.k3)
+        .append('k1', user.k)
 
-      @send "<v d0=\"#{user.d0}\" #{days} #{married} d3=\"#{user.d3}\" #{str} dx=\"#{user.xats}\" dt=\"#{Date.now()}\" i=\"#{user.id}\" n=\"#{user.username}\" k2=\"#{user.k2}\" k3=\"#{user.k3}\" k1=\"#{user.k}\"  />"
-      @send '<c t="/bd"  />'
-      @send "<c t=\"/b #{user.id},5,,#{user.nickname},#{user.avatar},#{user.url},0,0,0,0,0,0,0,0,0,0,0,0,0,0\"  />"
-      @send '<c t="/bf"  />'
-      @send '<ldone  />'
+      @send v.compose()
+      @send builder.create('c').append('t', '/bd').compose()
+      @send builder.create('c').append('t', '/b #{user.id},5,,#{user.nickname},#{user.avatar},#{user.url},0,0,0,0,0,0,0,0,0,0,0,0,0,0').compose()
+      @send builder.create('c').append('t', 'bf').compose()
+      @send builder.create('ldone').compose()
     )
 
   # TODO: Improve this
@@ -56,7 +70,7 @@ module.exports =
 
     @resetDetails(@user.id, (res) =>
       if !res
-        @handler.send "<logout e=\"F036\" />"
+        @handler.send builder.create('logout').append('e', 'F036').compose()
         callback(false, "Reset details failed for user with id #{@user.id}")
         return
 
@@ -120,6 +134,6 @@ module.exports =
     return true
 
   logout: ->
-    @send '<dup />'
+    @send builder.create('dup').compose()
     @user = {}
     @dispose()
