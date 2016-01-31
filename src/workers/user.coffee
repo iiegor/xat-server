@@ -11,7 +11,7 @@ module.exports =
     #   Complete all the attrs with real data.
     # INFO:
     #   d2 - married id
-    database.exec("SELECT * FROM users WHERE username = '#{name}' AND loginKey = '#{pw}' LIMIT 1 ").then((data) =>
+    database.execp('SELECT * FROM users WHERE username = ? AND loginKey = ? LIMIT 1', [name, pw]).then((data) =>
       return if data.length < 1
 
       user = data[0]
@@ -90,7 +90,7 @@ module.exports =
     )
 
   resetDetails: (userId, callback) ->
-    database.exec("SELECT * FROM users WHERE id = '#{userId}' AND k = '#{@user.k}' AND k3 = '#{@user.k3}' LIMIT 1 ").then((data) =>
+    database.execp('SELECT * FROM users WHERE id = ? AND k = ? AND k3 = ? LIMIT 1', [userId, @user.k, @user.k3]).then((data) =>
       if data.length < 1
         callback(false)
       else if data[0].username is 'unregistered'
@@ -118,7 +118,7 @@ module.exports =
 
   updateDetails: (callback) ->
     if @user.id != 0
-      database.exec("UPDATE users SET nickname = '#{@user.nickname}', avatar = '#{@user.avatar}', url = '#{@user.url}', remoteAddress = '#{@handler.socket.remoteAddress}' WHERE id = '#{@user.id}'").then((data) =>
+      database.execp('UPDATE users SET nickname = ?, avatar = ?, url = ?, remoteAddress = ? WHERE id = ?', [@user.nickname, @user.avatar, @user.url, @handler.socket.remoteAddress, @user.id]).then((data) =>
         @user.authenticated = true
 
         callback(true, null)

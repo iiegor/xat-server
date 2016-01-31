@@ -9,7 +9,7 @@ module.exports =
   joinRoom: ->
     return if @user.chat < 1 or isNaN(@user.chat) is true
 
-    database.exec("SELECT * FROM chats WHERE id = '#{@user.chat}' LIMIT 1 ").then((data) =>
+    database.execp('SELECT * FROM chats WHERE id = ? LIMIT 1', [@user.id]).then((data) =>
       if @user.chat is 8
         @send '<i b=";=;=;=- Cant ;=" f="932" v="1" cb="0"  />'
         @send '<w v="0 0 1"  />'
@@ -93,7 +93,7 @@ module.exports =
       @send builder.create('m').append('t', "/s#{@chat.sc}").append('d', '1010208').compose()
 
       ## Room messages
-      database.exec("SELECT * FROM (SELECT * FROM messages WHERE id='#{@user.chat}' AND pool='#{@chat.onPool}' ORDER BY time DESC LIMIT 15) sub ORDER BY time ASC LIMIT 0,15").then((data) =>
+      database.execp('SELECT * FROM (SELECT * FROM messages WHERE id = ? AND pool = ? ORDER BY time DESC LIMIT 15) sub ORDER BY time ASC LIMIT 0,15', [ @user.chat, @chat.onPool ]).then((data) =>
         data.forEach((message) => @send "<m t=\"#{message.message}\" u=\"#{message.uid}\"  />")
 
         ## Done packet
@@ -104,6 +104,6 @@ module.exports =
   sendMessage: (user, message) ->
     @broadcast(builder.create('m').append('t', message).append('u', user).compose())
 
-    database.exec("INSERT INTO messages (id, uid, message, name, registered, avatar, time, pool) values ('#{@user.chat}', '#{@user.id}', '#{message}', '#{@user.nickname}', '#{@user.username||'unregistered'}', '#{@user.avatar}', '#{math.time()}', '#{@chat.onPool}')").then((data) ->
+    database.execp('INSERT INTO messages (id, uid, message, name, registered, avatar, time, pool) values (?, ?, ?, ?, ?, ?, ?, ?)', [ @user.chat, @user.id, message, @user.nickname, @user.username||'unregistered', @user.avatar, math.time(), @chat.onPool ]).then((data) ->
       logger.log logger.level.DEBUG, 'New message sent'
     ).catch((err) -> logger.log logger.level.ERROR, 'Failed to send a message to the database', err)

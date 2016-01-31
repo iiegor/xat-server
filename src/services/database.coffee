@@ -32,3 +32,15 @@ module.exports =
       # Release connection
       connection.release()
   )
+
+  execp: (sql, values) -> new Promise((resolve, reject) ->
+    Pool.getConnection (err, connection) ->
+      reject(err) if err
+
+
+      connection.query(sql, values, (err, rows) ->
+        connection.release()
+        reject(err) if err
+        resolve(rows)
+      )
+  )
