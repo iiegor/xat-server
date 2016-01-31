@@ -71,6 +71,7 @@ module.exports =
     @resetDetails(@user.id, (res) =>
       if !res
         @handler.send builder.create('logout').append('e', 'F036').compose()
+        @handler.dispose()
         callback(false, "Reset details failed for user with id #{@user.id}")
         return
 

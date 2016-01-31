@@ -50,7 +50,8 @@ class Server
         if @clients[client.id] == client
           if @rooms[client.user.chat]
 
-            client.broadcast(builder.create('l').append('u', client.user.id).compose())
+            if client.user.authenticated
+              client.broadcast(builder.create('l').append('u', client.user.id).compose())
 
             delete @rooms[client.user.chat][client.user.id]
 
