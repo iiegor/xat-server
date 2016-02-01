@@ -105,8 +105,8 @@ module.exports =
       @user.guest = true
       @user.id = @handler.id
       return callback(true)
-    database.exec('SELECT * FROM users WHERE id = ? AND k = ? LIMIT 1', [userId, @user.k, @user.k3]).then((data) =>
-      if data.length < 1
+    database.exec('SELECT * FROM users WHERE id = ? AND k = ? LIMIT 1', [userId, @user.k]).then((data) =>
+      if data.length < 1 or @user.k3 isnt data[0].k3
         return callback(false)
       
       @user.guest = false
