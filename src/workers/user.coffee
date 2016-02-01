@@ -59,7 +59,7 @@ module.exports =
     @user.guest = true
     @user.pStr = ''
     @user.k = packet['k']
-    @user.k3 = packet['k3']
+    @user.k3 = parseInt(packet['k3'])
 
     i = 0
     while i <= 20

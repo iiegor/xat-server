@@ -140,15 +140,15 @@ class Handler
           @routeZ(packet, userProfileId)
         else if type.substr(0, 2) is '/a' and userProfile != null
           packet = builder.create('z')
-          packet.append('N', userProfile.username) if userProfile.registered
+          packet.append('N', @user.username) if @user.registered
 
           status = type.substr(2)
 
           if status[0] == '_'
-            if status.substr(1) == 'Nofollow'
-              status = '/a_Nofollow'
+            if status.substr(1) == 'NF' and not global.Server.rooms[@user.chat][userProfileId]
+              status = '/a_NF'
             else
-              status = '/a_Not added you as a friend'
+              status = '/a_'
           else
             status = "/a#{@user.chat}"
           packet.append('t', status)
