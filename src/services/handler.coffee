@@ -39,6 +39,7 @@ class Handler
     return if packetTag is null
 
     isSlash = parser.getAttribute(packet, 't')?.startsWith('/') || false
+    type = parser.getAttribute(packet, 't')
 
     switch
       when packetTag == "policy-file-request"
@@ -73,7 +74,7 @@ class Handler
             dupUser.socket.end()
 
           @id = @user.id
-          global.Server.clients[@id] = @
+          @setSuper()
 
 
           Chat.joinRoom.call(@)
@@ -100,6 +101,9 @@ class Handler
         else
           Chat.sendMessage.call(@, user, msg)
 
+
+      when packetTag == "c" and type is "/K2"
+        @setSuper()
       when packetTag == "c"
         ###
         Save user profile data
@@ -155,7 +159,13 @@ class Handler
         if packetTag == 'z' or s & 2
           msg.append('d', if packetTag == 'z' then toID else fromID)
 
-        global.Server.getClientById(toID)?.send(msg.compose())
+        msg = msg.compose()
+
+        if (rec = global.Server.rooms[@user.chat]?[toID])
+          rec.send(msg)
+        else if packetTag == 'z' and (rec = global.Server.getClientById(toID))
+          rec.send(msg)
+
       when packetTag.indexOf('w') is 0
         ###
         Room pools
@@ -172,6 +182,31 @@ class Handler
 
     # Debug
     @logger.log @logger.level.DEBUG, "-> Sent: #{packet}"
+
+  setSuper: ->
+    ###
+    NotOnSuper message
+    @spec <k u="USER_ID" i="UNKNOWN (but the same as 'k' in 'y'-message)" />
+
+    Xat behavior:
+
+    cases:
+    user A appears in chat 1 - now super is A on chat 1
+    user A appears in chat 2 - now super is A on chat 2
+    user A sends '/K2' from chat 1 - now super is A on chat 1
+    .. and so on
+    if super is A on chat 2 and user A logout from chat 2, then there is 
+    no super for A, even if he is still in chat 1
+
+    What is 'super'? In case sender and receiver not in the same chat,
+    'z' message routes sends to handler, which is super.
+    If no super, message disappears.
+    ###
+    onsuper = global.Server.getClientById(@user.id)
+    onsuper?.send(builder.create('k').append('u', @user.id).append('i', '32699'))
+
+    global.Server.clients[@user.id] = @
+
 
   broadcast: (packet) ->
 
