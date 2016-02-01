@@ -129,21 +129,49 @@ class Handler
 
         userProfileId = parser.getAttribute(packet, 'd')
         userProfile = global.Server.getClientById( userProfileId )?.user || null
-        userOrigin = parser.getAttribute(packet, 'u')
-        type = parser.getAttribute(packet, 't')
+        userOrigin = parseInt(parser.getAttribute(packet, 'u')?.split('_')[0])
+        type = parser.getAttribute(packet, 't') || ''
+
+        if userOrigin != @user.id
+          @logger.log @logger.level.INFO, "User #{@user.id} 'z'-packet security violation"
+          return
 
         if type is '/l' and userProfile != null
-          username = if userProfile.username then "N=\"#{userProfile.username}\"" else ''
-          status = "t=\"/a_Nofollow\"" # t=\"/a_on GROUP\"
-          @send "<z b=\"1\" d=\"#{@user.id}\" u=\"#{userProfile.id}\" #{status} po=\"0\" #{userProfile.pStr} x=\"#{userProfile.xats||0}\" y=\"#{userProfile.days||0}\" q=\"3\" #{username} n=\"#{userProfile.nickname}\" a=\"#{userProfile.avatar}\" h=\"#{userProfile.url}\" v=\"2\" />"
+          @routeZ(userProfileId, packet)
         else if type is '/l'
           Profile.getById(userProfileId)
             .then((data) =>
               @logger.log @logger.level.ERROR, "Unhandled null userProfile", null
             )
             .catch((err) => @logger.log @logger.level.ERROR, err, 'Profile.coffee - getById()')
-        else if type is '/a'
-          return
+        else if type.substr(0, 2) == '/a'
+          packet = builder.create('z')
+          packet.append('N', userProfile.username) if userProfile.registered
+
+          status = type.substr(2)
+
+          if status[0] == '_'
+            if status.substr(1) == 'Nofollow'
+              status = '/a_Nofollow'
+            else
+              status = '/a_Not added you as a friend'
+          else
+            status = "/a#{@user.chat}"
+          packet.append('t', status)
+
+          packet.append('b', '1')
+            .append('d', userProfileId)
+            .append('u', @user.id)
+            .append('po', '0')
+            .appendRaw(@user.pStr)
+            .append('x', @user.xats || 0)
+            .append('y', @user.days || 0)
+            .append('q', '3')
+            .append('n', @user.nickname)
+            .append('a', @user.avatar)
+            .append('h', @user.url)
+            .append('v', '2')
+          @send packet.compose()
       when packetTag == "p" or packetTag == "z"
         ###
         Private chat
@@ -173,10 +201,10 @@ class Handler
 
         msg = msg.compose()
 
-        if (rec = global.Server.rooms[@user.chat]?[toID])
-          rec.send(msg)
-        else if packetTag == 'z' and (rec = global.Server.getClientById(toID))
-          rec.send(msg)
+        if packetTag == 'p'
+          global.Server.rooms[@user.chat]?[toID].send(msg)
+        else
+         @routeZ(msg, toID)
 
       when packetTag.indexOf('w') is 0
         ###
@@ -194,6 +222,13 @@ class Handler
 
     # Debug
     @logger.log @logger.level.DEBUG, "-> Sent: #{packet}"
+
+  routeZ: (packet, toID) ->
+    if (rec = global.Server.rooms[@user.chat]?[toID])
+      rec.send(packet)
+    else if (rec = global.Server.getClientById(toID))
+      rec.send(packet)
+
 
   setSuper: ->
     ###
@@ -220,7 +255,7 @@ class Handler
     global.Server.clients[@user.id] = @
 
   maySendMessages: ->
-    return @user.authenticated and !@user.guest
+    return @user.authenticated and not @user.guest
 
   broadcast: (packet) ->
 
