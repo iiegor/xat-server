@@ -250,7 +250,7 @@ class Handler
     If no super, message disappears.
     ###
     onsuper = global.Server.getClientById(@user.id)
-    onsuper?.send(builder.create('k').append('u', @user.id).append('i', '32699'))
+    onsuper?.send(builder.create('k').append('u', @user.id).append('i', '32699').compose())
 
     global.Server.clients[@user.id] = @
 
