@@ -111,10 +111,12 @@ module.exports =
       
       @user.guest = false
       if data[0].username is 'unregistered'
+        @user.registered = false
         callback(true)
       else
         user = data[0]
 
+        @user.registered = true
         @user.username = user['username']
         @user.xats = user['xats']
         @user.days = Math.floor((user['days'] - math.time()) / 86400)
