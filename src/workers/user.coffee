@@ -51,7 +51,7 @@ module.exports =
     # Parse the packet
     packet = parser.getAttributes(packet)
 
-    @user.id = packet['u']
+    @user.id = parseInt(packet['u']) || 0
     @user.d0 = packet['d0']
     @user.d3 = packet['d3']
     @user.f = packet['f']
@@ -78,34 +78,44 @@ module.exports =
         callback(false, "Reset details failed for user with id #{@user.id}")
         return
 
-      @user.url = packet['h']
-      @user.avatar = packet['a']
-
-      @user.nickname = packet['n']
-      @user.nickname = @user.nickname.split('##')
-
-      if @user.nickname.length > 1
-        @user.nickname[1] = parser.escape(@user.nickname[1])
-        @user.nickname = @user.nickname.join('##')
+      if @user.guest
+        @user.nickname = ''
+        @user.avatar = ''
+        @user.url = ''
+        callback(true)
       else
-        @user.nickname = @user.nickname[0]
+        @user.url = packet['h']
+        @user.avatar = packet['a']
 
-      @updateDetails(callback)
+        @user.nickname = packet['n']
+        @user.nickname = @user.nickname.split('##')
+
+        if @user.nickname.length > 1
+          @user.nickname[1] = parser.escape(@user.nickname[1])
+          @user.nickname = @user.nickname.join('##')
+        else
+          @user.nickname = @user.nickname[0]
+
+        @updateDetails(callback)
     )
 
   resetDetails: (userId, callback) ->
-    database.exec('SELECT * FROM users WHERE id = ? AND k = ? AND k3 = ? LIMIT 1', [userId, @user.k, @user.k3]).then((data) =>
+    if userId == global.Application.config.guestAuthId
+      @user.authenticated = true
+      @user.guest = true
+      @user.id = @handler.id
+      return callback(true)
+    database.exec('SELECT * FROM users WHERE id = ? AND k = ? LIMIT 1', [userId, @user.k, @user.k3]).then((data) =>
       if data.length < 1
-        callback(false)
-      else if data[0].username is 'unregistered'
-        @user.guest = true
-
+        return callback(false)
+      
+      @user.guest = false
+      if data[0].username is 'unregistered'
         callback(true)
       else
         user = data[0]
 
         @user.username = user['username']
-        @user.guest = false
         @user.xats = user['xats']
         @user.days = Math.floor((user['days'] - math.time()) / 86400)
         @user.k2 = user['k2']
@@ -121,14 +131,13 @@ module.exports =
     )
 
   updateDetails: (callback) ->
-    if @user.id != 0
-      database.exec('UPDATE users SET nickname = ?, avatar = ?, url = ?, remoteAddress = ? WHERE id = ?', [@user.nickname, @user.avatar, @user.url, @handler.socket.remoteAddress, @user.id]).then((data) =>
-        @user.authenticated = true
+    database.exec('UPDATE users SET nickname = ?, avatar = ?, url = ?, remoteAddress = ? WHERE id = ?', [@user.nickname, @user.avatar, @user.url, @handler.socket.remoteAddress, @user.id]).then((data) =>
+      @user.authenticated = true
 
-        callback(true, null)
-      )
-    else
+      callback(true, null)
+    ).catch((err) =>
       callback(false, "Failed to updateDetails for user #{@user.id}")
+    )
 
   logout: ->
     @send builder.create('dup').compose()
