@@ -127,24 +127,18 @@ class Handler
         
         return if not @maySendMessages()
 
-        userProfileId = parser.getAttribute(packet, 'd')
+        userProfileId = parseInt(parser.getAttribute(packet, 'd')) || null
         userProfile = global.Server.getClientById( userProfileId )?.user || null
         userOrigin = parseInt(parser.getAttribute(packet, 'u')?.split('_')[0])
         type = parser.getAttribute(packet, 't') || ''
 
-        if userOrigin != @user.id
+        if userOrigin != @user.id or userProfileId == null
           @logger.log @logger.level.INFO, "User #{@user.id} 'z'-packet security violation"
           return
 
         if type is '/l' and userProfile != null
-          @routeZ(userProfileId, packet)
-        else if type is '/l'
-          Profile.getById(userProfileId)
-            .then((data) =>
-              @logger.log @logger.level.ERROR, "Unhandled null userProfile", null
-            )
-            .catch((err) => @logger.log @logger.level.ERROR, err, 'Profile.coffee - getById()')
-        else if type.substr(0, 2) == '/a'
+          @routeZ(packet, userProfileId)
+        else if type.substr(0, 2) is '/a' and userProfile != null
           packet = builder.create('z')
           packet.append('N', userProfile.username) if userProfile.registered
 
@@ -171,7 +165,14 @@ class Handler
             .append('a', @user.avatar)
             .append('h', @user.url)
             .append('v', '2')
-          @send packet.compose()
+
+          @routeZ(packet.compose(), userProfileId)
+        else if type is '/l' or type.substr(0,2) is '/a'
+          Profile.getById(userProfileId)
+            .then((data) =>
+              @logger.log @logger.level.ERROR, "Unhandled null userProfile", null
+            )
+            .catch((err) => @logger.log @logger.level.ERROR, err, 'Profile.coffee - getById()')
       when packetTag == "p" or packetTag == "z"
         ###
         Private chat
