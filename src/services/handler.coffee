@@ -93,22 +93,27 @@ class Handler
         Send message
         @spec <m t="MESSAGE(str)" u="USER_ID(int)" />
         ###
+        return if not @maySendMessages()
+
         user = parser.getAttribute(packet, 'u')
         msg = parser.getAttribute(packet, 't')
 
         if msg.indexOf(Commander.identifier) is 0
-          Commander.process(@, user, msg)
+          Commander.process(@, @user.id, msg)
         else
-          Chat.sendMessage.call(@, user, msg)
+          Chat.sendMessage.call(@, @user.id, msg)
 
 
       when packetTag == "c" and type is "/K2"
+        return if not @maySendMessages()
         @setSuper()
       when packetTag == "c"
         ###
         Save user profile data
         @spec <c u="2" t="/b USER_ID(int),UNKNOWN(int),,USERNAME(str),AVATAR(str),HOME(str),0,0,0,0....." />
         ###
+        return if not @user.authenicated or @user.guest
+
         type = parser.getAttribute(packet, 't')
 
         return if type is '/KEEPALIVE'
@@ -119,6 +124,9 @@ class Handler
         User profile
         @spec <z d="USER_ID_PROFILE(int)" u="USER_ID_ORIGIN(int)" t="TYPE(str)" />
         ###
+        
+        return if not @maySendMessages()
+
         userProfileId = parser.getAttribute(packet, 'd')
         userProfile = global.Server.getClientById( userProfileId )?.user || null
         userOrigin = parser.getAttribute(packet, 'u')
@@ -148,6 +156,10 @@ class Handler
         Private messages now more xat compatible. But is it required? 
         It looks too complicated and redudantly.
         ###
+
+        return if not @maySendMessages()
+        
+
         toID = parser.getAttribute(packet, if packetTag == 'p' then 'u' else 'd')?.split('_')[0]
         fromID = @user.id
         message = parser.getAttribute(packet, 't')
@@ -207,6 +219,8 @@ class Handler
 
     global.Server.clients[@user.id] = @
 
+  maySendMessages: ->
+    return @user.authenticated and !@user.guest
 
   broadcast: (packet) ->
 
