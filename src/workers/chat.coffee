@@ -7,7 +7,7 @@ logger = new (require "../utils/logger")(name: 'Chat')
 
 module.exports =
   joinRoom: ->
-    return if @user.chat < 1 or isNaN(@user.chat) is true
+    return if @user.chat < 1
 
     database.exec('SELECT * FROM chats WHERE id = ? LIMIT 1', [@user.chat]).then((data) =>
       if @user.chat is 8
@@ -59,9 +59,10 @@ module.exports =
       @send builder.create('w').append('v', "#{@chat.onPool} #{@chat.pool}").compose()
 
       ## Broadcast the current user
-      ## NOTE: Maybe this needs to be sent more earlier
       packet = builder.create('u')
-      packet.append('f', @user.f)
+      packet.append('cb', '1443256921')
+        .append('s', '1')
+        .append('f', @user.f)
         .append('u', @user.id)
         .append('n', @user.nickname)
         .append('q', '3')
@@ -69,39 +70,35 @@ module.exports =
         .append('h', @user.url)
         .append('cb', '1443256921')
         .append('v', '0')
-        .append('s', '1')
 
       if @user.registered
-          packet.append('N', @user.username)
-            .append('d0', @user.d0)
-            .appendRaw(@user.pStr)
-          packet.append('d2', @user.d2) if @user.d2
+        packet.append('N', @user.username)
+        packet.append('d0', @user.d0)
+        packet.append('d2', @user.d2) if @user.d2
+        packet.appendRaw(@user.pStr)
 
       @broadcast packet.compose()
 
-
       ## Room messages
       database.exec('SELECT * FROM (SELECT * FROM messages WHERE id = ? AND pool = ? ORDER BY time DESC LIMIT 15) sub ORDER BY time ASC LIMIT 0,15', [ @user.chat, @chat.onPool ]).then((data) =>
- 
         offline = {}
         for message in data
-          if global.Server.rooms[@user.chat][message.uid]?.chat.onPool == @chat.onPool
-            continue
+          continue if global.Server.rooms[@user.chat][message.uid]?.chat.onPool is @chat.onPool
 
           packet = builder.create('o')
-          packet.append('n', message.name)
-            .append('a', message.avatar)
+          packet.append('u', message.uid)
             .append('u', message.uid)
+            .append('n', message.name)
+            .append('a', message.avatar)
           packet.append('N', message.registered) if message.registered isnt 'unregistered'
+          
           offline[message.uid] = packet.compose()
 
         for _, packet of offline
           @send packet
 
-
         for _, client of global.Server.rooms[@user.chat]
-          if client.id is @user.id  or client.chat.onPool != @chat.onPool
-            continue
+          continue if client.id is @user.id  or client.chat.onPool != @chat.onPool
 
           user = client.user
 
@@ -123,10 +120,10 @@ module.exports =
 
         data.forEach((message) =>
           packet = builder.create('m')
-          packet.append('t', message.message)
+          packet.append('E', message.time)
             .append('u', message.uid)
+            .append('t', message.message)
             .append('s', '1')
-            .append('E', message.time)
 
           @send packet.compose()
         )
@@ -142,7 +139,7 @@ module.exports =
     )
 
   sendMessage: (user, message) ->
-    @broadcast(builder.create('m').append('t', message).append('u', user).compose())
+    @broadcast builder.create('m').append('t', message).append('u', user).compose()
 
     database.exec('INSERT INTO messages (id, uid, message, name, registered, avatar, time, pool) values (?, ?, ?, ?, ?, ?, ?, ?)', [ @user.chat, @user.id, message, @user.nickname, @user.username||'unregistered', @user.avatar, math.time(), @chat.onPool ]).then((data) ->
       logger.log logger.level.DEBUG, 'New message sent'

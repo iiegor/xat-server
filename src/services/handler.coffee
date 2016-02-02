@@ -76,7 +76,6 @@ class Handler
           @id = @user.id
           @setSuper()
 
-
           Chat.joinRoom.call(@)
         ).catch((err) => @logger.log @logger.level.ERROR, err, null)
       when packetTag == "v"
@@ -102,7 +101,6 @@ class Handler
           Commander.process(@, @user.id, msg)
         else
           Chat.sendMessage.call(@, @user.id, msg)
-
 
       when packetTag == "c" and type is "/K2"
         return if not @maySendMessages()
@@ -187,7 +185,6 @@ class Handler
         ###
 
         return if not @maySendMessages()
-        
 
         toID = parser.getAttribute(packet, if packetTag == 'p' then 'u' else 'd')?.split('_')[0]
         fromID = @user.id
@@ -205,7 +202,7 @@ class Handler
         if packetTag == 'p'
           global.Server.rooms[@user.chat]?[toID].send(msg)
         else
-         @routeZ(msg, toID)
+          @routeZ(msg, toID)
 
       when packetTag.indexOf('w') is 0
         ###
@@ -216,7 +213,6 @@ class Handler
         Chat.joinRoom.call(@)
       else
         @logger.log @logger.level.ERROR, "Unrecognized packet by the server!", packetTag
-
 
   send: (packet) ->
     @socket.write "#{packet}\0"
@@ -230,7 +226,6 @@ class Handler
     else if (rec = global.Server.getClientById(toID))
       rec.send(packet)
 
-
   setSuper: ->
     ###
     NotOnSuper message
@@ -243,7 +238,7 @@ class Handler
     user A appears in chat 2 - now super is A on chat 2
     user A sends '/K2' from chat 1 - now super is A on chat 1
     .. and so on
-    if super is A on chat 2 and user A logout from chat 2, then there is 
+    if super is A on chat 2 and user A logout from chat 2, then there is
     no super for A, even if he is still in chat 1
 
     What is 'super'? In case sender and receiver not in the same chat,
@@ -259,14 +254,12 @@ class Handler
     return @user.authenticated and not @user.guest
 
   broadcast: (packet) ->
-
     for _, client of global.Server.rooms[@user.chat]
       continue if @user.id == client.user.id
 
       console.log "Broadcasting from #{@user.id} to #{client.id}"
 
       client.send packet
-
 
     # Debug
     @logger.log @logger.level.DEBUG, "-> Broadcasted: #{packet}"
