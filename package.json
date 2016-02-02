@@ -1,6 +1,6 @@
 {
   "name": "xat-server",
-  "version": "0.0.62",
+  "version": "0.0.63",
   "description": "A Node.js private server for xat.com",
   "main": "./src/bootstrap",
   "bin": {
