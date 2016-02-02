@@ -58,10 +58,6 @@ module.exports =
       ## Chat pools
       @send builder.create('w').append('v', "#{@chat.onPool} #{@chat.pool}").compose()
 
-      ## Send connected users to client
-
-      ## Send
-
       ## Broadcast the current user
       ## NOTE: Maybe this needs to be sent more earlier
       packet = builder.create('u')

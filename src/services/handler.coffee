@@ -182,7 +182,7 @@ class Handler
         @spec <z u="FROM-USER_ID" t="MESSAGE" [s="2"] d="TO-USER_ID" /> - user receives and sends
         ###
         ###
-        Private messages now more xat compatible. But is it required? 
+        Private messages now more xat compatible. But is it required?
         It looks too complicated and redudantly.
         ###
 
