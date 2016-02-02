@@ -39,6 +39,7 @@ class Handler
     return if packetTag is null
 
     isSlash = parser.getAttribute(packet, 't')?.startsWith('/') || false
+    type = parser.getAttribute(packet, 't')
 
     switch
       when packetTag == "policy-file-request"
@@ -73,8 +74,7 @@ class Handler
             dupUser.socket.end()
 
           @id = @user.id
-          global.Server.clients[@id] = @
-
+          @setSuper()
 
           Chat.joinRoom.call(@)
         ).catch((err) => @logger.log @logger.level.ERROR, err, null)
@@ -92,19 +92,26 @@ class Handler
         Send message
         @spec <m t="MESSAGE(str)" u="USER_ID(int)" />
         ###
+        return if not @maySendMessages()
+
         user = parser.getAttribute(packet, 'u')
         msg = parser.getAttribute(packet, 't')
 
         if msg.indexOf(Commander.identifier) is 0
-          Commander.process(@, user, msg)
+          Commander.process(@, @user.id, msg)
         else
-          Chat.sendMessage.call(@, user, msg)
+          Chat.sendMessage.call(@, @user.id, msg)
 
+      when packetTag == "c" and type is "/K2"
+        return if not @maySendMessages()
+        @setSuper()
       when packetTag == "c"
         ###
         Save user profile data
         @spec <c u="2" t="/b USER_ID(int),UNKNOWN(int),,USERNAME(str),AVATAR(str),HOME(str),0,0,0,0....." />
         ###
+        return if not @user.authenicated or @user.guest
+
         type = parser.getAttribute(packet, 't')
 
         return if type is '/KEEPALIVE'
@@ -115,23 +122,55 @@ class Handler
         User profile
         @spec <z d="USER_ID_PROFILE(int)" u="USER_ID_ORIGIN(int)" t="TYPE(str)" />
         ###
-        userProfileId = parser.getAttribute(packet, 'd')
+        
+        return if not @maySendMessages()
+
+        userProfileId = parseInt(parser.getAttribute(packet, 'd')) || null
         userProfile = global.Server.getClientById( userProfileId )?.user || null
-        userOrigin = parser.getAttribute(packet, 'u')
-        type = parser.getAttribute(packet, 't')
+        userOrigin = parseInt(parser.getAttribute(packet, 'u')?.split('_')[0])
+        type = parser.getAttribute(packet, 't') || ''
+
+        if userOrigin != @user.id or userProfileId == null
+          @logger.log @logger.level.INFO, "User #{@user.id} 'z'-packet security violation"
+          return
 
         if type is '/l' and userProfile != null
-          username = if userProfile.username then "N=\"#{userProfile.username}\"" else ''
-          status = "t=\"/a_Nofollow\"" # t=\"/a_on GROUP\"
-          @send "<z b=\"1\" d=\"#{@user.id}\" u=\"#{userProfile.id}\" #{status} po=\"0\" #{userProfile.pStr} x=\"#{userProfile.xats||0}\" y=\"#{userProfile.days||0}\" q=\"3\" #{username} n=\"#{userProfile.nickname}\" a=\"#{userProfile.avatar}\" h=\"#{userProfile.url}\" v=\"2\" />"
-        else if type is '/l'
+          @routeZ(packet, userProfileId)
+        else if type.substr(0, 2) is '/a' and userProfile != null
+          packet = builder.create('z')
+          packet.append('N', @user.username) if @user.registered
+
+          status = type.substr(2)
+
+          if status[0] == '_'
+            if status.substr(1) == 'NF' and not global.Server.rooms[@user.chat][userProfileId]
+              status = '/a_NF'
+            else
+              status = '/a_'
+          else
+            status = "/a#{@user.chat}"
+          packet.append('t', status)
+
+          packet.append('b', '1')
+            .append('d', userProfileId)
+            .append('u', @user.id)
+            .append('po', '0')
+            .appendRaw(@user.pStr)
+            .append('x', @user.xats || 0)
+            .append('y', @user.days || 0)
+            .append('q', '3')
+            .append('n', @user.nickname)
+            .append('a', @user.avatar)
+            .append('h', @user.url)
+            .append('v', '2')
+
+          @routeZ(packet.compose(), userProfileId)
+        else if type is '/l' or type.substr(0,2) is '/a'
           Profile.getById(userProfileId)
             .then((data) =>
               @logger.log @logger.level.ERROR, "Unhandled null userProfile", null
             )
             .catch((err) => @logger.log @logger.level.ERROR, err, 'Profile.coffee - getById()')
-        else if type is '/a'
-          return
       when packetTag == "p" or packetTag == "z"
         ###
         Private chat
@@ -144,6 +183,9 @@ class Handler
         Private messages now more xat compatible. But is it required?
         It looks too complicated and redudantly.
         ###
+
+        return if not @maySendMessages()
+
         toID = parser.getAttribute(packet, if packetTag == 'p' then 'u' else 'd')?.split('_')[0]
         fromID = @user.id
         message = parser.getAttribute(packet, 't')
@@ -155,7 +197,13 @@ class Handler
         if packetTag == 'z' or s & 2
           msg.append('d', if packetTag == 'z' then toID else fromID)
 
-        global.Server.getClientById(toID)?.send(msg.compose())
+        msg = msg.compose()
+
+        if packetTag == 'p'
+          global.Server.rooms[@user.chat]?[toID].send(msg)
+        else
+          @routeZ(msg, toID)
+
       when packetTag.indexOf('w') is 0
         ###
         Room pools
@@ -166,22 +214,52 @@ class Handler
       else
         @logger.log @logger.level.ERROR, "Unrecognized packet by the server!", packetTag
 
-
   send: (packet) ->
     @socket.write "#{packet}\0"
 
     # Debug
     @logger.log @logger.level.DEBUG, "-> Sent: #{packet}"
 
-  broadcast: (packet) ->
+  routeZ: (packet, toID) ->
+    if (rec = global.Server.rooms[@user.chat]?[toID])
+      rec.send(packet)
+    else if (rec = global.Server.getClientById(toID))
+      rec.send(packet)
 
+  setSuper: ->
+    ###
+    NotOnSuper message
+    @spec <k u="USER_ID" i="UNKNOWN (but the same as 'k' in 'y'-message)" />
+
+    Xat behavior:
+
+    cases:
+    user A appears in chat 1 - now super is A on chat 1
+    user A appears in chat 2 - now super is A on chat 2
+    user A sends '/K2' from chat 1 - now super is A on chat 1
+    .. and so on
+    if super is A on chat 2 and user A logout from chat 2, then there is
+    no super for A, even if he is still in chat 1
+
+    What is 'super'? In case sender and receiver not in the same chat,
+    'z' message routes sends to handler, which is super.
+    If no super, message disappears.
+    ###
+    onsuper = global.Server.getClientById(@user.id)
+    onsuper?.send(builder.create('k').append('u', @user.id).append('i', '32699').compose())
+
+    global.Server.clients[@user.id] = @
+
+  maySendMessages: ->
+    return @user.authenticated and not @user.guest
+
+  broadcast: (packet) ->
     for _, client of global.Server.rooms[@user.chat]
       continue if @user.id == client.user.id
 
       console.log "Broadcasting from #{@user.id} to #{client.id}"
 
       client.send packet
-
 
     # Debug
     @logger.log @logger.level.DEBUG, "-> Broadcasted: #{packet}"

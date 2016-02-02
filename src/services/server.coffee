@@ -33,11 +33,13 @@ class Server
 
     @server.on 'listening', -> global.Application.emit('application:started')
 
-    clientId = 0
+    config = global.Application.config
+
+    clientId = config.guestid.start
     @server.on 'connection', (socket) =>
       client = new handler
-      client.id = clientId--
-      clientId %= 1 << 31
+      client.id = clientId++
+      clientId = config.guestid.start if clientId == config.guestid.end
 
       # NOTE: The client id is changed to the real one on authentication
       @clients[client.id] = client

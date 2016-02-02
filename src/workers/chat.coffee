@@ -7,7 +7,7 @@ logger = new (require "../utils/logger")(name: 'Chat')
 
 module.exports =
   joinRoom: ->
-    return if @user.chat < 1 or isNaN(@user.chat) is true
+    return if @user.chat < 1
 
     database.exec('SELECT * FROM chats WHERE id = ? LIMIT 1', [@user.chat]).then((data) =>
       if @user.chat is 8
@@ -58,52 +58,91 @@ module.exports =
       ## Chat pools
       @send builder.create('w').append('v', "#{@chat.onPool} #{@chat.pool}").compose()
 
-      ## Send connected users to client
-      for _, client of global.Server.rooms[@user.chat]
-        if client.id is @user.id or !global.Server.clients[client.id] or client.chat.onPool != @chat.onPool
-          continue
-
-        user = client.user
-
-        packet = builder.create('u')
-        packet.append('cb', '1414865425')
-        packet.append('s', '1')
-        packet.append('f', '169')
-        packet.appendRaw(user.pStr)
-        packet.append('u', user.id)
-        packet.append('d0', user.d0)
-        packet.append('d2', user.d2)
-        packet.append('q', '3')
-        packet.append('N', user.username) if not user.guest
-        packet.append('n', user.nickname)
-        packet.append('a', user.avatar)
-        packet.append('h', user.url)
-        packet.append('v', '0')
-
-        @send packet.compose()
-
-      ## Send
-      # @send '<o u="265826731" q="1" n="Returns" N="iegor" a="147" h="" v="1"  />'
-
       ## Broadcast the current user
-      ## NOTE: Maybe this needs to be sent more earlier
-      username = if not @user.guest and @user.username then "N=\"#{@user.username}\"" else ''
-      @broadcast "<u cb=\"1443256921\" s=\"1\" f=\"#{@user.f}\" #{@user.pStr} u=\"#{@user.id}\" d0=\"#{@user.d0}\" d2=\"#{@user.d2}\" q=\"3\" #{username} n=\"#{@user.nickname}\" a=\"#{@user.avatar}\" h=\"#{@user.url}\" v=\"0\"  />"
+      packet = builder.create('u')
+      packet.append('cb', '1443256921')
+        .append('s', '1')
+        .append('f', @user.f)
+        .append('u', @user.id)
+        .append('n', @user.nickname)
+        .append('q', '3')
+        .append('a', @user.avatar)
+        .append('h', @user.url)
+        .append('cb', '1443256921')
+        .append('v', '0')
 
-      ## Scroll message
-      @send builder.create('m').append('t', "/s#{@chat.sc}").append('d', '1010208').compose()
+      if @user.registered
+        packet.append('N', @user.username)
+        packet.append('d0', @user.d0)
+        packet.append('d2', @user.d2) if @user.d2
+        packet.appendRaw(@user.pStr)
+
+      @broadcast packet.compose()
 
       ## Room messages
       database.exec('SELECT * FROM (SELECT * FROM messages WHERE id = ? AND pool = ? ORDER BY time DESC LIMIT 15) sub ORDER BY time ASC LIMIT 0,15', [ @user.chat, @chat.onPool ]).then((data) =>
-        data.forEach((message) => @send "<m t=\"#{message.message}\" u=\"#{message.uid}\"  />")
+        offline = {}
+        for message in data
+          continue if global.Server.rooms[@user.chat][message.uid]?.chat.onPool is @chat.onPool
+
+          packet = builder.create('o')
+          packet.append('u', message.uid)
+            .append('u', message.uid)
+            .append('n', message.name)
+            .append('a', message.avatar)
+          packet.append('N', message.registered) if message.registered isnt 'unregistered'
+          
+          offline[message.uid] = packet.compose()
+
+        for _, packet of offline
+          @send packet
+
+        for _, client of global.Server.rooms[@user.chat]
+          continue if client.id is @user.id  or client.chat.onPool != @chat.onPool
+
+          user = client.user
+
+          packet = builder.create('u')
+          packet.append('cb', '1414865425')
+          packet.append('s', '1')
+          packet.append('f', user.f)
+          packet.append('u', user.id)
+          packet.append('q', '3')
+          packet.append('n', user.nickname)
+          packet.append('a', user.avatar)
+          packet.append('h', user.url)
+          packet.append('v', '0')
+
+          if user.registered
+            packet.append('N', user.username)
+            packet.append('d0', user.d0)
+            packet.append('d2', user.d2) if user.d2
+            packet.appendRaw(user.pStr)
+
+          @send packet.compose()
+
+        data.forEach((message) =>
+          packet = builder.create('m')
+          packet.append('E', message.time)
+            .append('u', message.uid)
+            .append('t', message.message)
+            .append('s', '1')
+
+          @send packet.compose()
+        )
+
+        ## Scroll message
+        # database.exec('SELECT * FROM messages WHERE id = ? AND SUBSTRING(message FROM 0 FOR 2) ORDER BY time DESC LIMIT 1', [ @user.chat ]).then((data) ->
+        @send builder.create('m').append('t', "/s#{@chat.sc}").append('d', '123').compose()
 
         ## Done packet
         @send '<done  />'
+        # )
       )
     )
 
   sendMessage: (user, message) ->
-    @broadcast(builder.create('m').append('t', message).append('u', user).compose())
+    @broadcast builder.create('m').append('t', message).append('u', user).compose()
 
     database.exec('INSERT INTO messages (id, uid, message, name, registered, avatar, time, pool) values (?, ?, ?, ?, ?, ?, ?, ?)', [ @user.chat, @user.id, message, @user.nickname, @user.username||'unregistered', @user.avatar, math.time(), @chat.onPool ]).then((data) ->
       logger.log logger.level.DEBUG, 'New message sent'
