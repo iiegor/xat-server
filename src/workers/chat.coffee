@@ -59,30 +59,8 @@ module.exports =
       @send builder.create('w').append('v', "#{@chat.onPool} #{@chat.pool}").compose()
 
       ## Send connected users to client
-      for _, client of global.Server.rooms[@user.chat]
-        if client.id is @user.id or !global.Server.clients[client.id] or client.chat.onPool != @chat.onPool
-          continue
-
-        user = client.user
-
-        packet = builder.create('u')
-        packet.append('cb', '1414865425')
-        packet.append('s', '1')
-        packet.append('f', '169')
-        packet.append('p0', '1979711487')
-        packet.append('u', user.id)
-        packet.append('d0', user.d0)
-        packet.append('q', '3')
-        packet.append('N', user.username)
-        packet.append('n', user.nickname)
-        packet.append('a', user.avatar)
-        packet.append('h', user.url)
-        packet.append('v', '0')
-
-        @send packet.compose()
 
       ## Send
-      # @send '<o u="265826731" q="1" n="Returns" N="iegor" a="147" h="" v="1"  />'
 
       ## Broadcast the current user
       ## NOTE: Maybe this needs to be sent more earlier
@@ -105,15 +83,65 @@ module.exports =
 
       @broadcast packet.compose()
 
-      ## Scroll message
-      @send builder.create('m').append('t', "/s#{@chat.sc}").append('d', '1010208').compose()
 
       ## Room messages
       database.exec('SELECT * FROM (SELECT * FROM messages WHERE id = ? AND pool = ? ORDER BY time DESC LIMIT 15) sub ORDER BY time ASC LIMIT 0,15', [ @user.chat, @chat.onPool ]).then((data) =>
-        data.forEach((message) => @send "<m t=\"#{message.message}\" u=\"#{message.uid}\"  />")
+ 
+        oldUsers = {}
+        for message in data
+          if global.Server.rooms[@user.chat][message.uid]?.chat.onPool == @chat.onPool
+            continue
+
+          packet = builder.create('o')
+          packet.append('n', message.name)
+            .append('a', message.avatar)
+            .append('u', message.uid)
+          packet.append('N', message.registered) if message.registered isnt 'unregistered'
+          oldUsers[message.uid] = packet.compose()
+
+        for _, packet of oldUsers
+          @send packet
+
+
+        for _, client of global.Server.rooms[@user.chat]
+          if client.id is @user.id  or client.chat.onPool != @chat.onPool
+            continue
+
+          user = client.user
+
+          packet = builder.create('u')
+          packet.append('cb', '1414865425')
+          packet.append('s', '1')
+          packet.append('f', '169')
+          packet.append('p0', '1979711487')
+          packet.append('u', user.id)
+          packet.append('d0', user.d0)
+          packet.append('q', '3')
+          packet.append('N', user.username)
+          packet.append('n', user.nickname)
+          packet.append('a', user.avatar)
+          packet.append('h', user.url)
+          packet.append('v', '0')
+
+          @send packet.compose()
+
+        data.forEach((message) =>
+          packet = builder.create('m')
+          packet.append('t', message.message)
+            .append('u', message.uid)
+            .append('s', '1')
+            .append('E', message.time)
+
+          @send packet.compose()
+        )
+
+        ## Scroll message
+#        database.exec('SELECT * FROM messages WHERE id = ? AND SUBSTRING(message FROM 0 FOR 2) ORDER BY time DESC LIMIT 1', [ @user.chat ]).then((data) ->
+        @send builder.create('m').append('t', "/s#{@chat.sc}").append('d', '123').compose()
 
         ## Done packet
         @send '<done  />'
+ #       )
       )
     )
 
