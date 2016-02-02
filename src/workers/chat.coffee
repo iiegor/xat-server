@@ -105,16 +105,19 @@ module.exports =
           packet = builder.create('u')
           packet.append('cb', '1414865425')
           packet.append('s', '1')
-          packet.append('f', '169')
-          packet.append('p0', '1979711487')
+          packet.append('f', user.f)
           packet.append('u', user.id)
-          packet.append('d0', user.d0)
           packet.append('q', '3')
-          packet.append('N', user.username)
           packet.append('n', user.nickname)
           packet.append('a', user.avatar)
           packet.append('h', user.url)
           packet.append('v', '0')
+
+          if user.registered
+            packet.append('N', user.username)
+            packet.append('d0', user.d0)
+            packet.append('d2', user.d2) if user.d2
+            packet.appendRaw(user.pStr)
 
           @send packet.compose()
 
