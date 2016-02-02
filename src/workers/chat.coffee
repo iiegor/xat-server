@@ -87,7 +87,7 @@ module.exports =
       ## Room messages
       database.exec('SELECT * FROM (SELECT * FROM messages WHERE id = ? AND pool = ? ORDER BY time DESC LIMIT 15) sub ORDER BY time ASC LIMIT 0,15', [ @user.chat, @chat.onPool ]).then((data) =>
  
-        oldUsers = {}
+        offline = {}
         for message in data
           if global.Server.rooms[@user.chat][message.uid]?.chat.onPool == @chat.onPool
             continue
@@ -97,9 +97,9 @@ module.exports =
             .append('a', message.avatar)
             .append('u', message.uid)
           packet.append('N', message.registered) if message.registered isnt 'unregistered'
-          oldUsers[message.uid] = packet.compose()
+          offline[message.uid] = packet.compose()
 
-        for _, packet of oldUsers
+        for _, packet of offline
           @send packet
 
 
@@ -136,12 +136,12 @@ module.exports =
         )
 
         ## Scroll message
-#        database.exec('SELECT * FROM messages WHERE id = ? AND SUBSTRING(message FROM 0 FOR 2) ORDER BY time DESC LIMIT 1', [ @user.chat ]).then((data) ->
+        # database.exec('SELECT * FROM messages WHERE id = ? AND SUBSTRING(message FROM 0 FOR 2) ORDER BY time DESC LIMIT 1', [ @user.chat ]).then((data) ->
         @send builder.create('m').append('t', "/s#{@chat.sc}").append('d', '123').compose()
 
         ## Done packet
         @send '<done  />'
- #       )
+        # )
       )
     )
 
