@@ -192,9 +192,9 @@ class Handler
         s = parseInt(parser.getAttribute(packet, 's')) || 0
 
         msg = builder.create(packetTag).append('E', "#{Date.now()}").append('u', fromID).append('t', message)
-        if s & 2
+        if s is 2
           msg.append('s', s)
-        if packetTag == 'z' or s & 2
+        if packetTag == 'z' or s is 2
           msg.append('d', if packetTag == 'z' then toID else fromID)
 
         msg = msg.compose()
