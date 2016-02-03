@@ -170,7 +170,7 @@ class Handler
             .then((data) =>
               @logger.log @logger.level.ERROR, "Unhandled null userProfile", null
             )
-            .catch((err) => @logger.log @logger.level.ERROR, err, 'Profile.coffee - getById()')
+            .catch((err) => @logger.log @logger.level.ERROR, 'Can not fetch user profile data', err)
       when packetTag == "p" or packetTag == "z"
         ###
         Private chat
