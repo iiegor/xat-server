@@ -25,4 +25,4 @@ module.exports.deployServer = => new Promise (resolve, reject) =>
   server.stdout.on 'data', (data) =>
     if not started and data.indexOf('Server started') >= 0
       started = true
-      resolve()
+      resolve(server)
