@@ -134,7 +134,7 @@ module.exports =
     )
 
   updateDetails: (callback) ->
-    database.exec('UPDATE users SET nickname = ?, avatar = ?, url = ?, connectedlast = ? WHERE id = ?', [@user.nickname, @user.avatar, @user.url, @handler.socket.remoteAddress, @user.id]).then((data) =>
+    database.exec('UPDATE users SET nickname = ?, avatar = ?, url = ?, remoteAddress = ? WHERE id = ?', [@user.nickname, @user.avatar, @user.url, @handler.socket.remoteAddress, @user.id]).then((data) =>
       @user.authenticated = true
 
       callback(true, null)
