@@ -97,9 +97,9 @@ class Handler
         user = parser.getAttribute(packet, 'u')
         msg = parser.getAttribute(packet, 't')
 
-        if msg.indexOf(Commander.identifier) is 0
+        if msg.charAt(0) is Commander.identifier
           Commander.process(@, @user.id, msg)
-        else
+        else if msg.charAt(0) isnt '/'
           Chat.sendMessage.call(@, @user.id, msg)
 
       when packetTag == "c" and type is "/K2"
