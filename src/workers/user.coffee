@@ -5,7 +5,7 @@ database = require "../services/database"
 builder = require "../utils/builder"
 
 module.exports =
-  login: (name, pw) ->
+  login: (handler, name, pw) ->
     # TODO:
     #   Fix user days packet attr.
     #   Complete all the attrs with real data.
@@ -16,28 +16,33 @@ module.exports =
 
       user = data[0]
       v = builder.create('v')
+      v.append('d0', user.d0)
       v.append('d1', user.days) if parseInt(user.days) > 0
       v.append('d2', user.d2) if parseInt(user.d2) > 0
+      v.append('d3', user.d3)
 
-      v.append('d4', 2209282)
-        .append('d5', '6292512')
-        .append('d6', '2097193')
-        .append('d9', '262144')
-        .append('d0', user.d0)
-        .append('d3', user.d3)
-        .append('dx', user.xats)
-        .append('dt', Date.now())
-        .append('i', user.id)
-        .append('n', user.username)
-        .append('k2', user.k2)
-        .append('k3', user.k3)
-        .append('k1', user.k)
+      if parseInt(user.days) > 0
+        @getPowers(user.id).then((powers) ->
+          v.appendRaw(powers)
+          done()
+        )
+      else
+        done()
 
-      @send v.compose()
-      @send builder.create('c').append('t', '/bd').compose()
-      @send builder.create('c').append('t', "/b #{user.id},5,,#{user.nickname},#{user.avatar},#{user.url},0,0,0,0,0,0,0,0,0,0,0,0,0,0").compose()
-      @send builder.create('c').append('t', 'bf').compose()
-      @send builder.create('ldone').compose()
+      done = ->
+        v.append('dx', user.xats)
+          .append('dt', Date.now())
+          .append('i', user.id)
+          .append('n', user.username)
+          .append('k2', user.k2)
+          .append('k3', user.k3)
+          .append('k1', user.k)
+
+        handler.send v.compose()
+        handler.send builder.create('c').append('t', '/bd').compose()
+        handler.send builder.create('c').append('t', "/b #{user.id},5,,#{user.nickname},#{user.avatar},#{user.url},0,0,0,0,0,0,0,0,0,0,0,0,0,0").compose()
+        handler.send builder.create('c').append('t', '/bf').compose()
+        handler.send builder.create('ldone').compose()
     )
 
   # TODO: Improve this
@@ -141,6 +146,9 @@ module.exports =
     ).catch((err) =>
       callback(false, "Failed to updateDetails for user #{@user.id}")
     )
+
+  getPowers: (id) -> new Promise (resolve, reject) =>
+    resolve('test="hello"')
 
   logout: ->
     @send builder.create('dup').compose()
