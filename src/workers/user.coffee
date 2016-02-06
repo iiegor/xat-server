@@ -148,7 +148,25 @@ module.exports =
     )
 
   getPowers: (id) -> new Promise (resolve, reject) =>
-    resolve('test="hello"')
+    database.exec('SELECT * FROM userpowers WHERE userid = ?', [id]).then (upowers) ->
+      database.exec('SELECT * FROM powers', []).then (spowers) ->
+        vals = new Array()
+        pv = new Array()
+
+        for pow in spowers
+          vals[pow['id']] = new Array(pow['section'], pow['subid'])
+
+          pv[pow['section']] = 0 if !pv[pow['section']]
+
+        for pow in upowers
+          if parseInt(pow['count']) >= 1 and vals[pow['powerid']]
+            pv[vals[pow['powerid']][0]] += vals[pow['powerid']][1]
+
+        vars = ''
+        for index in Object.keys(pv)
+          vars += "d#{index.substr(1)}=\"#{pv[index]}\" "
+
+        resolve(vars)
 
   logout: ->
     @send builder.create('dup').compose()
