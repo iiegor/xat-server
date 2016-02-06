@@ -99,11 +99,12 @@ class Handler
 
         if msg.charAt(0) is Commander.identifier
           Commander.process(@, @user.id, msg)
-        else if msg.charAt(0) isnt '/'
+        else if not isSlash
           Chat.sendMessage.call(@, @user.id, msg)
 
       when packetTag == "c" and type is "/K2"
         return if not @maySendMessages()
+
         @setSuper()
       when packetTag == "c"
         ###
@@ -122,7 +123,6 @@ class Handler
         User profile
         @spec <z d="USER_ID_PROFILE(int)" u="USER_ID_ORIGIN(int)" t="TYPE(str)" />
         ###
-        
         return if not @maySendMessages()
 
         userProfileId = parseInt(parser.getAttribute(packet, 'd')) || null
@@ -131,7 +131,7 @@ class Handler
         type = parser.getAttribute(packet, 't') || ''
 
         if userOrigin != @user.id or userProfileId == null
-          @logger.log @logger.level.INFO, "User #{@user.id} 'z'-packet security violation"
+          @logger.log @logger.level.ERROR, "User #{@user.id} 'z'-packet security violation", null
           return
 
         if type is '/l' and userProfile != null
@@ -149,6 +149,7 @@ class Handler
               status = '/a_'
           else
             status = "/a#{@user.chat}"
+
           packet.append('t', status)
 
           packet.append('b', '1')
@@ -183,7 +184,6 @@ class Handler
         Private messages now more xat compatible. But is it required?
         It looks too complicated and redudantly.
         ###
-
         return if not @maySendMessages()
 
         toID = parser.getAttribute(packet, if packetTag == 'p' then 'u' else 'd')?.split('_')[0]
@@ -192,6 +192,7 @@ class Handler
         s = parseInt(parser.getAttribute(packet, 's')) || 0
 
         msg = builder.create(packetTag).append('E', "#{Date.now()}").append('u', fromID).append('t', message)
+
         if s is 2
           msg.append('s', s)
         if packetTag == 'z' or s is 2
@@ -209,7 +210,8 @@ class Handler
         Room pools
         @spec <w v="ACTUAL_POOL(int) POOLS(int,int..)"  />
         ###
-        @chat.onPool = packetTag.split('w')[1]
+        @chat.onPool = packetTag.substr(1)
+
         Chat.joinRoom.call(@)
       else
         @logger.log @logger.level.ERROR, "Unrecognized packet by the server!", packetTag

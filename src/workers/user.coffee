@@ -147,7 +147,7 @@ module.exports =
       callback(false, "Failed to updateDetails for user #{@user.id}")
     )
 
-  getPowers: (id) -> new Promise (resolve, reject) =>
+  getPowers: (id) -> new Promise (resolve, reject) ->
     database.exec('SELECT * FROM userpowers WHERE userid = ?', [id]).then (upowers) ->
       database.exec('SELECT * FROM powers', []).then (spowers) ->
         vals = new Array()
