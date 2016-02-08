@@ -97,7 +97,7 @@ module.exports =
             offline.push(message.uid)
 
         for _, client of global.Server.rooms[@user.chat]
-          continue if client.id is @user.id  or client.chat.onPool != @chat.onPool
+          continue if client.id is @user.id  or client.chat.onPool isnt @chat.onPool
 
           user = client.user
 

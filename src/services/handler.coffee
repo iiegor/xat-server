@@ -15,8 +15,6 @@ class Handler
   ###
   id: null
   socket: null
-  user: {}
-  chat: null
   logger: new logger(name: 'Handler')
 
   ###
@@ -24,6 +22,7 @@ class Handler
   ###
   constructor: ->
     @user = {}
+    @chat = null
 
   ###
   Section: Private
