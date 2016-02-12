@@ -1,12 +1,12 @@
-colors = require "colors"
-fs = require "fs"
+colors = require 'colors'
+fs = require 'fs'
 
 module.exports =
 class Logger
   level: {
-    INFO: "INFO"
-    ERROR: "ERROR"
-    DEBUG: "DEBUG"
+    INFO: 'INFO'
+    ERROR: 'ERROR'
+    DEBUG: 'DEBUG'
   }
 
   constructor: (@caller) ->

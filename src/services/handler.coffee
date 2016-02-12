@@ -1,12 +1,12 @@
-parser = require "../utils/parser"
-math = require "../utils/math"
-logger = require "../utils/logger"
-builder = require "../utils/builder"
+parser = require '../utils/parser'
+math = require '../utils/math'
+logger = require '../utils/logger'
+builder = require '../utils/builder'
 
-User = require "../workers/user"
-Chat = require "../workers/chat"
-Commander = require "../workers/commander"
-Profile = require "../workers/profile"
+User = require '../workers/user'
+Chat = require '../workers/chat'
+Commander = require '../workers/commander'
+Profile = require '../workers/profile'
 
 module.exports =
 class Handler

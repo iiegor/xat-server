@@ -1,4 +1,4 @@
-database = require "../services/database"
+database = require '../services/database'
 
 ###
 Available commands

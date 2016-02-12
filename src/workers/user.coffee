@@ -1,8 +1,8 @@
-logger = new (require "../utils/logger")(name: 'User')
-parser = require "../utils/parser"
-math = require "../utils/math"
-database = require "../services/database"
-builder = require "../utils/builder"
+logger = new (require '../utils/logger')(name: 'User')
+parser = require '../utils/parser'
+math = require '../utils/math'
+database = require '../services/database'
+builder = require '../utils/builder'
 
 module.exports =
   login: (handler, name, pw) ->

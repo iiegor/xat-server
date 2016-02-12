@@ -1,9 +1,9 @@
-database = require "../services/database"
+database = require '../services/database'
 
-parser = require "../utils/parser"
-math = require "../utils/math"
-builder = require "../utils/builder"
-logger = new (require "../utils/logger")(name: 'Chat')
+parser = require '../utils/parser'
+math = require '../utils/math'
+builder = require '../utils/builder'
+logger = new (require '../utils/logger')(name: 'Chat')
 
 module.exports =
   joinRoom: ->

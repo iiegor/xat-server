@@ -1,11 +1,11 @@
-net = require "net"
+net = require 'net'
 
-logger = require "../utils/logger"
-handler = require "./handler"
-builder = require "../utils/builder"
+logger = require '../utils/logger'
+handler = require './handler'
+builder = require '../utils/builder'
 
-{EventEmitter} = require "events"
-_ = require "underscore"
+{EventEmitter} = require 'events'
+_ = require 'underscore'
 
 module.exports =
 class Server
