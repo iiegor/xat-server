@@ -9,13 +9,13 @@ Commander = require '../workers/commander'
 Profile = require '../workers/profile'
 
 module.exports =
-class Handler
+class Client
   ###
   Section: Properties
   ###
   id: null
   socket: null
-  logger: new logger(name: 'Handler')
+  logger: new logger(name: 'Client')
 
   ###
   Section: Construction

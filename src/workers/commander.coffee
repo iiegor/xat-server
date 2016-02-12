@@ -13,12 +13,12 @@ Available commands
 module.exports =
   identifier: '~'
 
-  process: (@handler, user, msg) ->
+  process: (@client, user, msg) ->
     # TODO: Need to check the user rank and probably other details to verify the identity of the user
     return unless msg.indexOf @identifier is 0
 
     switch msg.slice(1)
       when 'hello'
-        @handler.send "<m t=\"Hello world\" u=\"#{user}\" />"
+        @client.send "<m t=\"Hello world\" u=\"#{user}\" />"
       when 'clear all messages'
-        database.exec('TRUNCATE TABLE messages').then((data) => @handler.send "<m t=\"Messages cleared\" u=\"#{user}\" />")
+        database.exec('TRUNCATE TABLE messages').then((data) => @client.send "<m t=\"Messages cleared\" u=\"#{user}\" />")

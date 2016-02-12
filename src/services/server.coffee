@@ -1,16 +1,12 @@
 net = require 'net'
 
 logger = require '../utils/logger'
-handler = require './handler'
 builder = require '../utils/builder'
 
-{EventEmitter} = require 'events'
-_ = require 'underscore'
+Client = require './client'
 
 module.exports =
 class Server
-  _.extend @prototype, EventEmitter.prototype
-
   ###
   Section: Properties
   ###
@@ -37,7 +33,7 @@ class Server
 
     clientId = config.guestid.start
     @server.on 'connection', (socket) =>
-      client = new handler
+      client = new Client
       client.id = clientId++
       clientId = config.guestid.start if clientId == config.guestid.end
 

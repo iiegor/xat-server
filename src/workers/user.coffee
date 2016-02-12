@@ -5,7 +5,7 @@ database = require '../services/database'
 builder = require '../utils/builder'
 
 module.exports =
-  login: (handler, name, pw) ->
+  login: (client, name, pw) ->
     # TODO:
     #   Fix user days packet attr.
     #   Complete all the attrs with real data.
@@ -38,16 +38,16 @@ module.exports =
           .append('k3', user.k3)
           .append('k1', user.k)
 
-        handler.send v.compose()
-        handler.send builder.create('c').append('t', '/bd').compose()
-        handler.send builder.create('c').append('t', "/b #{user.id},5,,#{user.nickname},#{user.avatar},#{user.url},0,0,0,0,0,0,0,0,0,0,0,0,0,0").compose()
-        handler.send builder.create('c').append('t', '/bf').compose()
-        handler.send builder.create('ldone').compose()
+        client.send v.compose()
+        client.send builder.create('c').append('t', '/bd').compose()
+        client.send builder.create('c').append('t', "/b #{user.id},5,,#{user.nickname},#{user.avatar},#{user.url},0,0,0,0,0,0,0,0,0,0,0,0,0,0").compose()
+        client.send builder.create('c').append('t', '/bf').compose()
+        client.send builder.create('ldone').compose()
     )
 
   # TODO: Improve this
-  process: (@handler, packet) -> new Promise (resolve, reject) =>
-    @user = @handler.user
+  process: (@client, packet) -> new Promise (resolve, reject) =>
+    @user = @client.user
 
     # Authenticate
     @auth(packet, (done, err) -> if done is true then resolve() else reject(err))
@@ -78,8 +78,8 @@ module.exports =
 
     @resetDetails(@user.id, (res) =>
       if !res
-        @handler.send builder.create('logout').append('e', 'F036').compose()
-        @handler.dispose()
+        @client.send builder.create('logout').append('e', 'F036').compose()
+        @client.dispose()
         callback(false, "Reset details failed for user with id #{@user.id}")
         return
 
@@ -108,7 +108,7 @@ module.exports =
     if userId == global.Application.config.guestAuthId
       @user.authenticated = true
       @user.guest = true
-      @user.id = @handler.id
+      @user.id = @client.id
       return callback(true)
 
     database.exec('SELECT * FROM users WHERE id = ? AND k = ? LIMIT 1', [userId, @user.k]).then((data) =>
@@ -139,7 +139,7 @@ module.exports =
     )
 
   updateDetails: (callback) ->
-    database.exec('UPDATE users SET nickname = ?, avatar = ?, url = ?, remoteAddress = ? WHERE id = ?', [@user.nickname, @user.avatar, @user.url, @handler.socket.remoteAddress, @user.id]).then((data) =>
+    database.exec('UPDATE users SET nickname = ?, avatar = ?, url = ?, remoteAddress = ? WHERE id = ?', [@user.nickname, @user.avatar, @user.url, @client.socket.remoteAddress, @user.id]).then((data) =>
       @user.authenticated = true
 
       callback(true, null)
