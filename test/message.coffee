@@ -1,35 +1,26 @@
-fork = require('child_process').fork
-path = require 'path'
-
-
-
 test = require './test-kit'
 XatUser = test.IXatUser
 deploy = test.deployServer
 
 describe 'message', () ->
-  @timeout(2000)
 
   it 'u1 should receive message sent by u2', (done) =>
-    deploy().then () =>
+    deploy().then (server) =>
       u1 = new XatUser(
         todo:
+          w_userno: 51
           w_useroom: 1
-          w_userno: 1
-          w_k1: 1
-          w_k3: 3
+          w_k1: 1112
           w_userrev: 0
       )
 
       u2 = new XatUser(
         todo:
           w_useroom: 1
-          w_userno: 2
-          w_k1: 1
-          w_k3: 3
+          w_userno: 50
+          w_k1: 555
           w_userrev: 0
-      )
-      u2.addExtension('user-actions')
+      ).addExtension('user-actions')
       u1.connect()
 
       u1.on 'data', (data) =>
@@ -45,4 +36,3 @@ describe 'message', () ->
 
                 if data.m and data.m.attributes.t == 'test!'
                   done()
-
