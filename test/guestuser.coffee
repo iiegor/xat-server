@@ -1,15 +1,22 @@
-assert = require 'assert'
+should = require('chai').should()
+
 test = require './test-kit'
 XatUser = test.IXatUser
 deploy = test.deployServer
 
 conf = require '../config/default'
 
+
 describe 'guest user', ->
 
   items = {}
+  guest = null
+  check = null
+  server = null
+
   before (beforeDone) =>
-    deploy().then (server) =>
+    deploy().then (_server) =>
+      server = _server
       guest = new XatUser(
         todo:
           w_userno: conf.guestAuthId
@@ -17,7 +24,7 @@ describe 'guest user', ->
           w_avatar: '123'
           w_homepage: 'http://example.com'
           w_useroom: 1
-      )
+      ).addExtension('user-actions')
 
       check = new XatUser(
         todo:
@@ -29,30 +36,41 @@ describe 'guest user', ->
           w_userrev: 0
       )
 
-      items.server = server
-      items.guest = guest
-      items.check = check
-
       check.connect()
       check.on 'data', (data) =>
         if data.done?
           items.guest.connect()
           beforeDone()
+
   after (afterDone) =>
-    items.server.kill()
+    server.kill()
     afterDone()
 
-  it "should receive 'u' message with id between [guestid.start, guestid.end)", (done) =>
-    items.check.on 'data', (data) =>
-      u = data.u
-      if u? and u.attributes.u >= conf.guestid.start and u.attributes.u < conf.guestid.end
-        throw new Error() if u.attributes.n isnt '' or u.attributes.a isnt '' or u.attributes.h isnt ''
-        done()
+
+  describe 'checker', =>
+
+    it "should receive 'u' message with id between [guestid.start, guestid.end)", (done) =>
+      check.on 'data', (data) =>
+        u = data.u
+        if u?
+          u.attributes.u.should.be.at.least conf.guestid.start
+          u.attributes.u.should.be.below conf.guestid.end
+          done()
+    it "should receive 'u' with empty n,a,h, with v=1, cb=0 and without any other attributes", (done) =>
+      items.check.on 'data', (data) =>
+        u = data.u
+        if u?
+          u.attributes.n.should.equal ''
+          u.attributes.a.should.equal ''
+          u.attributes.h.should.equal ''
 
 
 
-  it 'should receive done', (done) =>
-    items.guest.on 'data', (data) =>
-      if data.done?
-        done()
-
+  describe 'guest', () =>
+    it 'should receive done', (done) =>
+      items.guest.on 'data', (data) =>
+        if data.done?
+          done()
+     it "shouldn't be able to send messages", (done) =>
+       items.guest.sendTextMessage('hello all')
+       done()

@@ -23,7 +23,10 @@
     "underscore": "^1.8.3"
   },
   "devDependencies": {
-    "coffeelint": "^1.14.2"
+    "coffeelint": "^1.14.2",
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5",
+    "xat-client": "^0.1.2"
   },
   "packageDependencies": {},
   "private": true,

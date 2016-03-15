@@ -3,6 +3,16 @@ path = require('path')
 
 XatUser = require('xat-client').XatUser
 
+
+class ServerInstance
+  server: null
+  constructor: (server) ->
+    @server = server
+
+  kill: ->
+    @server.kill()
+
+
 module.exports.IXatUser =
   class IXatUser extends XatUser
     constructor: (options) ->
@@ -19,10 +29,12 @@ module.exports.deployServer = => new Promise (resolve, reject) =>
 
   server.on 'error', (err) => reject err
 
+  wrapper = new ServerInstance(server)
+
   process.on 'exit', => server.kill()
 
   started = false
   server.stdout.on 'data', (data) =>
     if not started and data.indexOf('Server started') >= 0
       started = true
-      resolve(server)
+      resolve(wrapper)
