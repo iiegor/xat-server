@@ -17,6 +17,9 @@ describe 'guest user', ->
   before (beforeDone) =>
     deploy().then (_server) =>
       server = _server
+      beforeDone()
+
+  beforeEach (beforeEachDone) =>
       guest = new XatUser(
         todo:
           w_userno: conf.guestAuthId
@@ -35,12 +38,14 @@ describe 'guest user', ->
           w_avatar: '555'
           w_userrev: 0
       )
+      beforeEachDone()
 
-      check.connect()
-      check.on 'data', (data) =>
-        if data.done?
-          items.guest.connect()
-          beforeDone()
+
+  afterEach (afterEachDone) =>
+    check.end()
+    guest.end()
+    afterEachDone()
+
 
   after (afterDone) =>
     server.kill()
@@ -50,27 +55,43 @@ describe 'guest user', ->
   describe 'checker', =>
 
     it "should receive 'u' message with id between [guestid.start, guestid.end)", (done) =>
+      check.connect()
       check.on 'data', (data) =>
-        u = data.u
-        if u?
-          u.attributes.u.should.be.at.least conf.guestid.start
-          u.attributes.u.should.be.below conf.guestid.end
-          done()
+        if data.done?
+          guest.connect()
+
+          check.on 'data', (data) =>
+
+            u = data.u
+            if u?
+              u.attributes.u.should.be.at.least conf.guestid.start
+              u.attributes.u.should.be.below conf.guestid.end
+
+              done()
+
+
     it "should receive 'u' with empty n,a,h, with v=1, cb=0 and without any other attributes", (done) =>
-      items.check.on 'data', (data) =>
-        u = data.u
-        if u?
-          u.attributes.n.should.equal ''
-          u.attributes.a.should.equal ''
-          u.attributes.h.should.equal ''
+      check.connect()
+      check.on 'data', (data) =>
+        if data.done?
+          guest.connect()
+
+          check.on 'data', (data) =>
+            u = data.u
+            if u?
+              u.attributes.n.should.equal ''
+              u.attributes.a.should.equal ''
+              u.attributes.h.should.equal ''
+              done()
 
 
 
   describe 'guest', () =>
     it 'should receive done', (done) =>
-      items.guest.on 'data', (data) =>
+      guest.connect()
+      guest.on 'data', (data) =>
         if data.done?
           done()
      it "shouldn't be able to send messages", (done) =>
-       items.guest.sendTextMessage('hello all')
+       guest.sendTextMessage('hello all')
        done()
