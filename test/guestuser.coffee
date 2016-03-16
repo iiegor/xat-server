@@ -9,7 +9,6 @@ conf = require '../config/default'
 
 describe 'guest user', ->
 
-  items = {}
   guest = null
   check = null
   server = null
