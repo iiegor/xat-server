@@ -48,5 +48,5 @@ module.exports.delay = (delay, callback) => setTimeout callback, delay
 module.exports.should = => chai.should()
 
 module.exports.timestamp =
-  fromServer: (ts) => ts
-  toServer: (ts) => ts
+  fromServer: (ts) => Number(ts)
+  toServer: (ts) => ts.toString()
