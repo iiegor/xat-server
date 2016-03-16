@@ -5,13 +5,15 @@ deploy = test.deployServer
 describe 'message', =>
   u1 = null
   u2 = null
+  server = null
 
   messages =
     u1: []
     u2: []
     all: []
   before (beforeDone) =>
-    deploy().then (server) =>
+    deploy().then (_server) =>
+      server = _server
       u1 = new XatUser(
         todo:
           w_userno: 51
@@ -37,6 +39,9 @@ describe 'message', =>
             messages.u2.push data
             if data.done?
               beforeDone()
+
+  after =>
+    server.kill()
 
   describe 'user 1', =>
     it 'should receive message sent by user 2', (done) =>
