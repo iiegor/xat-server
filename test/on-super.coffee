@@ -3,6 +3,14 @@ XatUser = test.IXatUser
 deploy = test.deployServer
 assert = require('chai').assert
 
+
+# This tests intend to test server's behavior
+# when user sit in more than one chat.
+# The most important task for server is to determine
+# destination of 'z'-packets.
+#
+# FIXME:
+#   Sometimes some of this tests fails. Strange...
 describe 'on-super', ->
   server = null
 
@@ -74,6 +82,23 @@ describe 'on-super', ->
       receiver3.end()
 
     describe 'receiver', ->
+      it "should receive 'k'-packet in first chat", =>
+        messages.receiver2.should.contains.an.item.with.property('k')
+      it "should receive 'k'-packet with appropriate content", =>
+        [y] = (_.y for _ in messages.receiver2 when _.y?)
+
+        assert.isDefined y
+        k =
+          k:
+            attributes:
+              d: receiver2.todo.w_userno
+              i: y.attributes.i
+
+
+        [..., actual] = (_ for _ in messages.receiver2 when _.k?)
+
+        assert.equal actual, k, 'packets are not equal. Actual is ' + JSON.stringify(actual) + ' while ' + JSON.stringify(k) + ' expected'
+
       it 'should receive the message in the last visited chat', (done) ->
         ts = new Date().getTime()
 
