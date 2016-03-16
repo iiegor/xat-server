@@ -1,12 +1,14 @@
-chai = require('chai')
-chai.use(require('chai-things'))
+chai = require 'chai'
+chai.use(require 'chai-things')
 
 fork = require('child_process').fork
-path = require('path')
+path = require 'path'
 
-assert = require('assert')
+assert = require 'assert'
 
 XatUser = require('xat-client').XatUser
+
+config = require '../../config/tests'
 
 
 
@@ -81,3 +83,4 @@ module.exports.should = -> chai.should()
 module.exports.timestamp =
   fromServer: (ts) -> Number(ts)
   toServer: (ts) -> ts.toString()
+
