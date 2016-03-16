@@ -17,9 +17,6 @@ describe 'guest user', ->
   before (beforeDone) =>
     deploy().then (_server) =>
       server = _server
-      beforeDone()
-
-  beforeEach (beforeEachDone) =>
       guest = new XatUser(
         todo:
           w_userno: conf.guestAuthId
@@ -37,61 +34,81 @@ describe 'guest user', ->
           w_name: 'tester'
           w_avatar: '555'
           w_userrev: 0
-      )
-      beforeEachDone()
+      ).addExtension('user-actions')
+      beforeDone()
 
 
-  afterEach (afterEachDone) =>
-    check.end()
-    guest.end()
-    afterEachDone()
 
-
-  after (afterDone) =>
+  after =>
     server.kill()
-    afterDone()
 
 
-  describe 'checker', =>
+  describe 'guest connects to chat with user already connected', =>
 
-    it "should receive 'u' message with id between [guestid.start, guestid.end)", (done) =>
+    messages =
+      all: []
+      check: []
+      guest: []
+
+    before (beforeDone) =>
       check.connect()
+
       check.on 'data', (data) =>
+        messages.check.push data
+        messages.all.push data
         if data.done?
           guest.connect()
 
-          check.on 'data', (data) =>
+          guest.on 'data', (data) =>
+            messages.guest.push data
+            messages.all.push data
+            if data.done?
+              beforeDone()
 
-            u = data.u
-            if u?
-              u.attributes.u.should.be.at.least conf.guestid.start
-              u.attributes.u.should.be.below conf.guestid.end
+    after =>
+      check.end()
+      guest.end()
 
-              done()
+    describe 'check', =>
 
+      it "should receive the only 'u' message with id between [guestid.start, guestid.end)", =>
+        messages.check.should.contain.an.item.with.property('u')
 
-    it "should receive 'u' with empty n,a,h, with v=1, cb=0 and without any other attributes", (done) =>
-      check.connect()
-      check.on 'data', (data) =>
-        if data.done?
-          guest.connect()
+        for message in messages.check when message.u?
+          u = message.u
+          u.attributes.u.should.be.within conf.guestid.start, conf.guestid.end - 1
 
-          check.on 'data', (data) =>
-            u = data.u
-            if u?
-              u.attributes.n.should.equal ''
-              u.attributes.a.should.equal ''
-              u.attributes.h.should.equal ''
-              done()
+      it "should receive 'u' with empty n,a,h, with v=1, cb=0 and without any other attributes", =>
+        for message in messages.check when message.u?
+          u = message.u
+          u.attributes.n.should.equal ''
+          u.attributes.a.should.equal ''
+          u.attributes.h.should.equal ''
 
 
 
-  describe 'guest', () =>
-    it 'should receive done', (done) =>
-      guest.connect()
-      guest.on 'data', (data) =>
-        if data.done?
-          done()
-     it "shouldn't be able to send messages", (done) =>
-       guest.sendTextMessage('hello all')
-       done()
+    describe 'guest', () =>
+      it 'should receive done', =>
+        messages.guest.should.contain.an.item.with.property('done')
+
+      it "shouldn't be able to send messages, should be able to receive message", (done) =>
+        ts = new Date().getTime()
+        guest.sendTextMessage('guest message ' + ts)
+        test.delay 20, =>
+          check.sendTextMessage('checker message ' + ts)
+          test.delay 20, =>
+
+            gotdone = false
+            for message in messages.check
+              if message.done?
+                gotdone = true
+              if gotdone
+                message.m?.should.be.false
+
+            guestMessage = (message for message in messages.guest when message.m?)
+            guestMessage = guestMessage[guestMessage.length - 1].m
+
+
+            guestMessage.attributes.u.split('_')[0].should.be.equal(check.todo.w_userno.toString())
+            guestMessage.attributes.t.should.be.equal('checker message ' + ts)
+            done()

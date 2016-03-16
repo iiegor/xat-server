@@ -1,3 +1,6 @@
+chai = require('chai')
+chai.use(require('chai-things'))
+
 fork = require('child_process').fork
 path = require('path')
 
@@ -38,3 +41,8 @@ module.exports.deployServer = => new Promise (resolve, reject) =>
     if not started and data.indexOf('Server started') >= 0
       started = true
       resolve(wrapper)
+
+
+module.exports.delay = (delay, callback) => setTimeout callback, delay
+
+module.exports.should = => chai.should()
