@@ -13,8 +13,8 @@ describe 'guest user', ->
   check = null
   server = null
 
-  before (beforeDone) =>
-    deploy().then (_server) =>
+  before (beforeDone) ->
+    deploy().then (_server) ->
       server = _server
       guest = new XatUser(
         todo:
@@ -38,46 +38,46 @@ describe 'guest user', ->
 
 
 
-  after =>
+  after ->
     server.kill()
 
 
-  describe 'guest connects to chat with user already connected', =>
+  describe 'guest connects to chat with user already connected', ->
 
     messages =
       all: []
       check: []
       guest: []
 
-    before (beforeDone) =>
+    before (beforeDone) ->
       check.connect()
 
-      check.on 'data', (data) =>
+      check.on 'data', (data) ->
         messages.check.push data
         messages.all.push data
         if data.done?
           guest.connect()
 
-          guest.on 'data', (data) =>
+          guest.on 'data', (data) ->
             messages.guest.push data
             messages.all.push data
             if data.done?
               beforeDone()
 
-    after =>
+    after ->
       check.end()
       guest.end()
 
-    describe 'check', =>
+    describe 'check', ->
 
-      it "should receive the only 'u' message with id between [guestid.start, guestid.end)", =>
+      it "should receive the only 'u' message with id between [guestid.start, guestid.end)", ->
         messages.check.should.contain.an.item.with.property('u')
 
         for message in messages.check when message.u?
           u = message.u
           u.attributes.u.should.be.within conf.guestid.start, conf.guestid.end - 1
 
-      it "should receive 'u' with empty n,a,h, with v=1, cb=0 and without any other attributes", =>
+      it "should receive 'u' with empty n,a,h, with v=1, cb=0 and without any other attributes", ->
         for message in messages.check when message.u?
           u = message.u
           u.attributes.n.should.equal ''
@@ -86,16 +86,16 @@ describe 'guest user', ->
 
 
 
-    describe 'guest', () =>
-      it 'should receive done', =>
+    describe 'guest', ->
+      it 'should receive done', ->
         messages.guest.should.contain.an.item.with.property('done')
 
-      it "shouldn't be able to send messages, should be able to receive message", (done) =>
+      it "shouldn't be able to send messages, should be able to receive message", (done) ->
         ts = new Date().getTime()
         guest.sendTextMessage('guest message ' + ts)
-        test.delay 20, =>
+        test.delay 20, ->
           check.sendTextMessage('checker message ' + ts)
-          test.delay 20, =>
+          test.delay 20, ->
 
             gotdone = false
             for message in messages.check

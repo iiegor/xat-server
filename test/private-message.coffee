@@ -3,13 +3,13 @@ XatUser = test.IXatUser
 deploy = test.deployServer
 assert = require('chai').assert
 
-describe 'private messaging', =>
+describe 'private messaging', ->
   sender = null
   receiver = null
   server = null
 
-  before (beforeDone) =>
-    deploy().then (_server) =>
+  before (beforeDone) ->
+    deploy().then (_server) ->
       server = _server
       sender = new XatUser(
         todo:
@@ -26,36 +26,36 @@ describe 'private messaging', =>
       )
       beforeDone()
 
-  after =>
+  after ->
     server.kill()
 
-  describe 'users are in the same room', =>
+  describe 'users are in the same room', ->
     messages =
       sender: []
       receiver: []
       all: []
 
-    before (beforeDone) =>
+    before (beforeDone) ->
       sender.todo.w_useroom = receiver.todo.w_useroom = 1
       sender.connect()
-      sender.on 'data', (data) =>
+      sender.on 'data', (data) ->
         messages.sender.push data
         messages.all.push data
         
         if data.done?
           receiver.connect()
-          receiver.on 'data', (data) =>
+          receiver.on 'data', (data) ->
             messages.receiver.push data
             messages.all.push data
             if data.done?
               beforeDone()
 
 
-    it 'should receive "p" private message', (done) =>
+    it 'should receive "p" private message', (done) ->
       ts = new Date().getTime()
       text = 'pmp' + ts
       sender.sendPMMessage text, receiver.todo.w_userno, true
-      test.delay 20, =>
+      test.delay 20, ->
         messages.receiver.should.contains.an.item.with.property('p')
 
         [..., message] = (message for message in messages.receiver when message.p?)
@@ -66,11 +66,11 @@ describe 'private messaging', =>
         test.timestamp.fromServer(p.attributes.E).should.be.closeTo(ts, 10 * 1000)
         done()
 
-    it 'should receive "p" private chat message', (done) =>
+    it 'should receive "p" private chat message', (done) ->
       ts = new Date().getTime()
       text = 'pcp' + ts
       sender.sendPCMessage text, receiver.todo.w_userno, true
-      test.delay 20, =>
+      test.delay 20, ->
         messages.receiver.should.contains.an.item.with.property('p')
         [..., message] = (message for message in messages.receiver when message.p?)
         p = message.p
@@ -85,11 +85,11 @@ describe 'private messaging', =>
 
 
 
-    it 'should receive "z" private message', (done) =>
+    it 'should receive "z" private message', (done) ->
       ts = new Date().getTime()
       text = 'pmz' + ts
       sender.sendPMMessage text, receiver.todo.w_userno, false
-      test.delay 20, =>
+      test.delay 20, ->
         messages.receiver.should.contains.an.item.with.property('z')
         [..., message] = (message for message in messages.receiver when message.z?)
         z = message.z
@@ -102,11 +102,11 @@ describe 'private messaging', =>
 
         done()
 
-    it 'should receive "z" private chat message', (done) =>
+    it 'should receive "z" private chat message', (done) ->
       ts = new Date().getTime()
       text = 'pcz' + ts
       sender.sendPCMessage text, receiver.todo.w_userno, false
-      test.delay 20, =>
+      test.delay 20, ->
         messages.receiver.should.contains.an.item.with.property('z')
         [..., message] = (message for message in messages.receiver when message.z?)
         z = message.z
@@ -120,11 +120,11 @@ describe 'private messaging', =>
         done()
 
 
-    it "shouldn't receive messages with illegal 'u' attribute", (done) =>
+    it "shouldn't receive messages with illegal 'u' attribute", (done) ->
       text = 'illegal'
       illegalId = sender.todo.w_userno + 1
       sender._NetworkSendMsg(illegalId, text, receiver.todo.w_userno)
-      test.delay 20, =>
+      test.delay 20, ->
         [..., message] = (message for message in messages.receiver when message.z?)
         assert.isFalse(message? and message.z.attributes.u.split('_')[0] == illegalId.toString())
         done()

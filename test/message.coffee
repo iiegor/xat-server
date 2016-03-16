@@ -2,7 +2,7 @@ test = require './test-kit'
 XatUser = test.IXatUser
 deploy = test.deployServer
 
-describe 'message', =>
+describe 'message', ->
   u1 = null
   u2 = null
   server = null
@@ -11,8 +11,8 @@ describe 'message', =>
     u1: []
     u2: []
     all: []
-  before (beforeDone) =>
-    deploy().then (_server) =>
+  before (beforeDone) ->
+    deploy().then (_server) ->
       server = _server
       u1 = new XatUser(
         todo:
@@ -31,32 +31,32 @@ describe 'message', =>
       ).addExtension('user-actions')
 
       u1.connect()
-      u1.on 'data', (data) =>
+      u1.on 'data', (data) ->
         messages.u1.push data
         if data.done?
           u2.connect()
-          u2.on 'data', (data) =>
+          u2.on 'data', (data) ->
             messages.u2.push data
             if data.done?
               beforeDone()
 
-  after =>
+  after ->
     server.kill()
 
-  describe 'user 1', =>
-    it 'should receive message sent by user 2', (done) =>
-     u2.sendTextMessage('test!')
-     test.delay 10, =>
-       gotdone = false
-       messageReceived = false
-       for message in messages.u1
-         gotdone = true if message.done?
-         if gotdone and message.m?
-           messageReceived = true
-           m = message.m
-           m.attributes.t.should.be.equal('test!')
-           m.attributes.u.should.be.oneOf([u2.todo.w_userno + '_' + u2.todo.w_userrev, String(u2.todo.w_userno)])
+  describe 'user 1', ->
+    it 'should receive message sent by user 2', (done) ->
+      u2.sendTextMessage('test!')
+      test.delay 10, ->
+        gotdone = false
+        messageReceived = false
+        for message in messages.u1
+          gotdone = true if message.done?
+          if gotdone and message.m?
+            messageReceived = true
+            m = message.m
+            m.attributes.t.should.be.equal('test!')
+            m.attributes.u.should.be.oneOf([u2.todo.w_userno + '_' + u2.todo.w_userrev, String(u2.todo.w_userno)])
 
-       messageReceived.should.be.true
-       done()
+        messageReceived.should.be.true
+        done()
 
