@@ -9,23 +9,24 @@ class Logger
     DEBUG: 'DEBUG'
   }
 
-  constructor: (@caller) ->
+  constructor: (caller) ->
+    @caller = caller.name
 
   log: (level, message) ->
-    return console.log "[#{@caller.name}] [?] #{message}" if typeof level == "undefined"
+    return console.log "[#{@caller}] [?] #{message}" if typeof level == "undefined"
 
     switch level
       when @level.INFO
-        console.info chalk.cyan("[#{@caller.name}]") + chalk.green("[#{level}] ") + "#{message}"
+        console.info chalk.cyan("[#{@caller}]") + chalk.green("[#{level}] ") + "#{message}"
       when @level.ERROR
-        console.error chalk.cyan("[#{@caller.name}]") + chalk.red("[#{level}] ") + "#{message} - ", arguments[2]
+        console.error chalk.cyan("[#{@caller}]") + chalk.red("[#{level}] ") + "#{message} - ", arguments[2]
         @write """
           #{new Date()}
-          ERROR: #{@caller.name} #{message}
+          ERROR: #{@caller} #{message}
           MESSAGE: #{arguments[2]}
           \n
           """ if global.Application.config['env'] isnt 'dev'
       when @level.DEBUG
-        console.log chalk.cyan("[#{@caller.name}]") + chalk.gray("[#{level}] ") + "#{message}" if global.Application.config['env'] is 'dev'
+        console.log chalk.cyan("[#{@caller}]") + chalk.gray("[#{level}] ") + "#{message}" if global.Application.config['env'] is 'dev'
 
   write: (exception) -> fs.appendFile global.Application.config.logfile, exception
