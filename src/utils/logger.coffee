@@ -1,4 +1,4 @@
-colors = require 'colors'
+chalk = require 'chalk'
 fs = require 'fs'
 
 module.exports =
@@ -16,16 +16,16 @@ class Logger
 
     switch level
       when @level.INFO
-        console.info "[#{@caller.name}]".cyan + "[#{level}] ".green + "#{message}"
+        console.info chalk.cyan("[#{@caller.name}]") + chalk.green("[#{level}] ") + "#{message}"
       when @level.ERROR
-        console.error "[#{@caller.name}]".cyan + "[#{level}] ".red + "#{message} - ", arguments[2]
+        console.error chalk.cyan("[#{@caller.name}]") + chalk.red("[#{level}] ") + "#{message} - ", arguments[2]
         @write """
           #{new Date()}
           ERROR: #{@caller.name} #{message}
           MESSAGE: #{arguments[2]}
           \n
-          """ if global.Application.config['env'] != 'dev'
+          """ if global.Application.config['env'] isnt 'dev'
       when @level.DEBUG
-        console.log "[#{@caller.name}]".cyan + "[#{level}] ".gray + "#{message}" if global.Application.config['env'] is 'dev'
+        console.log chalk.cyan("[#{@caller.name}]") + chalk.gray("[#{level}] ") + "#{message}" if global.Application.config['env'] is 'dev'
 
   write: (exception) -> fs.appendFile global.Application.config.logfile, exception
