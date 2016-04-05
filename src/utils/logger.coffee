@@ -22,11 +22,14 @@ class Logger
         console.error chalk.cyan("[#{@caller}]") + chalk.red("[#{level}] ") + "#{message} - ", arguments[2]
         @write """
           #{new Date()}
-          ERROR: #{@caller} #{message}
-          MESSAGE: #{arguments[2]}
+          ERROR: #{arguments[2]}
+          MESSAGE: [#{@caller}] #{message}
           \n
           """ if global.Application.config['env'] isnt 'dev'
       when @level.DEBUG
         console.log chalk.cyan("[#{@caller}]") + chalk.gray("[#{level}] ") + "#{message}" if global.Application.config['env'] is 'dev'
 
+  ###
+  Write exceptions to a log file
+  ###
   write: (exception) -> fs.appendFile global.Application.config.logfile, exception
