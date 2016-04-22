@@ -17,7 +17,7 @@
     "semver": "^5.1.0"
   },
   "devDependencies": {
-    "coffeelint": "^1.15.2"
+    "coffeelint": "^1.15.7"
   },
   "packageDependencies": {},
   "private": true,
