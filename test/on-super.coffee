@@ -1,4 +1,4 @@
-test = require './test-kit'
+test = require '../src/test/test-kit'
 XatUser = test.IXatUser
 deploy = test.deployServer
 assert = require('chai').assert
@@ -14,10 +14,9 @@ assert = require('chai').assert
 describe 'on-super', ->
   server = null
 
-  before (beforeDone) ->
+  before () ->
     deploy().then (_server) ->
       server = _server
-      beforeDone()
 
   after ->
     server.kill()
@@ -36,25 +35,25 @@ describe 'on-super', ->
       sender = new XatUser(
         todo:
           w_userno: 50
-          w_k1: 555
+          w_k1: 'k_50'
           w_userrev: 0
-          w_useroom: 1
+          w_useroom: 100
       ).addExtension('user-actions')
 
       receiver2 = new XatUser(
         todo:
           w_userno: 51
-          w_k1: 1112
+          w_k1: 'k_51'
           w_userrev: 0
-          w_useroom: 2
+          w_useroom: 101
       ).addExtension('user-actions').addExtension('on-super')
 
       receiver3 = new XatUser(
         todo:
           w_userno: 51
-          w_k1: 1112
+          w_k1: 'k_51'
           w_userrev: 0
-          w_useroom: 3
+          w_useroom: 102
       ).addExtension('user-actions').addExtension('on-super')
       
       sender.connect()
@@ -163,25 +162,25 @@ describe 'on-super', ->
       sender = new XatUser(
         todo:
           w_userno: 50
-          w_k1: 555
+          w_k1: 'k_50'
           w_userrev: 0
-          w_useroom: 1
+          w_useroom: 100
       ).addExtension('user-actions')
 
       receiver1 = new XatUser(
         todo:
           w_userno: 51
-          w_k1: 1112
+          w_k1: 'k_51'
           w_userrev: 0
-          w_useroom: 1
+          w_useroom: 100
       ).addExtension('user-actions').addExtension('on-super')
 
       receiver2 = new XatUser(
         todo:
           w_userno: 51
-          w_k1: 1112
+          w_k1: 'k_51'
           w_userrev: 0
-          w_useroom: 2
+          w_useroom: 101
       ).addExtension('user-actions').addExtension('on-super')
       
       sender.connect()

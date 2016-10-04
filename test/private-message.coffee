@@ -1,4 +1,4 @@
-test = require './test-kit'
+test = require '../src/test/test-kit'
 XatUser = test.IXatUser
 deploy = test.deployServer
 assert = require('chai').assert
@@ -8,21 +8,20 @@ describe 'private messaging', ->
   senderConfig =
     todo:
       w_userno: 50
-      w_k1: 555
+      w_k1: 'k_50'
       w_userrev: 0
 
   receiverConfig =
     todo:
       w_userno: 51
-      w_k1: 1112
+      w_k1: 'k_51'
       w_userrev: 0
 
 
 
-  before (beforeDone) ->
+  before () ->
     deploy().then (_server) ->
       server = _server
-      beforeDone()
 
   after ->
     server.kill()
@@ -56,7 +55,6 @@ describe 'private messaging', ->
 
             if data.done?
               beforeDone()
-
 
     after ->
       sender.end()

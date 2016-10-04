@@ -1,6 +1,6 @@
 should = require('chai').should()
 
-test = require './test-kit'
+test = require '../src/test/test-kit'
 XatUser = test.IXatUser
 deploy = test.deployServer
 
@@ -13,7 +13,7 @@ describe 'guest user', ->
   check = null
   server = null
 
-  before (beforeDone) ->
+  before () ->
     deploy().then (_server) ->
       server = _server
       guest = new XatUser(
@@ -22,19 +22,18 @@ describe 'guest user', ->
           w_name: 'NAME'
           w_avatar: '123'
           w_homepage: 'http://example.com'
-          w_useroom: 1
-      ).addExtension('user-actions')
+          w_useroom: 100
+      ).addExtension('user-actions').addExtension('extended-events')
 
       check = new XatUser(
         todo:
           w_userno: 50
-          w_useroom: 1
-          w_k1: 555
+          w_useroom: 100
+          w_k1: 'k_50'
           w_name: 'tester'
           w_avatar: '555'
           w_userrev: 0
-      ).addExtension('user-actions')
-      beforeDone()
+      ).addExtension('user-actions').addExtension('extended-events')
 
 
 
@@ -55,14 +54,15 @@ describe 'guest user', ->
       check.on 'data', (data) ->
         messages.check.push data
         messages.all.push data
-        if data.done?
-          guest.connect()
+      check.on 'ee-done', (data) ->
+        guest.connect()
 
-          guest.on 'data', (data) ->
-            messages.guest.push data
-            messages.all.push data
-            if data.done?
-              beforeDone()
+        guest.on 'ee-done', (data) ->
+          beforeDone()
+
+        guest.on 'data', (data) ->
+          messages.guest.push data
+          messages.all.push data
 
     after ->
       check.end()
@@ -92,22 +92,28 @@ describe 'guest user', ->
 
       it "shouldn't be able to send messages, should be able to receive message", (done) ->
         ts = new Date().getTime()
-        guest.sendTextMessage('guest message ' + ts)
+        checkerMessage = 'checker message' + ts
+        guestMessage = 'guest message ' + ts
+        guest.sendTextMessage guestMessage
+        check.sendTextMessage checkerMessage
         test.delay 20, ->
-          check.sendTextMessage('checker message ' + ts)
-          test.delay 20, ->
 
-            gotdone = false
-            for message in messages.check
-              if message.done?
-                gotdone = true
-              if gotdone
-                message.m?.should.be.false
+          gotdone = false
+          for message in messages.check
+            if message.done?
+              gotdone = true
+            if gotdone
+              message.m?.should.be.false
 
-            guestMessage = (message for message in messages.guest when message.m?)
-            guestMessage = guestMessage[guestMessage.length - 1].m
+          [..., receivedByGuest] = (message for message in messages.guest\
+                                                        when message.m? and message.m.attributes? and message.m.attributes.t == checkerMessage)
+          should.exist(receivedByGuest)
+
+          receivedByGuest = receivedByGuest.m
 
 
-            guestMessage.attributes.u.split('_')[0].should.be.equal(check.todo.w_userno.toString())
-            guestMessage.attributes.t.should.be.equal('checker message ' + ts)
-            done()
+          receivedByGuest.should.have.property 'attributes'
+          receivedByGuest.attributes.should.have.property 'u'
+          receivedByGuest.attributes.u.split('_')[0].should.be.equal(check.todo.w_userno.toString())
+          receivedByGuest.attributes.t.should.be.equal(checkerMessage)
+          done()

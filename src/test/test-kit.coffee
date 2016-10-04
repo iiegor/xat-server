@@ -53,14 +53,15 @@ module.exports.IXatUser =
       options.perlinNoise = -> new Promise (resolve, reject) ->
         resolve(0)
 
-      return new XatUser(options)
+      u = new XatUser(options)
+      return u
 
 module.exports.deployServer = (options) -> new Promise (resolve, reject) ->
 
   options = options || {}
 
 
-  server = fork(path.join(__dirname, '../bin/xat'), [], silent: true)
+  server = fork(path.join(__dirname, '../../bin/xat'), [], silent: true)
 
   server.on 'error', (err) ->
     reject err
@@ -70,6 +71,8 @@ module.exports.deployServer = (options) -> new Promise (resolve, reject) ->
   process.on 'exit', -> wrapper.kill()
 
   started = false
+  server.stderr.on 'data', (data) ->
+    console.log data.toString()
 
   server.stdout.on 'data', (data) ->
     if not started and data.indexOf('Server started') >= 0

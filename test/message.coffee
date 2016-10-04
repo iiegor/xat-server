@@ -1,6 +1,7 @@
-test = require './test-kit'
+test = require '../src/test/test-kit'
 XatUser = test.IXatUser
 deploy = test.deployServer
+should = require('chai').should()
 
 describe 'message', ->
   u1 = null
@@ -17,16 +18,16 @@ describe 'message', ->
       u1 = new XatUser(
         todo:
           w_userno: 51
-          w_useroom: 1
-          w_k1: 1112
+          w_useroom: 100
+          w_k1: 'k_51'
           w_userrev: 0
       )
 
       u2 = new XatUser(
         todo:
-          w_useroom: 1
+          w_useroom: 100
           w_userno: 50
-          w_k1: 555
+          w_k1: 'k_50'
           w_userrev: 0
       ).addExtension('user-actions')
 
@@ -39,6 +40,7 @@ describe 'message', ->
             messages.u2.push data
             if data.done?
               beforeDone()
+    return
 
   after ->
     server.kill()
