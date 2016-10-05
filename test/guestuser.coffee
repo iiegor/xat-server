@@ -60,9 +60,9 @@ describe 'guest user', ->
         guest.on 'ee-done', (data) ->
           beforeDone()
 
-        guest.on 'data', (data) ->
-          messages.guest.push data
-          messages.all.push data
+      guest.on 'data', (data) ->
+        messages.guest.push data
+        messages.all.push data
 
     after ->
       check.end()
@@ -96,18 +96,18 @@ describe 'guest user', ->
         guestMessage = 'guest message ' + ts
         guest.sendTextMessage guestMessage
         check.sendTextMessage checkerMessage
-        test.delay 20, ->
 
-          gotdone = false
+        guest.once 'ee-text-message', (data) ->
+          receivedByGuest = data.xml
+
           for message in messages.check
             if message.done?
               gotdone = true
             if gotdone
               message.m?.should.be.false
 
-          [..., receivedByGuest] = (message for message in messages.guest\
-                                                        when message.m? and message.m.attributes? and message.m.attributes.t == checkerMessage)
-          should.exist(receivedByGuest)
+          
+          should.exist(receivedByGuest.m)
 
           receivedByGuest = receivedByGuest.m
 
