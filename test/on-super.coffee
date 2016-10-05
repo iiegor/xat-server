@@ -56,7 +56,7 @@ describe 'on-super', ->
           w_userrev: 0
           w_useroom: 102
       ).addExtension('user-actions').addExtension('on-super').addExtension('extended-events')
-      
+
       sender.connect()
       sender.on 'data', (data) ->
         messages.sender.push data
@@ -182,7 +182,7 @@ describe 'on-super', ->
           w_userrev: 0
           w_useroom: 101
       ).addExtension('user-actions').addExtension('on-super')
-      
+
       sender.connect()
       sender.on 'data', (data) ->
         messages.sender.push data
