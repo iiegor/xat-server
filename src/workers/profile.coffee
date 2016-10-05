@@ -1,4 +1,4 @@
-database = require "../services/database"
+database = require '../services/database'
 
 module.exports =
   getById: (userProfileId) -> new Promise((resolve, reject) ->

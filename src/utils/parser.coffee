@@ -1,4 +1,4 @@
-et = require "elementtree"
+et = require 'elementtree'
 
 module.exports =
   getTagName: (packet) ->

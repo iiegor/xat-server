@@ -1,5 +1,5 @@
-config = require '../../config/database'
 mysql = require 'mysql'
+config = require '../../config/database'
 
 ###
 Package documentation: https://github.com/felixge/node-mysql
