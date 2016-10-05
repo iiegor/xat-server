@@ -200,7 +200,7 @@ class Handler
         msg = msg.compose()
 
         if packetTag == 'p'
-          global.Server.rooms[@user.chat]?[toID].send(msg)
+          global.Server.rooms[@user.chat]?[toID]?.send(msg)
         else
           @routeZ(msg, toID)
 
