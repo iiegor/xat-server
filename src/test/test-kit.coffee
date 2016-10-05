@@ -83,7 +83,7 @@ module.exports.delay = (delay, callback) -> setTimeout callback, delay
 
 module.exports.should = -> chai.should()
 
-module.exports.timestamp =
+module.exports.convertTimestamp =
   fromServer: (ts) -> Number(ts)
   toServer: (ts) -> ts.toString()
 

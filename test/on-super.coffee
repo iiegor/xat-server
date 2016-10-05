@@ -2,6 +2,7 @@ test = require '../src/test/test-kit'
 XatUser = test.IXatUser
 deploy = test.deployServer
 assert = require('chai').assert
+should = require('chai').should()
 
 
 # This tests intend to test server's behavior
@@ -46,7 +47,7 @@ describe 'on-super', ->
           w_k1: 'k_51'
           w_userrev: 0
           w_useroom: 101
-      ).addExtension('user-actions').addExtension('on-super')
+      ).addExtension('user-actions').addExtension('on-super').addExtension('extended-events')
 
       receiver3 = new XatUser(
         todo:
@@ -54,7 +55,7 @@ describe 'on-super', ->
           w_k1: 'k_51'
           w_userrev: 0
           w_useroom: 102
-      ).addExtension('user-actions').addExtension('on-super')
+      ).addExtension('user-actions').addExtension('on-super').addExtension('extended-events')
       
       sender.connect()
       sender.on 'data', (data) ->
@@ -98,7 +99,7 @@ describe 'on-super', ->
 
         assert.equal actual, k, 'packets are not equal. Actual is ' + JSON.stringify(actual) + ' while ' + JSON.stringify(k) + ' expected'
 
-      it 'should receive the message in the last visited chat', (done) ->
+      it 'should receive private message in the last visited chat', (done) ->
         ts = new Date().getTime()
 
         text = ts.toString()
@@ -118,11 +119,10 @@ describe 'on-super', ->
         ts = new Date().getTime()
         text = ts.toString()
 
-        #this delay is required. but why?
-        test.delay 20, ->
+        receiver3.once 'ee-not-on-super', () ->
           sender.sendPMMessage(text, receiver2.todo.w_userno)
 
-          test.delay 10, ->
+          test.delay 50, ->
             [..., msg] = (_ for _ in messages.receiver2 when _.z?)
             assert.isOk(msg? and msg.z.attributes.t == text)
 
@@ -136,11 +136,11 @@ describe 'on-super', ->
         ts = new Date().getTime()
 
         text = ts.toString()
-        #this delay is required. but why?
-        test.delay 20, ->
+        #delay is required. but why?
+        receiver2.once 'ee-not-on-super', () ->
           sender.sendPMMessage(text, receiver2.todo.w_userno)
 
-          test.delay 10, ->
+          test.delay 50, ->
             [..., msg] = (_ for _ in messages.receiver2 when _.z?)
             assert.isFalse(msg? and msg.z.attributes.t == text)
 
@@ -216,14 +216,14 @@ describe 'on-super', ->
           assert.isFalse(z? and z.attributes.t == text)
           done()
 
-      it 'even if K2 has been exactly sent', (done) ->
+      it 'even if K2 has been sent exactly', (done) ->
         text = new Date().getTime().toString()
         receiver2.sendK2()
 
-        test.delay 20, ->
+        test.delay 50, ->
           sender.sendPMMessage(text, receiver1.todo.w_userno)
 
-          test.delay 20, ->
+          test.delay 50, ->
             [..., z] = (_.z for _ in messages.receiver1 when _.z?)
             assert.isOk(z? and z.attributes.t == text)
 
