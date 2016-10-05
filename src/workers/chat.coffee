@@ -1,9 +1,9 @@
-database = require "../services/database"
+database = require '../services/database'
 
-parser = require "../utils/parser"
-math = require "../utils/math"
-builder = require "../utils/builder"
-logger = new (require "../utils/logger")(name: 'Chat')
+parser = require '../utils/parser'
+math = require '../utils/math'
+builder = require '../utils/builder'
+logger = new (require '../utils/logger')(name: 'Chat')
 
 module.exports =
   joinRoom: ->
@@ -81,7 +81,7 @@ module.exports =
 
       ## Room messages
       database.exec('SELECT * FROM (SELECT * FROM messages WHERE id = ? AND pool = ? ORDER BY time DESC LIMIT 15) sub ORDER BY time ASC LIMIT 0,15', [ @user.chat, @chat.onPool ]).then((data) =>
-        offline = {}
+        offline = new Array()
         for message in data
           continue if global.Server.rooms[@user.chat][message.uid]?.chat.onPool is @chat.onPool
 
@@ -92,13 +92,12 @@ module.exports =
             .append('a', message.avatar)
           packet.append('N', message.registered) if message.registered isnt 'unregistered'
           
-          offline[message.uid] = packet.compose()
-
-        for _, packet of offline
-          @send packet
+          if offline.indexOf(message.uid) is -1
+            @send packet.compose()
+            offline.push(message.uid)
 
         for _, client of global.Server.rooms[@user.chat]
-          continue if client.id is @user.id  or client.chat.onPool != @chat.onPool
+          continue if client.id is @user.id  or client.chat.onPool isnt @chat.onPool
 
           user = client.user
 
