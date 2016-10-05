@@ -55,7 +55,7 @@ class Application extends EventEmitter
     @on 'application:dispose', @dispose
 
     unless process.platform is 'win32'
-      process.on 'SIGTERM', -> @dispose
+      process.on 'SIGTERM', @dispose
 
   # Load application plugins
   loadPlugins: ->
