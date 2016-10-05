@@ -198,7 +198,6 @@ describe 'private messaging', ->
 
 
     it 'should receive "z" private message', (done) ->
-      return done()
       ts = new Date().getTime()
       text = 'pmz' + ts
       sender.sendPMMessage text, receiver.todo.w_userno, false
@@ -219,7 +218,6 @@ describe 'private messaging', ->
         done()
 
     it 'should receive "z" private chat message', (done) ->
-      return done()
       ts = new Date().getTime()
       text = 'pcz' + ts
       sender.sendPCMessage text, receiver.todo.w_userno, false
