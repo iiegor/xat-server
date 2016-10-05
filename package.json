@@ -20,7 +20,7 @@
     "chai": "^3.5.0",
     "mocha": "^2.4.5",
     "chai-things": "^0.2.0",
-    "xat-client": "huumanoid/xat-client"
+    "xat-client": "huumanoid/xat-client",
     "coffeelint": "^1.15.7"
   },
   "packageDependencies": {},
