@@ -95,7 +95,10 @@ describe 'locating interactions', ->
         it 'should receive response to locate', () ->
           at.xml.should.have.property 'z'
           z = at.xml.z
-          z.attributes.should.contain.keys(['u', 'd', 't'])
+          z.attributes.should.contain.keys(['u', 'd', 't', 'n', 'a', 'h', 'v'])
           z.attributes.u.split('_')[0].should.be.equal responder.todo.w_userno
           z.attributes.d.should.be.equal locator.todo.w_userno
           assert.equal z.attributes.t.substr(0, 3), '/a_'
+          z.attributes.n.should.be.equal responder.todo.w_name
+          z.attributes.a.should.be.equal responder.todo.w_avatar
+          z.attributes.h.should.be.equal String(responder.todo.w_homepage)
