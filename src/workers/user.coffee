@@ -4,7 +4,6 @@ math = require '../utils/math'
 database = require '../services/database'
 builder = require '../utils/builder'
 
-
 module.exports =
   login: (client, name, pw) ->
     # TODO:

@@ -23,7 +23,7 @@ module.exports =
 
       return false if !@chat
 
-      ## Push theuser to the rooms object
+      ## Push the user to the rooms object
       if typeof global.Server.rooms[@user.chat] is 'object'
         global.Server.rooms[@user.chat][@user.id] = @
       else
