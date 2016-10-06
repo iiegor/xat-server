@@ -5,6 +5,9 @@ math = require '../utils/math'
 builder = require '../utils/builder'
 logger = new (require '../utils/logger')(name: 'Chat')
 
+userBuilder = require '../packet-builders/user'
+messageBuilder = require '../packet-builders/message'
+
 module.exports =
   joinRoom: ->
     return if @user.chat < 1
@@ -60,22 +63,7 @@ module.exports =
 
       ## Broadcast the current user
       packet = builder.create('u')
-      packet.append('cb', '1443256921')
-        .append('s', '1')
-        .append('f', @user.f)
-        .append('u', @user.id)
-        .append('n', @user.nickname)
-        .append('q', '3')
-        .append('a', @user.avatar)
-        .append('h', @user.url)
-        .append('cb', '1443256921')
-        .append('v', '0')
-
-      if @user.registered
-        packet.append('N', @user.username)
-        packet.append('d0', @user.d0)
-        packet.append('d2', @user.d2) if @user.d2
-        packet.appendRaw(@user.pStr)
+      userBuilder.expandPacketWithOnlineUserData(packet, @)
 
       @broadcast packet.compose()
 
@@ -85,47 +73,30 @@ module.exports =
         for message in data
           continue if global.Server.rooms[@user.chat][message.uid]?.chat.onPool is @chat.onPool
 
-          packet = builder.create('o')
-          packet.append('u', message.uid)
-            .append('u', message.uid)
-            .append('n', message.name)
-            .append('a', message.avatar)
-          packet.append('N', message.registered) if message.registered isnt 'unregistered'
           
           if offline.indexOf(message.uid) is -1
+            packet = builder.create('o')
+            packet.append('u', message.uid)
+              .append('u', message.uid)
+              .append('n', message.name)
+              .append('a', message.avatar)
+              .append('s', 1)
+            packet.append('N', message.registered) if message.registered isnt 'unregistered'
+
             @send packet.compose()
             offline.push(message.uid)
 
         for _, client of global.Server.rooms[@user.chat]
           continue if client.id is @user.id  or client.chat.onPool isnt @chat.onPool
 
-          user = client.user
-
           packet = builder.create('u')
-          packet.append('cb', '1414865425')
+          userBuilder.expandPacketWithOnlineUserData(packet, client)
           packet.append('s', '1')
-          packet.append('f', user.f)
-          packet.append('u', user.id)
-          packet.append('q', '3')
-          packet.append('n', user.nickname)
-          packet.append('a', user.avatar)
-          packet.append('h', user.url)
-          packet.append('v', '0')
-
-          if user.registered
-            packet.append('N', user.username)
-            packet.append('d0', user.d0)
-            packet.append('d2', user.d2) if user.d2
-            packet.appendRaw(user.pStr)
 
           @send packet.compose()
 
         data.forEach((message) =>
-          packet = builder.create('m')
-          packet.append('E', message.time)
-            .append('u', message.uid)
-            .append('t', message.message)
-            .append('s', '1')
+          packet = messageBuilder.buildOldMain message
 
           @send packet.compose()
         )
@@ -141,8 +112,18 @@ module.exports =
     )
 
   sendMessage: (user, message) ->
-    @broadcast builder.create('m').append('t', message).append('u', user).compose()
+    time = math.time()
 
-    database.exec('INSERT INTO messages (id, uid, message, name, registered, avatar, time, pool) values (?, ?, ?, ?, ?, ?, ?, ?)', [ @user.chat, @user.id, message, @user.nickname, @user.username||'unregistered', @user.avatar, math.time(), @chat.onPool ]).then((data) ->
+    database.exec('INSERT INTO messages (id, uid, message, name, registered, avatar, time, pool) values (?, ?, ?, ?, ?, ?, ?, ?)', [ @user.chat, @user.id, message, @user.nickname, @user.username||'unregistered', @user.avatar, time, @chat.onPool ]).then((data) =>
+
+      packet = messageBuilder.buildNewMain(
+        message: message
+        client: @
+        time: time
+        messageId: data.insertId
+      )
+
+      @broadcast packet.compose()
+
       logger.log logger.level.DEBUG, 'New message sent'
     ).catch((err) -> logger.log logger.level.ERROR, 'Failed to send a message to the database', err)
