@@ -2,6 +2,7 @@ parser = require '../utils/parser'
 math = require '../utils/math'
 logger = require '../utils/logger'
 builder = require '../utils/builder'
+userBuilder = require '../packet-builders/user'
 
 User = require '../workers/user'
 Chat = require '../workers/chat'
@@ -143,7 +144,6 @@ class Client
           @routeZ(packet.compose(), userProfileId)
         else if type.substr(0, 2) is '/a' and userProfile != null
           packet = builder.create('z')
-          packet.append('N', @user.username) if @user.registered
 
           status = type.substr(2)
 
@@ -155,20 +155,13 @@ class Client
           else
             status = "/a#{Chat.getChatLink @user.chat}"
 
-          packet.append('t', status)
+          userBuilder.expandPacketWithOnlineUserData packet, user
 
-          packet.append('b', '1')
+          packet.append('t', status)
+          # .append('b', '1') # what does 'b' means?
             .append('d', userProfileId)
-            .append('u', @user.id)
-            .append('po', '0')
-            .appendRaw(@user.pStr)
             .append('x', @user.xats || 0)
             .append('y', @user.days || 0)
-            .append('q', '3')
-            .append('n', @user.nickname)
-            .append('a', @user.avatar)
-            .append('h', @user.url)
-            .append('v', '2')
 
           @routeZ(packet.compose(), userProfileId)
         else if type is '/l' or type.substr(0, 2) is '/a'
