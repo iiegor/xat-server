@@ -134,7 +134,12 @@ class Client
           return
 
         if type is '/l' and userProfile != null
-          @routeZ(packet, userProfileId)
+          ## can't just resend packet because of trailing '\0'
+          packet = builder.create('z')
+            .append('d', userProfileId)
+            .append('u', userOrigin)
+            .append('t', '/l')
+          @routeZ(packet.compose(), userProfileId)
         else if type.substr(0, 2) is '/a' and userProfile != null
           packet = builder.create('z')
           packet.append('N', @user.username) if @user.registered
