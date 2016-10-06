@@ -3,8 +3,10 @@ database = require '../services/database'
 parser = require '../utils/parser'
 math = require '../utils/math'
 builder = require '../utils/builder'
-userWorker = require '../workers/user'
 logger = new (require '../utils/logger')(name: 'Chat')
+
+userBuilder = require '../packet-builders/user'
+messageBuilder = require '../packet-builders/message'
 
 module.exports =
   joinRoom: ->
@@ -61,7 +63,7 @@ module.exports =
 
       ## Broadcast the current user
       packet = builder.create('u')
-      userWorker.expandPacketWithOnlineUserData(packet, @user.id)
+      userBuilder.expandPacketWithOnlineUserData(packet, @)
 
       @broadcast packet.compose()
 
@@ -88,17 +90,13 @@ module.exports =
           continue if client.id is @user.id  or client.chat.onPool isnt @chat.onPool
 
           packet = builder.create('u')
-          userWorker.expandPacketWithOnlineUserData(packet, client.user.id)
+          userBuilder.expandPacketWithOnlineUserData(packet, client)
           packet.append('s', '1')
 
           @send packet.compose()
 
         data.forEach((message) =>
-          packet = builder.create('m')
-          packet.append('E', message.time)
-            .append('u', message.uid)
-            .append('t', message.message)
-            .append('s', '1')
+          packet = messageBuilder.buildOldMain message
 
           @send packet.compose()
         )
@@ -114,8 +112,18 @@ module.exports =
     )
 
   sendMessage: (user, message) ->
-    @broadcast builder.create('m').append('t', message).append('u', user).compose()
+    time = math.time()
 
-    database.exec('INSERT INTO messages (id, uid, message, name, registered, avatar, time, pool) values (?, ?, ?, ?, ?, ?, ?, ?)', [ @user.chat, @user.id, message, @user.nickname, @user.username||'unregistered', @user.avatar, math.time(), @chat.onPool ]).then((data) ->
+    database.exec('INSERT INTO messages (id, uid, message, name, registered, avatar, time, pool) values (?, ?, ?, ?, ?, ?, ?, ?)', [ @user.chat, @user.id, message, @user.nickname, @user.username||'unregistered', @user.avatar, time, @chat.onPool ]).then((data) =>
+
+      packet = messageBuilder.buildNewMain(
+        message: message
+        client: @
+        time: time
+        messageId: data.insertId
+      )
+
+      @broadcast packet.compose()
+
       logger.log logger.level.DEBUG, 'New message sent'
     ).catch((err) -> logger.log logger.level.ERROR, 'Failed to send a message to the database', err)
