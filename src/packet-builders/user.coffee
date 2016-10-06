@@ -20,7 +20,7 @@ expandPacket = (packet, user, fillType) ->
 # This method works assuming user with id=userId is online.
 # This method is sync.
 expandPacketWithOnlineUserData = (packet, client, fillType) ->
-    expandPacket(packet, client.user, fillType)
+  expandPacket(packet, client.user, fillType)
 
 expandPacketWithUserData = (packet, userId, fillType) ->
   new Promise (resolve, reject) ->
