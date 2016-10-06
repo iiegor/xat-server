@@ -3,6 +3,7 @@ database = require '../services/database'
 parser = require '../utils/parser'
 math = require '../utils/math'
 builder = require '../utils/builder'
+userWorker = require '../workers/user'
 logger = new (require '../utils/logger')(name: 'Chat')
 
 module.exports =
@@ -20,7 +21,7 @@ module.exports =
 
       return false if !@chat
 
-      ## Push the user to the rooms object
+      ## Push theuser to the rooms object
       if typeof global.Server.rooms[@user.chat] is 'object'
         global.Server.rooms[@user.chat][@user.id] = @
       else
@@ -60,22 +61,7 @@ module.exports =
 
       ## Broadcast the current user
       packet = builder.create('u')
-      packet.append('cb', '1443256921')
-        .append('s', '1')
-        .append('f', @user.f)
-        .append('u', @user.id)
-        .append('n', @user.nickname)
-        .append('q', '3')
-        .append('a', @user.avatar)
-        .append('h', @user.url)
-        .append('cb', '1443256921')
-        .append('v', '0')
-
-      if @user.registered
-        packet.append('N', @user.username)
-        packet.append('d0', @user.d0)
-        packet.append('d2', @user.d2) if @user.d2
-        packet.appendRaw(@user.pStr)
+      userWorker.expandPacketWithOnlineUserData(packet, @user.id)
 
       @broadcast packet.compose()
 
@@ -85,38 +71,25 @@ module.exports =
         for message in data
           continue if global.Server.rooms[@user.chat][message.uid]?.chat.onPool is @chat.onPool
 
-          packet = builder.create('o')
-          packet.append('u', message.uid)
-            .append('u', message.uid)
-            .append('n', message.name)
-            .append('a', message.avatar)
-          packet.append('N', message.registered) if message.registered isnt 'unregistered'
           
           if offline.indexOf(message.uid) is -1
+            packet = builder.create('o')
+            packet.append('u', message.uid)
+              .append('u', message.uid)
+              .append('n', message.name)
+              .append('a', message.avatar)
+              .append('s', 1)
+            packet.append('N', message.registered) if message.registered isnt 'unregistered'
+
             @send packet.compose()
             offline.push(message.uid)
 
         for _, client of global.Server.rooms[@user.chat]
           continue if client.id is @user.id  or client.chat.onPool isnt @chat.onPool
 
-          user = client.user
-
           packet = builder.create('u')
-          packet.append('cb', '1414865425')
+          userWorker.expandPacketWithOnlineUserData(packet, client.user.id)
           packet.append('s', '1')
-          packet.append('f', user.f)
-          packet.append('u', user.id)
-          packet.append('q', '3')
-          packet.append('n', user.nickname)
-          packet.append('a', user.avatar)
-          packet.append('h', user.url)
-          packet.append('v', '0')
-
-          if user.registered
-            packet.append('N', user.username)
-            packet.append('d0', user.d0)
-            packet.append('d2', user.d2) if user.d2
-            packet.appendRaw(user.pStr)
 
           @send packet.compose()
 
