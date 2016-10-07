@@ -125,10 +125,10 @@ describe 'locating interactions', ->
             done()
 
       describe 'sender', ->
-        it 'should not receive NF, should receive regular answer', ->
+        it 'should receive NF', ->
           checkResponse(at, locator, responder)
           z = at.xml.z
-          z.attributes.t.should.be.equal '/a_'
+          z.attributes.t.should.be.equal '/a_NF'
 
   describe 'locator and responder are in different chats', ->
     locator = null
