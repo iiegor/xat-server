@@ -26,11 +26,10 @@ module.exports =
       return false if !@chat
 
       ## Push the user to the rooms object
-      if typeof global.Server.rooms[@user.chat] is 'object'
-        global.Server.rooms[@user.chat][@user.id] = @
-      else
-        global.Server.rooms[@user.chat] = {}
-        global.Server.rooms[@user.chat][@user.id] = @
+      if typeof global.Server.rooms[@user.chat] isnt 'object'
+        global.Server.rooms[@user.chat] = { }
+
+      global.Server.rooms[@user.chat][@user.id] = @
 
       @chat.attached = try JSON.parse(@chat.attached) catch error then {}
       @chat.onPool = @chat.onPool || 0
