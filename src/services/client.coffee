@@ -147,7 +147,7 @@ class Client
           status = type.substr(2)
 
           if status[0] == '_'
-            if status.substr(1) == 'NF' and not global.Server.rooms[@user.chat][userProfileId]
+            if status.substr(1) == 'NF'
               status = '/a_NF'
             else
               status = '/a_'
