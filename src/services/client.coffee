@@ -214,7 +214,7 @@ class Client
         Room pools
         @spec <w v="ACTUAL_POOL(int) POOLS(int,int..)"  />
         ###
-        @chat.onPool = packetTag.substr(1)
+        @chat.onPool = parseInt packetTag.substr(1)
 
         Chat.joinRoom.call(@)
       else
