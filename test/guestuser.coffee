@@ -54,10 +54,10 @@ describe 'guest user', ->
       check.on 'data', (data) ->
         messages.check.push data
         messages.all.push data
-      check.on 'ee-done', (data) ->
+      check.once 'ee-done', (data) ->
         guest.connect()
 
-        guest.on 'ee-done', (data) ->
+        guest.once 'ee-done', (data) ->
           beforeDone()
 
       guest.on 'data', (data) ->
