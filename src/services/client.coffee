@@ -261,7 +261,7 @@ class Client
 
   broadcast: (packet) ->
     for _, client of global.Server.rooms[@user.chat]
-      continue if @user.id == client.user.id
+      continue if @user.id == client.user.id or @chat.onPool != client.chat.onPool
 
       console.log "Broadcasting from #{@user.id} to #{client.id}"
 
