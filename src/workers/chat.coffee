@@ -8,7 +8,7 @@ logger = new (require '../utils/logger')(name: 'Chat')
 getPlainChatLink = (chatId) ->
   return global.Application.config.domain + '/chat/room/' + chatId + '/'
 
-joinRoom = ->
+joinRoom = (poolId) ->
     return if @user.chat < 1
 
     database.exec('SELECT * FROM chats WHERE id = ? LIMIT 1', [@user.chat]).then((data) =>
@@ -29,7 +29,12 @@ joinRoom = ->
       global.Server.rooms[@user.chat][@user.id] = @
 
       @chat.attached = try JSON.parse(@chat.attached) catch error then {}
-      @chat.onPool = @chat.onPool || 0
+      ## if poolId undefined or 0 - should choose @chat.onPool, according to xat's protocol
+      ## However, real implementation is more complicated
+      ## 0 pool is default pool. In case there are more than one
+      ## regular pool (regular pools appear when there are too many users in chat),
+      ## chat engine should switch to less populated pool.
+      @chat.onPool = poolId || @chat.onPool || 0
 
       @setSuper()
 
