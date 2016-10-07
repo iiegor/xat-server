@@ -31,6 +31,8 @@ joinRoom = ->
       @chat.attached = try JSON.parse(@chat.attached) catch error then {}
       @chat.onPool = @chat.onPool || 0
 
+      @setSuper()
+
       ## Chat settings and info
       ## r: 1 - (All main owner) / 2 - (All moderator) / 3 - (All member) / 4 (All owner)
       ## v: 1 - (Normal) / 3 - (w_VIP) / 4 - (w_ALLP) / other - (All unregistered)

@@ -73,7 +73,6 @@ class Client
             dupUser.socket.end()
 
           @id = @user.id
-          @setSuper()
 
           Chat.joinRoom.call(@)
         ).catch((err) => @logger.log @logger.level.ERROR, err, null)
