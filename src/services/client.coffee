@@ -152,7 +152,7 @@ class Client
             else
               status = '/a_'
           else
-            status = "/a#{@user.chat}"
+            status = "/a#{Chat.getChatLink @user.chat}"
 
           packet.append('t', status)
 

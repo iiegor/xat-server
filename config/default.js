@@ -8,5 +8,6 @@ module.exports = {
   'guestid': {
     'start': 1999900000,
     'end': 2000000000
-  }
+  },
+  'domain': 'xat.dev'
 }
