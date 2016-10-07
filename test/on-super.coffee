@@ -4,6 +4,7 @@ deploy = test.deployServer
 assert = require('chai').assert
 should = require('chai').should()
 
+delay = 100
 
 # This tests intend to test server's behavior
 # when user sit in more than one chat.
@@ -105,7 +106,7 @@ describe 'on-super', ->
         text = ts.toString()
         sender.sendPMMessage(text, receiver2.todo.w_userno)
 
-        test.delay 20, ->
+        test.delay delay, ->
           [..., msg] = (_ for _ in messages.receiver2 when _.z?)
           assert.isFalse(msg? and msg.z.attributes.t == text)
 
@@ -122,7 +123,7 @@ describe 'on-super', ->
         receiver3.once 'ee-not-on-super', () ->
           sender.sendPMMessage(text, receiver2.todo.w_userno)
 
-          test.delay 50, ->
+          test.delay delay, ->
             [..., msg] = (_ for _ in messages.receiver2 when _.z?)
             assert.isOk(msg? and msg.z.attributes.t == text)
 
@@ -140,7 +141,7 @@ describe 'on-super', ->
         receiver2.once 'ee-not-on-super', () ->
           sender.sendPMMessage(text, receiver2.todo.w_userno)
 
-          test.delay 50, ->
+          test.delay delay, ->
             [..., msg] = (_ for _ in messages.receiver2 when _.z?)
             assert.isFalse(msg? and msg.z.attributes.t == text)
 
@@ -208,7 +209,7 @@ describe 'on-super', ->
         text = new Date().getTime().toString()
 
         sender.sendPMMessage(text, receiver1.todo.w_userno)
-        test.delay 20, ->
+        test.delay delay, ->
           [..., z] = (_.z for _ in messages.receiver1 when _.z?)
           assert.isOk(z? and z.attributes.t == text)
 
@@ -220,10 +221,10 @@ describe 'on-super', ->
         text = new Date().getTime().toString()
         receiver2.sendK2()
 
-        test.delay 50, ->
+        test.delay delay, ->
           sender.sendPMMessage(text, receiver1.todo.w_userno)
 
-          test.delay 50, ->
+          test.delay delay, ->
             [..., z] = (_.z for _ in messages.receiver1 when _.z?)
             assert.isOk(z? and z.attributes.t == text)
 
