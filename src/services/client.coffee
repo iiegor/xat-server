@@ -214,9 +214,11 @@ class Client
         Room pools
         @spec <w v="ACTUAL_POOL(int) POOLS(int,int..)"  />
         ###
-        @chat.onPool = parseInt packetTag.substr(1)
-
-        Chat.joinRoom.call(@)
+        ###
+        Change pool
+        @spec <wNEWPOOL />
+        ###
+        Chat.changePool.call(@, parseInt packetTag.substr(1))
       else
         @logger.log @logger.level.ERROR, "Unrecognized packet by the server!", packetTag
 
