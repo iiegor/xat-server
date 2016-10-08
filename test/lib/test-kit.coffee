@@ -10,12 +10,8 @@ XatUser = require('xat-client').XatUser
 
 config = require '../../config/tests'
 
-
-
-
 class ServerInstance
   server: null
-
   _error: null
 
   constructor: (server) ->
@@ -43,8 +39,7 @@ class ServerInstance
 
     @server.kill()
 
-
-module.exports.IXatUser =
+exports.IXatUser =
   class IXatUser extends XatUser
     constructor: (options) ->
       options.ippicker =
@@ -56,10 +51,8 @@ module.exports.IXatUser =
       u = new XatUser(options)
       return u
 
-module.exports.deployServer = (options) -> new Promise (resolve, reject) ->
-
+exports.deployServer = (options) -> new Promise (resolve, reject) ->
   options = options || {}
-
 
   server = fork(path.join(__dirname, '../../bin/xat'), [], silent: true)
 
@@ -79,11 +72,11 @@ module.exports.deployServer = (options) -> new Promise (resolve, reject) ->
       started = true
       resolve(wrapper)
 
-module.exports.delay = (delay, callback) -> setTimeout callback, delay
+exports.delay = (delay, callback) -> setTimeout callback, delay
 
-module.exports.should = -> chai.should()
+exports.should = -> chai.should()
 
-module.exports.convertTimestamp =
+exports.convertTimestamp =
   fromServer: (ts) -> Number(ts)
   toServer: (ts) -> ts.toString()
 

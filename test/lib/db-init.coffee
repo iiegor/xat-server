@@ -1,13 +1,9 @@
-
-database = require '../services/database'
-
+database = require '../../src/services/database'
 config = require '../../config/tests'
 
 idRange = [config.idRange.min .. config.idRange.max]
 chatRange = [config.chatRange.min .. config.chatRange.max]
 #`chats`(`id`, `name`, `bg`, `language`, `desc`, `sc`, `ch`, `email`, `radio`, `pass`, `button`, `attached`, `pool`, `pools`)
-
-
 
 Promise.all(
   for chatid in chatRange

@@ -1,13 +1,12 @@
 should = require('chai').should()
 assert = require('chai').assert
 
-test = require '../src/test/test-kit'
+test = require './lib/test-kit'
 XatUser = test.IXatUser
 deploy = test.deployServer
 
 conf = require '../config/default'
 Chat = require '../src/workers/chat'
-
 
 describe 'locating interactions', ->
 

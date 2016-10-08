@@ -1,6 +1,7 @@
-test = require '../src/test/test-kit'
+test = require './lib/test-kit'
 XatUser = test.IXatUser
 deploy = test.deployServer
+
 assert = require('chai').assert
 should = require('chai').should()
 
@@ -17,7 +18,6 @@ describe 'private messaging', ->
       w_userno: 51
       w_k1: 'k_51'
       w_userrev: 0
-
 
   before () ->
     deploy().then (_server) ->

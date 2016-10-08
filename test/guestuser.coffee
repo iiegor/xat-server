@@ -1,14 +1,12 @@
 should = require('chai').should()
 
-test = require '../src/test/test-kit'
+test = require './lib/test-kit'
 XatUser = test.IXatUser
 deploy = test.deployServer
 
-conf = require '../config/default'
-
+config = require '../config/default'
 
 describe 'guest user', ->
-
   guest = null
   check = null
   server = null
@@ -18,7 +16,7 @@ describe 'guest user', ->
       server = _server
       guest = new XatUser(
         todo:
-          w_userno: conf.guestAuthId
+          w_userno: config.guestAuthId
           w_name: 'NAME'
           w_avatar: '123'
           w_homepage: 'http://example.com'
@@ -35,14 +33,10 @@ describe 'guest user', ->
           w_userrev: 0
       ).addExtension('user-actions').addExtension('extended-events')
 
-
-
   after ->
     server.kill()
 
-
   describe 'guest connects to chat with user already connected', ->
-
     messages =
       all: []
       check: []
@@ -75,7 +69,7 @@ describe 'guest user', ->
 
         for message in messages.check when message.u?
           u = message.u
-          u.attributes.u.should.be.within conf.guestid.start, conf.guestid.end - 1
+          u.attributes.u.should.be.within config.guestid.start, config.guestid.end - 1
 
       it "should receive 'u' with empty n,a,h, with v=1, cb=0 and without any other attributes", ->
         for message in messages.check when message.u?
@@ -83,8 +77,6 @@ describe 'guest user', ->
           u.attributes.n.should.equal ''
           u.attributes.a.should.equal ''
           u.attributes.h.should.equal ''
-
-
 
     describe 'guest', ->
       it 'should receive done', ->
@@ -105,12 +97,10 @@ describe 'guest user', ->
               gotdone = true
             if gotdone
               message.m?.should.be.false
-
           
           should.exist(receivedByGuest.m)
 
           receivedByGuest = receivedByGuest.m
-
 
           receivedByGuest.should.have.property 'attributes'
           receivedByGuest.attributes.should.have.property 'u'

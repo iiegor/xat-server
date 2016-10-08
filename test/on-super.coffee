@@ -1,6 +1,7 @@
-test = require '../src/test/test-kit'
+test = require './lib/test-kit'
 XatUser = test.IXatUser
 deploy = test.deployServer
+
 assert = require('chai').assert
 should = require('chai').should()
 

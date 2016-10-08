@@ -1,6 +1,7 @@
-test = require '../src/test/test-kit'
+test = require './lib/test-kit'
 XatUser = test.IXatUser
 deploy = test.deployServer
+
 should = require('chai').should()
 
 describe 'message', ->
