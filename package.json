@@ -17,12 +17,17 @@
     "semver": "^5.3.0"
   },
   "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.4.5",
+    "chai-things": "^0.2.0",
+    "xat-client": "huumanoid/xat-client",
     "coffeelint": "^1.15.7"
   },
   "packageDependencies": {},
   "private": true,
   "scripts": {
     "start": "node bin/xat",
-    "lint": "coffeelint src"
+    "lint": "coffeelint src",
+    "test": "./node_modules/mocha/bin/mocha --require coffee-script/register --compilers coffee:coffee-script --recursive test"
   }
 }
