@@ -170,7 +170,7 @@ class Client
             .append('v', '2')
 
           @routeZ(packet.compose(), userProfileId)
-        else if type is '/l' or type.substr(0,2) is '/a'
+        else if type is '/l' or type.substr(0, 2) is '/a'
           Profile.getById(userProfileId)
             .then((data) =>
               @logger.log @logger.level.ERROR, "Unhandled null userProfile", null

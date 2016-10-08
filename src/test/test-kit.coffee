@@ -36,7 +36,7 @@ class ServerInstance
       if code != 0
         @_error =
           code: code
-          signal:signal
+          signal: signal
 
   kill: =>
     assert(@_error == null, 'Server has crashed')
@@ -49,7 +49,7 @@ module.exports.IXatUser =
     constructor: (options) ->
       options.ippicker =
         pickIp: -> new Promise (resolve, reject) ->
-          resolve({ host: 'localhost', port: 1243 })
+          resolve({host: 'localhost', port: 1243})
       options.perlinNoise = -> new Promise (resolve, reject) ->
         resolve(0)
 

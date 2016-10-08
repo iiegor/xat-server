@@ -28,6 +28,6 @@
   "scripts": {
     "start": "node bin/xat",
     "lint": "coffeelint src",
-    "test": "./node_modules/mocha/bin/mocha --require coffee-script/register --compilers coffee:coffee-script --recursive test"
+    "test": "mocha --require coffee-script/register --compilers coffee:coffee-script --recursive test"
   }
 }

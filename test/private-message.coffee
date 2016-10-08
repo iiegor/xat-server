@@ -19,7 +19,6 @@ describe 'private messaging', ->
       w_userrev: 0
 
 
-
   before () ->
     deploy().then (_server) ->
       server = _server
@@ -57,7 +56,6 @@ describe 'private messaging', ->
       sender.end()
       receiver.end()
 
-
     it 'should receive "p" private message', (done) ->
       ts = new Date().getTime()
       text = 'pmp' + ts
@@ -91,8 +89,6 @@ describe 'private messaging', ->
         p.attributes.s.should.be.equal('2')
         p.attributes.d.should.be.equal(p.attributes.d)
         done()
-
-
 
     it 'should receive "z" private message', (done) ->
       ts = new Date().getTime()
@@ -139,7 +135,6 @@ describe 'private messaging', ->
         [..., message] = (message for message in messages.receiver when message.z?)
         assert.isFalse(message? and message.z.attributes.u.split('_')[0] == illegalId.toString())
         done()
-
 
   describe 'sender and receiver are in different chats', ->
     sender = null
@@ -195,8 +190,6 @@ describe 'private messaging', ->
 
         done()
 
-
-
     it 'should receive "z" private message', (done) ->
       ts = new Date().getTime()
       text = 'pmz' + ts
@@ -236,7 +229,6 @@ describe 'private messaging', ->
         z.attributes.t.should.be.equal(text)
         z.attributes.s.should.be.equal('2')
         done()
-
 
     it "shouldn't receive messages with illegal 'u' attribute", (done) ->
       text = 'illegal'
