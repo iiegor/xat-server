@@ -5,7 +5,12 @@ math = require '../utils/math'
 builder = require '../utils/builder'
 logger = new (require '../utils/logger')(name: 'Chat')
 
+getPlainChatLink = (chatId) ->
+  return global.Application.config.domain + '/chat/room/' + chatId + '/'
+
 module.exports =
+  getChatLink: (chatId) ->
+    return getPlainChatLink chatId
   joinRoom: ->
     return if @user.chat < 1
 
@@ -24,7 +29,7 @@ module.exports =
       if typeof global.Server.rooms[@user.chat] is 'object'
         global.Server.rooms[@user.chat][@user.id] = @
       else
-        global.Server.rooms[@user.chat] = { }
+        global.Server.rooms[@user.chat] = {}
         global.Server.rooms[@user.chat][@user.id] = @
 
       @chat.attached = try JSON.parse(@chat.attached) catch error then {}
@@ -34,7 +39,7 @@ module.exports =
       ## r: 1 - (All main owner) / 2 - (All moderator) / 3 - (All member) / 4 (All owner)
       ## v: 1 - (Normal) / 3 - (w_VIP) / 4 - (w_ALLP) / other - (All unregistered)
       packet = builder.create('i')
-      packet.append('b', "#{@chat.bg};=#{@chat.attached.name||''};=#{@chat.attached.id||''};=#{@chat.language};=#{@chat.radio};=#{@chat.button}")
+      packet.append('b', "#{@chat.bg};=#{@chat.attached.name || ''};=#{@chat.attached.id || ''};=#{@chat.language};=#{@chat.radio};=#{@chat.button}")
       packet.append('f', '21233728')
       packet.append('v', '3')
       packet.append('cb', '2387')
@@ -143,6 +148,6 @@ module.exports =
   sendMessage: (user, message) ->
     @broadcast builder.create('m').append('t', message).append('u', user).compose()
 
-    database.exec('INSERT INTO messages (id, uid, message, name, registered, avatar, time, pool) values (?, ?, ?, ?, ?, ?, ?, ?)', [ @user.chat, @user.id, message, @user.nickname, @user.username||'unregistered', @user.avatar, math.time(), @chat.onPool ]).then((data) ->
+    database.exec('INSERT INTO messages (id, uid, message, name, registered, avatar, time, pool) values (?, ?, ?, ?, ?, ?, ?, ?)', [ @user.chat, @user.id, message, @user.nickname, @user.username || 'unregistered', @user.avatar, math.time(), @chat.onPool ]).then((data) ->
       logger.log logger.level.DEBUG, 'New message sent'
     ).catch((err) -> logger.log logger.level.ERROR, 'Failed to send a message to the database', err)

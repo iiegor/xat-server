@@ -134,7 +134,12 @@ class Client
           return
 
         if type is '/l' and userProfile != null
-          @routeZ(packet, userProfileId)
+          ## can't just resend packet because of trailing '\0'
+          packet = builder.create('z')
+            .append('d', userProfileId)
+            .append('u', userOrigin)
+            .append('t', '/l')
+          @routeZ(packet.compose(), userProfileId)
         else if type.substr(0, 2) is '/a' and userProfile != null
           packet = builder.create('z')
           packet.append('N', @user.username) if @user.registered
@@ -147,7 +152,7 @@ class Client
             else
               status = '/a_'
           else
-            status = "/a#{@user.chat}"
+            status = "/a#{Chat.getChatLink @user.chat}"
 
           packet.append('t', status)
 
@@ -165,7 +170,7 @@ class Client
             .append('v', '2')
 
           @routeZ(packet.compose(), userProfileId)
-        else if type is '/l' or type.substr(0,2) is '/a'
+        else if type is '/l' or type.substr(0, 2) is '/a'
           Profile.getById(userProfileId)
             .then((data) =>
               @logger.log @logger.level.ERROR, "Unhandled null userProfile", null
