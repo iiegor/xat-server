@@ -64,7 +64,7 @@ describe 'pools', ->
 
       checker0 = new XatUser(
         todo:
-          w_userno: 51
+          w_userno: '51'
           w_useroom: 100
           w_k1: 'k_51'
           w_userrev: 0
@@ -73,7 +73,7 @@ describe 'pools', ->
 
       checker1 = new XatUser(
         todo:
-          w_userno: 52
+          w_userno: '52'
           w_useroom: 100
           w_k1: 'k_52'
           w_userrev: 0
@@ -95,6 +95,29 @@ describe 'pools', ->
       checker0.end()
       checker1.end()
 
+    checkSigninReceived = (signin, user) ->
+      should.exist signin
+      signin.should.have.property 'u'
+      u = signin.u
+      u.attributes.should.have.property 'u'
+      u.attributes.u.should.be.equal user.todo.w_userno
+
+    checkSignoutReceived = (signout, user) ->
+      should.exist signout
+      signout.should.have.property 'l'
+      l = signout.l
+      l.attributes.should.have.property 'u'
+      l.attributes.u.should.be.equal tweaker.todo.w_userno
+
+    checkMessageReceived = (received, message, sender) ->
+      should.exist received
+      received.should.have.property 'm'
+      m = received.m
+      m.attributes.should.contain.keys ['u', 't']
+      m.attributes.u.split('_')[0].should.be.equal sender.todo.w_userno
+      m.attributes.t.should.be.equal message
+      
+
 
     describe 'tweaker goes to pool 1', ->
       logout = null
@@ -111,17 +134,9 @@ describe 'pools', ->
           signin = data.xml
 
       it 'checker from pool 0 should receive <l>', ->
-        should.exist logout
-        logout.should.have.property 'l'
-        l = logout.l
-        l.attributes.should.have.property 'u'
-        l.attributes.u.should.be.equal tweaker.todo.w_userno
+        checkSignoutReceived logout, tweaker
       it 'checker from pool 1 should receive <u>', ->
-        should.exist signin
-        signin.should.have.property 'u'
-        u = signin.u
-        u.attributes.should.have.property 'u'
-        u.attributes.u.should.be.equal tweaker.todo.w_userno
+        checkSigninReceived signin, tweaker
 
 
     describe 'tweaker sends message to pool 1', ->
@@ -144,9 +159,41 @@ describe 'pools', ->
       it 'checker from pool 0 shouldn\'t receive <m>', ->
         should.not.exist receivedBy0
       it 'checker from pool 1 should receive <m>', ->
-        should.exist receivedBy1
-        receivedBy1.should.have.property 'm'
-        m = receivedBy1.m
-        m.attributes.should.contain.keys ['u', 't']
-        m.attributes.u.split('_')[0].should.be.equal tweaker.todo.w_userno
-        m.attributes.t.should.be.equal message
+        checkMessageReceived receivedBy1, message, tweaker
+    describe 'tweaker backs to pool 0', ->
+      message = 'message to pool 0' + new Date().getTime()
+      checkerMessage = 'message to tweaker from pool 0' + new Date().getTime()
+      message0 = null
+      message1 = null
+      messaget = null
+      logout = null
+      signin = null
+
+      before (done) ->
+        tweaker.setPool 0
+        checker0.once 'ee-user-signin', (data) ->
+          signin = data.xml
+        checker1.once 'ee-user-signout', (data) ->
+          logout = data.xml
+
+        test.delay 100, ->
+          tweaker.sendTextMessage message
+          checker0.sendTextMessage checkerMessage
+          checker0.once 'ee-text-message', (data) ->
+            message0 = data.xml
+          checker1.once 'ee-text-message', (data) ->
+            message1 = data.xml
+          tweaker.once 'ee-text-message', (data) ->
+            messaget = data.xml
+
+          test.delay 100, -> done()
+      it 'checker from pool 0 should receive <u>', ->
+        checkSigninReceived signin, tweaker
+      it 'checker from pool 0 should receive <m>', ->
+        checkMessageReceived message0, message, tweaker
+      it 'checker from pool 1 should receive <l>', ->
+        checkSignoutReceived logout, tweaker
+      it 'checker from pool 1 shouldn\'t receive <m>', ->
+        should.not.exist message1
+      it 'tweaker should be able to receive messages from pool 0 checker', ->
+        checkMessageReceived messaget, checkerMessage, checker0
