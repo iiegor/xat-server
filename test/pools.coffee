@@ -59,6 +59,7 @@ describe 'pools', ->
           w_k1: 'k_50'
           w_useroom: 100
           w_userrev: 0
+          w_pool: 0
       ).addExtension('user-actions').addExtension('extended-events')
 
       checker0 = new XatUser(
@@ -67,6 +68,7 @@ describe 'pools', ->
           w_useroom: 100
           w_k1: 'k_51'
           w_userrev: 0
+          w_pool: 0
       ).addExtension('user-actions').addExtension('extended-events')
 
       checker1 = new XatUser(
@@ -75,6 +77,7 @@ describe 'pools', ->
           w_useroom: 100
           w_k1: 'k_52'
           w_userrev: 0
+          w_pool: 1
       ).addExtension('user-actions').addExtension('extended-events')
       checker0.connect()
       checker0.once 'ee-done', (data) ->
@@ -102,7 +105,7 @@ describe 'pools', ->
         tweaker.once 'ee-done', ->
           test.delay 100, ->
             beforeDone()
-        checker0.once 'ee-user-logout', (data) ->
+        checker0.once 'ee-user-signout', (data) ->
           logout = data.xml
         checker1.once 'ee-user-signin', (data) ->
           signin = data.xml
