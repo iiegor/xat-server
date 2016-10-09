@@ -42,10 +42,10 @@ describe 'private messaging', ->
 
       sender.connect()
 
-      sender.on 'ee-done', () ->
+      sender.once 'ee-done', () ->
         receiver.connect()
 
-      receiver.on 'ee-done', () ->
+      receiver.once 'ee-done', () ->
         beforeDone()
 
       receiver.on 'data', (data) ->
