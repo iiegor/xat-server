@@ -107,7 +107,7 @@ describe 'pools', ->
       signout.should.have.property 'l'
       l = signout.l
       l.attributes.should.have.property 'u'
-      l.attributes.u.should.be.equal tweaker.todo.w_userno
+      l.attributes.u.should.be.equal user.todo.w_userno
 
     checkMessageReceived = (received, message, sender) ->
       should.exist received
@@ -130,7 +130,7 @@ describe 'pools', ->
             beforeDone()
         checker0.once 'ee-user-signout', (data) ->
           logout = data.xml
-        checker1.once 'ee-user-signin', (data) ->
+        checker1.once 'ee-user', (data) ->
           signin = data.xml
 
       it 'checker from pool 0 should receive <l>', ->
@@ -171,7 +171,7 @@ describe 'pools', ->
 
       before (done) ->
         tweaker.setPool 0
-        checker0.once 'ee-user-signin', (data) ->
+        checker0.once 'ee-user', (data) ->
           signin = data.xml
         checker1.once 'ee-user-signout', (data) ->
           logout = data.xml
@@ -197,3 +197,21 @@ describe 'pools', ->
         should.not.exist message1
       it 'tweaker should be able to receive messages from pool 0 checker', ->
         checkMessageReceived messaget, checkerMessage, checker0
+
+    describe 'checker 0 signout - signin.', ->
+      signin = null
+      logout = null
+      before (done) ->
+        checker0.end()
+        tweaker.once 'ee-user-signout', (data) ->
+          logout = data.xml
+
+        test.delay 10, ->
+          checker0.connect()
+          tweaker.once 'ee-user', (data) ->
+            signin = data.xml
+          checker0.once 'ee-done', -> done()
+      it 'tweaker should receive <l>', ->
+        checkSignoutReceived logout, checker0
+      it 'tweaker should receive <u>', ->
+        checkSigninReceived signin, checker0
