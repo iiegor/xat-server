@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+
+var Application;
+
+Application = new (require('../lib/bootstrap'))
