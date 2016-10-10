@@ -155,7 +155,7 @@ class Client
           else
             status = "/a#{Chat.getChatLink @user.chat}"
 
-          userBuilder.expandPacketWithOnlineUserData packet, user
+          userBuilder.expandPacketWithOnlineUserData packet, @
 
           packet.append('t', status)
           # .append('b', '1') # what does 'b' means?
