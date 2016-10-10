@@ -54,7 +54,7 @@ exports.IXatUser =
 exports.deployServer = (options) -> new Promise (resolve, reject) ->
   options = options || {}
 
-  server = fork(path.join(__dirname, '../../bin/xat'), [], silent: true)
+  server = fork(path.join(__dirname, '../../bin/xat-test'), [], silent: true)
 
   server.on 'error', (err) ->
     reject err

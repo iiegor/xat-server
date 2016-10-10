@@ -28,7 +28,7 @@
   "scripts": {
     "start": "node bin/xat",
     "lint": "coffeelint src",
-    "test": "mocha --require coffee-script/register --compilers coffee:coffee-script test",
+    "test": "script/test",
     "compile": "coffee --compile --output lib src",
     "start-production": "node bin/xat-production"
   }

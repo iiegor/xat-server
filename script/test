@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
 
-coffee src/test/db-init.coffee
+#coffee src/test/db-init.coffee
+npm run compile
 mocha --compilers coffee:coffee-script/register "$@"
