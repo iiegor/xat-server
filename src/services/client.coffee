@@ -76,8 +76,9 @@ class Client
           @id = @user.id
 
           pool = parseInt parser.getAttribute(packet, 'p')
+          rankPass = parser.getAttribute(packet, 'r')
 
-          Chat.joinRoom.call(@, pool)
+          Chat.joinRoom.call(@, pool, rankPass)
         ).catch((err) => @logger.log @logger.level.ERROR, err, null)
       when packetTag == "v"
         ###

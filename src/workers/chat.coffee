@@ -10,10 +10,10 @@ messageBuilder = require '../packet-builders/message'
 getPlainChatLink = (chatId) ->
   return global.Application.config.domain + '/chat/room/' + chatId + '/'
 
-joinRoom = (poolId) ->
+joinRoom = (poolId, rankPass) ->
   return if @user.chat < 1
 
-  database.exec('SELECT * FROM chats WHERE id = ? LIMIT 1', [@user.chat]).then((data) =>
+  database.exec('SELECT * FROM chats LEFT JOIN `ranks` ON (`chats`.id = `ranks`.chatid and `ranks`.userid = ?) WHERE `chats`.id = ? LIMIT 1', [@user.id, @user.chat]).then((data) =>
     if @user.chat is 8
       @send '<i b=";=;=;=- Cant ;=" f="932" v="1" cb="0"  />'
       @send '<w v="0 0 1"  />'
@@ -38,6 +38,9 @@ joinRoom = (poolId) ->
     ## chat engine should switch to less populated pool.
     @chat.onPool = poolId || @chat.onPool || 0
 
+    @chat.rank = @chat.f & 7 || 0
+    @chat.rank = 1 if @chat.pass == rankPass
+
     @setSuper()
 
     ## Chat settings and info
@@ -45,6 +48,7 @@ joinRoom = (poolId) ->
     ## v: 1 - (Normal) / 3 - (w_VIP) / 4 - (w_ALLP) / other - (All unregistered)
     packet = builder.create('i')
     packet.append('b', "#{@chat.bg};=#{@chat.attached.name || ''};=#{@chat.attached.id || ''};=#{@chat.language};=#{@chat.radio};=#{@chat.button}")
+    packet.append('r', @chat.rank) if @chat.rank > 0
     packet.append('f', '21233728')
     packet.append('v', '3')
     packet.append('cb', '2387')
