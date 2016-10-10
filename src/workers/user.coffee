@@ -105,6 +105,7 @@ module.exports =
     )
 
   resetDetails: (userId, callback) ->
+    # NOTE: Check this, not working as expected!
     if userId == global.Application.config.guestAuthId
       @user.authenticated = true
       @user.guest = true

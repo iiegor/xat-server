@@ -5,12 +5,9 @@ math = require '../utils/math'
 builder = require '../utils/builder'
 logger = new (require '../utils/logger')(name: 'Chat')
 
-getPlainChatLink = (chatId) ->
-  return global.Application.config.domain + '/chat/room/' + chatId + '/'
-
 module.exports =
-  getChatLink: (chatId) ->
-    return getPlainChatLink chatId
+  getLink: (chat) -> global.Application.config.domain + '/room/' + chat
+
   joinRoom: ->
     return if @user.chat < 1
 

@@ -146,13 +146,14 @@ class Client
 
           status = type.substr(2)
 
+          # TODO: Show only for friends
           if status[0] == '_'
             if status.substr(1) == 'NF' and not global.Server.rooms[@user.chat][userProfileId]
               status = '/a_NF'
             else
               status = '/a_'
           else
-            status = "/a#{Chat.getChatLink @user.chat}"
+            status = "/a#{Chat.getLink(@user.chat)}"
 
           packet.append('t', status)
 
@@ -261,8 +262,9 @@ class Client
 
   broadcast: (packet) ->
     for _, client of global.Server.rooms[@user.chat]
-      continue if @user.id == client.user.id
+      continue if @user.id == client.user.id or @chat.onPool != client.chat.onPool
 
+      # NOTE: This must be removed!
       console.log "Broadcasting from #{@user.id} to #{client.id}"
 
       client.send packet
