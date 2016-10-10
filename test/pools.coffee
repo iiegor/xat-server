@@ -206,7 +206,7 @@ describe 'pools', ->
         tweaker.once 'ee-user-signout', (data) ->
           logout = data.xml
 
-        test.delay 10, ->
+        test.delay 100, ->
           checker0.connect()
           tweaker.once 'ee-user', (data) ->
             signin = data.xml
