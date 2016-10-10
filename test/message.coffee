@@ -53,7 +53,7 @@ describe 'message', ->
     describe 'user 1', ->
       it 'should receive message sent by user 2', (done) ->
         u2.sendTextMessage('test!')
-        test.delay 10, ->
+        test.delay 100, ->
           gotdone = false
           messageReceived = false
           for message in messages.u1
