@@ -26,7 +26,7 @@ joinRoom = (poolId) ->
 
     ## Push the user to the rooms object
     if typeof global.Server.rooms[@user.chat] isnt 'object'
-      global.Server.rooms[@user.chat] = { }
+      global.Server.rooms[@user.chat] = {}
 
     global.Server.rooms[@user.chat][@user.id] = @
 
@@ -132,7 +132,7 @@ module.exports =
   sendMessage: (user, message) ->
     time = math.time()
 
-    database.exec('INSERT INTO messages (id, uid, message, name, registered, avatar, time, pool) values (?, ?, ?, ?, ?, ?, ?, ?)', [ @user.chat, @user.id, message, @user.nickname, @user.username||'unregistered', @user.avatar, time, @chat.onPool ]).then((data) =>
+    database.exec('INSERT INTO messages (id, uid, message, name, registered, avatar, time, pool) values (?, ?, ?, ?, ?, ?, ?, ?)', [ @user.chat, @user.id, message, @user.nickname, @user.username || 'unregistered', @user.avatar, time, @chat.onPool ]).then((data) =>
 
       packet = messageBuilder.buildNewMain(
         message: message
