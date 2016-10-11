@@ -169,3 +169,56 @@ describe 'ranks', ->
 
       it 'owner shouldn\'t receive <l>', ->
         should.not.exist ownerSignout
+
+    describe 'owner makes himself a moderator', ->
+      control = make = signin = meta = null
+
+      before (done) ->
+        owner.makeModerator owner.todo.w_userno
+        owner.once 'ee-control-make-user', (data) ->
+          control = data.xml
+        owner.once 'ee-make-user', (data) ->
+          make = data.xml
+        owner.once 'ee-user-signin', (data) ->
+          signin = data.xml
+        owner.once 'ee-chat-meta', (data) ->
+          meta = data.xml
+
+        test.delay 100, -> done()
+      it 'owner shouldn\'t be able to do so', ->
+        should.not.exist control
+        should.not.exist make
+        should.not.exist signin
+        should.not.exist meta
+
+    describe 'owner makes user a moderator', ->
+      userMeta = null
+      before (done) ->
+        owner.makeModerator user.todo.w_userno
+        user.once 'ee-chat-meta', (data) ->
+          userMeta = data.xml
+          done()
+
+      it 'user should receive <i r=2..', ->
+        should.exist userMeta
+        i = userMeta.i
+        i.attributes.should.have.property 'r'
+        i.attributes.r.should.be.equal '2'
+
+      describe 'moderator ban user', ->
+        victim = null
+
+        victimUser = null
+        before (done) ->
+          victim = new XatUser(
+            todo:
+              w_userno: '52'
+              w_k1: 'k_52'
+              w_useroom: owner.todo.w_useroom
+          ).addExtension('user-actions').addExtension('extended-events')
+
+          vistim.connect()
+          victim.once 'ee-user', (data) ->
+            victimUser = data.xml if not victimUser and data.xml.u?.attributes.u == user.todo.w_userno
+
+          victim.once 'ee-done', -> done()
