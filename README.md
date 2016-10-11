@@ -13,7 +13,7 @@ You can get the latest stable release from the [releases](https://github.com/iie
 $ cd xat-server
 $ npm install
 ```
-Obviously, if you want to try the latest version of xat-server, you can clone the master branch but can have bugs because it's a development branch, so don't use it for production.
+Otherwhise, if you want to try the latest version of xat-server, you can clone the master branch but can have bugs because it's a development branch, so don't use it for production.
 
 The server depends on [Node.js](http://nodejs.org/), [npm](http://npmjs.org/) and other packages that are downloaded and installed during the installation process.
 
@@ -34,6 +34,10 @@ Example:
 }
 ```
 and run ``$ script/install``.
+
+## Related projects
+|[xat-www](https://github.com/iiegor/xat-www)|[xat-extractor](https://github.com/iiegor/xat-extractor)|[xat-flash](https://github.com/iiegor/xat-flash)|[xat-client](https://github.com/HuuMaNoID/xat-client)|[xat-decompiler](https://github.com/iiegor/xat-decompiler)|
+|---|---|---|---|---|
 
 ## Contributors
 * **Iegor Azuaga** (dextrackmedia@gmail.com)

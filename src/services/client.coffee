@@ -153,13 +153,14 @@ class Client
 
           status = type.substr(2)
 
+          # TODO: Show only for friends
           if status[0] == '_'
             if status.substr(1) == 'NF'
               status = '/a_NF'
             else
               status = '/a_'
           else
-            status = "/a#{Chat.getChatLink @user.chat}"
+            status = "/a#{Chat.getLink(@user.chat)}"
 
           userBuilder.expandPacketWithOnlineUserData packet, @
 
@@ -176,7 +177,7 @@ class Client
               @logger.log @logger.level.ERROR, "Unhandled null userProfile", null
             )
             .catch((err) => @logger.log @logger.level.ERROR, 'Can not fetch user profile data', err)
-      when packetTag == "p" or packetTag == "z"
+      when packetTag == 'p' or packetTag == 'z'
         ###
         Private chat
         @spec <p u="FROM-USER_ID" t="MESSAGE" [s="2" d="FROM-USER_ID"] /> - user receives
@@ -184,10 +185,8 @@ class Client
         @spec <p u="TO-USER_ID" t="MESSAGE" s="2" d="FROM-USER_ID" > - user sends
         @spec <z u="FROM-USER_ID" t="MESSAGE" [s="2"] d="TO-USER_ID" /> - user receives and sends
         ###
-        ###
-        Private messages now more xat compatible. But is it required?
-        It looks too complicated and redudantly.
-        ###
+
+        # NOTE: Private message system follows the original xat behavior. Is it required?
         return if not @maySendMessages()
 
         toID = parser.getAttribute(packet, if packetTag == 'p' then 'u' else 'd')?.split('_')[0]
@@ -219,6 +218,14 @@ class Client
         @spec <wNEWPOOL />
         ###
         Chat.changePool.call(@, parseInt packetTag.substr(1))
+        @chat.onPool = packetTag.substr(1)
+
+        Chat.joinRoom.call(@)
+      when packetTag == 'x'
+        ###
+        App
+        @spec <x i="APP_ID(int)" u="USER_ID(int)" d="TARGET_ID(int)" t="UNKNOWN(str)">
+        ###
       else
         @logger.log @logger.level.ERROR, "Unrecognized packet by the server!", packetTag
 
@@ -265,6 +272,7 @@ class Client
     for _, client of global.Server.rooms[@user.chat]
       continue if @user.id == client.user.id or @chat.onPool != client.chat.onPool
 
+      # NOTE: This must be removed!
       console.log "Broadcasting from #{@user.id} to #{client.id}"
 
       client.send packet
