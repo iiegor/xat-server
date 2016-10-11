@@ -35,18 +35,16 @@ Example:
 ```
 and run ``$ script/install``.
 
+## Related projects
+|[xat-www](https://github.com/iiegor/xat-www)|[xat-extractor](https://github.com/iiegor/xat-extractor)|[xat-flash](https://github.com/iiegor/xat-flash)|[xat-client](https://github.com/HuuMaNoID/xat-client)|
+|---|---|---|---|
+
 ## Contributors
 * **Iegor Azuaga** (dextrackmedia@gmail.com)
 * [**HuuMaNoID**](https://github.com/HuuMaNoID)
 * [**Hotallday**](https://github.com/Hotallday)
 
 You can contribute to the project by cloning, forking or starring it. If you have any bug, open an issue or if you have an interesting thing you want to implement into the official repository, open a pull request.
-
-## Other related projects
-* [xat-www](https://github.com/iiegor/xat-www)
-* [xat-extractor](https://github.com/iiegor/xat-extractor)
-* [xat-flash](https://github.com/iiegor/xat-flash)
-* [xat-client](https://github.com/HuuMaNoID/xat-client)
 
 ## License
 MIT © [Iegor Azuaga](https://github.com/iiegor)
