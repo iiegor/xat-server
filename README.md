@@ -22,18 +22,6 @@ Execute this command to start the server.
 ```sh
 $ script/run
 ```
-If you want to install a plugin, add it to ``packageDependencies`` in the package.json with the respective version.
-
-Example:
-```json
-{
-  ...
-  "packageDependencies": {
-    "my-plugin": "0.1.0"
-  }
-}
-```
-and run ``$ script/install``.
 
 ## Related projects
 |[xat-www](https://github.com/iiegor/xat-www)|[xat-extractor](https://github.com/iiegor/xat-extractor)|[xat-flash](https://github.com/iiegor/xat-flash)|[xat-client](https://github.com/HuuMaNoID/xat-client)|[xat-decompiler](https://github.com/iiegor/xat-decompiler)|

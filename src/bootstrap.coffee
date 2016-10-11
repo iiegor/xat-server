@@ -4,8 +4,6 @@ pkg = require '../package'
 server = require './services/server'
 database = require './services/database'
 
-keys = require 'object-keys'
-semver = require 'semver'
 {EventEmitter} = require 'events'
 
 module.exports =
@@ -31,9 +29,6 @@ class Application extends EventEmitter
     # Handle app events
     @handleEvents()
 
-    # Load plugins
-    @loadPlugins()
-
     # Bootstrap the application
     @bootstrap()
 
@@ -56,25 +51,6 @@ class Application extends EventEmitter
 
     unless process.platform is 'win32'
       process.on 'SIGTERM', @dispose
-
-  # Load application plugins
-  loadPlugins: ->
-    plugins = pkg.packageDependencies
-
-    for plugin in keys(plugins)
-      try
-        # Validate package
-        depPkg = require "#{plugin}/package.json"
-        depEngine = depPkg.engines['xat-server']
-
-        if typeof depEngine is 'undefined'
-          return throw new Error('The plugin does not support this server')
-        else if !semver.satisfies(pkg.version, depEngine)
-          return throw new Error("Compatibility error (#{depEngine})")
-        else
-          dep = require plugin
-          dep.initialize(@)
-      catch error then @logger.log @logger.level.ERROR, "Cannot load '#{plugin}' plugin", error
 
   # Dispose with success code
   dispose: -> process.exit 0
