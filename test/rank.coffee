@@ -68,14 +68,12 @@ describe 'ranks', ->
     owner = null
     user = null
 
-    ownerMake = null
-    userMake = null
-    controlMake = null
+    userMeta = null
 
     checkMake = (packet, object, subject) ->
       should.exist packet
       packet.should.have.property 'm'
-      m = userMake.m
+      m = packet.m
 
       m.attributes.should.contain.keys [ 'u', 'd', 't', 'p' ]
       m.attributes.u.should.be.equal subject.todo.w_userno
@@ -85,6 +83,7 @@ describe 'ranks', ->
     checkMakeMember = (packet, object, subject) ->
       checkMake packet, object, subject
       packet.m.attributes.p.should.be.equal 'e'
+
 
     before (done) ->
       owner = new XatUser(
@@ -103,14 +102,36 @@ describe 'ranks', ->
       owner.connect()
       owner.once 'ee-done', ->
         user.connect()
+        user.once 'ee-chat-meta', (data) ->
+          userMeta = data.xml
         user.once 'ee-done', ->
           done()
+    it 'user should be a guest', ->
+      should.exist userMeta
+      i = userMeta.i
+      r = i.attributes.r
+      if r?
+        r.should.be.equal 0
 
     describe 'owner makes user a member', ->
+
+      ownerMake = null
+      ownerSignin = null
+      ownerSignout = null
+      userMake = null
+      userMeta = null
+      controlMake = null
+
       before (done) ->
         owner.makeMember user.todo.w_userno
         owner.once 'ee-make-user', (data) ->
           ownerMake = data.xml
+        owner.once 'ee-user-signin', (data) ->
+          ownerSignin = data.xml
+        owner.once 'ee-user-signout', (data) ->
+          ownerSignout = data.xml
+        user.once 'ee-chat-meta', (data) ->
+          userMeta = data.xml
         user.once 'ee-control-make-user', (data) ->
           controlMake = data.xml
         user.once 'ee-make-user', (data) ->
@@ -124,7 +145,27 @@ describe 'ranks', ->
         c.attributes.should.contain.keys [ 'u', 't' ]
         c.attributes.u.should.be.equal user.todo.w_userno
         c.attributes.t.substr(0, 2).should.be.equal '/m'
+
       it 'user should receive notify', ->
         checkMakeMember userMake, user, owner
+
       it 'owner should receive notify', ->
         checkMakeMember ownerMake, user, owner
+
+      it 'user should receive <i> again', ->
+        should.exist userMeta
+        userMeta.should.have.property 'i'
+        i = userMeta.i
+        i.attributes.should.contain.keys [ 'r' ]
+        i.attributes.r.should.be.equal '3'
+
+      it 'owner should receive <u>', ->
+        should.exist ownerSignin
+        ownerSignin.should.have.property 'u'
+        u = ownerSignin.u
+        u.attributes.should.contain.keys [ 'u', 'f' ]
+        u.attributes.u.should.be.equal user.todo.w_userno
+        (u.attributes.f & 7).should.be.equal 3
+
+      it 'owner shouldn\'t receive <l>', ->
+        should.not.exist ownerSignout
