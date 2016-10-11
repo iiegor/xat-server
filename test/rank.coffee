@@ -73,7 +73,7 @@ describe 'ranks', ->
     controlMake = null
 
     checkMake = (packet, object, subject) ->
-      should.exists packet
+      should.exist packet
       packet.should.have.property 'm'
       m = userMake.m
 
@@ -92,14 +92,14 @@ describe 'ranks', ->
           w_userno: '50'
           w_useroom: 110
           w_k1: 'k_50'
-          pass: 100 + 20000
-      )
+          pass: 110 + 20000
+      ).addExtension('extended-events').addExtension('user-actions')
       user = new XatUser(
         todo:
           w_userno: '51'
           w_useroom: 110
           w_k1: 'k_51'
-      )
+      ).addExtension('extended-events').addExtension('user-actions')
       owner.connect()
       owner.once 'ee-done', ->
         user.connect()
@@ -109,11 +109,11 @@ describe 'ranks', ->
     describe 'owner makes user a member', ->
       before (done) ->
         owner.makeMember user.todo.w_userno
-        owner.once 'make-user', (data) ->
+        owner.once 'ee-make-user', (data) ->
           ownerMake = data.xml
-        user.once 'control-make-user', (data) ->
+        user.once 'ee-control-make-user', (data) ->
           controlMake = data.xml
-        user.once 'make-user', (data) ->
+        user.once 'ee-make-user', (data) ->
           userMake = data.xml
         test.delay 100, -> done()
 
@@ -121,10 +121,10 @@ describe 'ranks', ->
         should.exist controlMake
         controlMake.should.have.property 'c'
         c = controlMake.c
-        c.attributes.should.contain.keys [ 'u', 'm' ]
+        c.attributes.should.contain.keys [ 'u', 't' ]
         c.attributes.u.should.be.equal user.todo.w_userno
-        c.attributes.m.substr(0, 2).should.be.equal '/e'
+        c.attributes.t.substr(0, 2).should.be.equal '/m'
       it 'user should receive notify', ->
-        checkMakeMember userMake, owner, user
+        checkMakeMember userMake, user, owner
       it 'owner should receive notify', ->
-        checkMakeMember ownerMake, owner, user
+        checkMakeMember ownerMake, user, owner
