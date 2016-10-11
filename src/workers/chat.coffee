@@ -7,20 +7,47 @@ logger = new (require '../utils/logger')(name: 'Chat')
 userBuilder = require '../packet-builders/user'
 messageBuilder = require '../packet-builders/message'
 
+class Rank
+  _number: null
+  map = [0, 4, 2, 1, 3]
+  strmap = ['r', null, 'm', 'e', 'M']
+  rankPool = [new Rank(0), new Rank(1), new Rank(2), new Rank(3), new Rank(4)]
+
+  @GUEST = rankPool[0]
+  @MEMBER = rankPool[3]
+  @MODERATOR = rankPool[2]
+  @OWNER = rankPool[4]
+  @MAINOWNER = rankPool[1]
+
+  ## For internal use.
+  constructor: (@_number) ->
+
+  toNumber: -> @_number
+
+  toString: -> strmap[@_number]
+
+  ## Normal way to convert number to rank.
+  @fromNumber: (number) ->
+    return rankPool[number]
+  @fromString: (str) ->
+    return rankPool[strmap.indexOf str]
+
+  compareTo: (rank) -> map[@_number] - map[rank._number]
+
 getPlainChatLink = (chatId) ->
   return global.Application.config.domain + '/chat/room/' + chatId + '/'
 
 joinRoom = (poolId, rankPass) ->
   return if @user.chat < 1
 
-  database.exec('SELECT * FROM chats LEFT JOIN `ranks` ON (`chats`.id = `ranks`.chatid and `ranks`.userid = ?) WHERE `chats`.id = ? LIMIT 1', [@user.id, @user.chat]).then((data) =>
+  database.execJoin('SELECT * FROM chats LEFT JOIN `ranks` ON (`chats`.id = `ranks`.chatid and `ranks`.userid = ?) WHERE `chats`.id = ? LIMIT 1', [@user.id, @user.chat]).then((data) =>
     if @user.chat is 8
       @send '<i b=";=;=;=- Cant ;=" f="932" v="1" cb="0"  />'
       @send '<w v="0 0 1"  />'
       @send '<done  />'
       return
 
-    @chat = data[0] if @chat is null
+    @chat = data[0].chats if @chat is null
 
     return false if !@chat
 
@@ -38,8 +65,8 @@ joinRoom = (poolId, rankPass) ->
     ## chat engine should switch to less populated pool.
     @chat.onPool = poolId || @chat.onPool || 0
 
-    @chat.rank = @chat.f & 7 || 0
-    @chat.rank = 1 if @chat.pass == rankPass
+    @chat.rank = Rank.fromNumber(data[0].ranks.f & 7 || 0)
+    @chat.rank = Rank.MAINOWNER if @chat.pass == rankPass
 
     @setSuper()
 
@@ -48,7 +75,7 @@ joinRoom = (poolId, rankPass) ->
     ## v: 1 - (Normal) / 3 - (w_VIP) / 4 - (w_ALLP) / other - (All unregistered)
     packet = builder.create('i')
     packet.append('b', "#{@chat.bg};=#{@chat.attached.name || ''};=#{@chat.attached.id || ''};=#{@chat.language};=#{@chat.radio};=#{@chat.button}")
-    packet.append('r', @chat.rank) if @chat.rank > 0
+    packet.append('r', @chat.rank.toNumber()) if @chat.rank != Rank.GUEST
     packet.append('f', '21233728')
     packet.append('v', '3')
     packet.append('cb', '2387')
@@ -132,6 +159,59 @@ module.exports =
     return getPlainChatLink chatId
   joinRoom: joinRoom
   changePool: changePool
+
+  banUser: (options) ->
+    new Promise (resolve, reject) ->
+      duration = parseInt options?.duration
+      userId = options?.userId
+
+      return reject() if isNaN(duration) or duration < 0
+      return reject() if @chat.rank.compareTo(Rank.MODERATOR) < 0
+      return reject() if @chat.rank.compareTo(Rank.MODERATOR) == 0 and (duration > 6 * 3600 or duration == 0)
+      database.exec 'SELECT f FROM `ranks` WHERE `userid` = ?', [userId], (err, data) ->
+        return reject(err) if err?
+        return reject() if data[0]?.f? and @chat.rank.compareTo(Rank.fromNumber(data[0].f & 7))
+
+    throw new Error('Not implemented')
+
+  makeUser: (options) ->
+    new Promise (resolve, reject) =>
+      userId = options?.userId
+      duration = options?.duration
+      newrank = Rank.fromString options?.rank
+      chatId = @chat.id
+
+      return reject() if newrank.compareTo(@chat.rank) >= 0
+      return reject() if @chat.rank.compareTo(Rank.MODERATOR) < 0
+      #return false if @chat.rank.compareTo(Rank.MODERATOR) == 0 and duration > 3600 * 6
+
+      database.exec('SELECT f FROM `ranks` WHERE userid = ? AND chatid = ? LIMIT 1', [userId, chatId]).then((data) =>
+        return reject() if data[0]?.f? and @chat.rank.compareTo(Rank.fromNumber(data[0].f & 7)) <= 0
+
+        if data[0]?
+          database.exec('UPDATE `ranks` SET `f` = ? WHERE userid = ? AND chatid = ?', [newrank.toNumber(), userId, chatId])
+        else
+          database.exec('INSERT INTO `ranks` (`userid`, `chatid`, `f`) VALUES(?, ?, ?)', [userId, chatId, newrank.toNumber()])
+      ).then((data) =>
+        packet = builder.create('m')
+          .append('u', @user.id)
+          .append('d', userId)
+          .append('t', '/m')
+          .append('p', newrank.toString())
+          .compose()
+        @broadcast packet
+        @send packet
+
+        destination = global.Server.rooms[chatId][userId]
+        if destination?
+          destination.chat.rank = newrank
+          packet = builder.create('c')
+            .append('u', userId)
+            .append('t', "/#{newrank.toString()}")
+          destination.send packet.compose()
+
+        resolve()
+      ).catch(reject)
 
   sendMessage: (user, message) ->
     time = math.time()
