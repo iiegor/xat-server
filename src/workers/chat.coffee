@@ -10,9 +10,6 @@ chatBuilder = require '../packet-builders/chat'
 
 Rank = require '../structures/rank'
 
-getPlainChatLink = (chatId) ->
-  return global.Application.config.domain + '/chat/room/' + chatId + '/'
-
 joinRoom = (poolId, rankPass) ->
   return if @user.chat < 1
 
@@ -105,8 +102,7 @@ changePool = (poolId) ->
   joinRoom.call(@)
 
 module.exports =
-  getChatLink: (chatId) ->
-    return getPlainChatLink chatId
+  getLink: (chat) -> global.Application.config.domain + '/room/' + chat
   joinRoom: joinRoom
   changePool: changePool
 

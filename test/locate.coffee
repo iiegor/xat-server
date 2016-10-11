@@ -110,7 +110,7 @@ describe 'locating interactions', ->
         it 'should receive response to locate', ->
           checkResponse(at, locator, responder)
           z = at.xml.z
-          z.attributes.t.should.be.equal '/axat.dev/chat/room/' + responder.todo.w_useroom + '/'
+          t = z.attributes.t.split('/').should.contain.an.item responder.todo.w_useroom
 
     describe 'receiver responds as nofollow', ->
       at = null

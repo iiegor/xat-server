@@ -218,9 +218,6 @@ class Client
         @spec <wNEWPOOL />
         ###
         Chat.changePool.call(@, parseInt packetTag.substr(1))
-        @chat.onPool = packetTag.substr(1)
-
-        Chat.joinRoom.call(@)
       when packetTag == 'x'
         ###
         App
