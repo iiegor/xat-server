@@ -1,6 +1,6 @@
 {
   "name": "xat-server",
-  "version": "0.0.66",
+  "version": "0.0.67",
   "description": "A Node.js private server for xat.com",
   "repository": "https://github.com/iiegor/xat-server",
   "license": "MIT",
