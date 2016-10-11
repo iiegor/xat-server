@@ -136,6 +136,9 @@ module.exports =
       return reject('Moderator\'s rank is too low for target rank') if newrank.compareTo(@chat.rank) >= 0
       #return false if @chat.rank.compareTo(Rank.MODERATOR) == 0 and duration > 3600 * 6
 
+      destination = global.Server.rooms[chatId][userId]
+      return reject('Target user\'s rank is too high') if destination?.chat.rank? and @chat.rank.compareTo(destination.chat.rank) <= 0
+
       database.exec('SELECT f FROM `ranks` WHERE userid = ? AND chatid = ? LIMIT 1', [userId, chatId]).then((data) =>
         return reject('Target user\'s rank is too high') if data[0]?.f? and @chat.rank.compareTo(Rank.fromNumber(data[0].f & 7)) <= 0
 
@@ -153,7 +156,6 @@ module.exports =
         @broadcast packet
         @send packet
 
-        destination = global.Server.rooms[chatId][userId]
         if destination?
           destination.chat.rank = newrank
           destination.user.f = destination.user.f & ~7 | destination.chat.rank.toNumber()
