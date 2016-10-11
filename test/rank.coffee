@@ -1,5 +1,7 @@
 should = require('chai').should()
 
+Rank = require '../src/structures/rank'
+
 test = require './lib/test-kit'
 XatUser = test.IXatUser
 deploy = test.deployServer
@@ -84,6 +86,20 @@ describe 'ranks', ->
       checkMake packet, object, subject
       packet.m.attributes.p.should.be.equal 'e'
 
+    checkSignin = (packet, user, rank) ->
+      should.exist packet
+      packet.should.have.property 'u'
+      u = packet.u
+      u.attributes.should.contain.keys [ 'u' ]
+      u.attributes.u.should.be.equal user.todo.w_userno
+      if rank != Rank.GUEST or u.attributes.f?
+        Rank.fromNumber(u.attributes.f & 7).should.be.equal(rank)
+
+    checkMeta = (packet, user, rank) ->
+      should.exist packet
+      packet.should.have.property 'i'
+      if rank != Rank.GUEST or u.attributes.r?
+        Rank.fromNumber(i.attributes.r).should.be.equal(rank)
 
     before (done) ->
       owner = new XatUser(
@@ -106,12 +122,9 @@ describe 'ranks', ->
           userMeta = data.xml
         user.once 'ee-done', ->
           done()
+
     it 'user should be a guest', ->
-      should.exist userMeta
-      i = userMeta.i
-      r = i.attributes.r
-      if r?
-        r.should.be.equal 0
+      checkMeta userMeta, user, Rank.GUEST
 
     describe 'owner makes user a member', ->
 
@@ -153,19 +166,10 @@ describe 'ranks', ->
         checkMakeMember ownerMake, user, owner
 
       it 'user should receive <i> again', ->
-        should.exist userMeta
-        userMeta.should.have.property 'i'
-        i = userMeta.i
-        i.attributes.should.contain.keys [ 'r' ]
-        i.attributes.r.should.be.equal '3'
+        checkMeta userMeta, user, Rank.MEMBER
 
       it 'owner should receive <u>', ->
-        should.exist ownerSignin
-        ownerSignin.should.have.property 'u'
-        u = ownerSignin.u
-        u.attributes.should.contain.keys [ 'u', 'f' ]
-        u.attributes.u.should.be.equal user.todo.w_userno
-        (u.attributes.f & 7).should.be.equal 3
+        checkSignin ownerSignin, user, Rank.MEMBER
 
       it 'owner shouldn\'t receive <l>', ->
         should.not.exist ownerSignout
@@ -193,17 +197,21 @@ describe 'ranks', ->
 
     describe 'owner makes user a moderator', ->
       userMeta = null
+      ownerSignin = null
+
       before (done) ->
         owner.makeModerator user.todo.w_userno
+        owner.once 'ee-user-signin', (data) ->
+          ownerSignin = data.xml
         user.once 'ee-chat-meta', (data) ->
           userMeta = data.xml
-          done()
+        test.delay 100, done
 
       it 'user should receive <i r=2..', ->
-        should.exist userMeta
-        i = userMeta.i
-        i.attributes.should.have.property 'r'
-        i.attributes.r.should.be.equal '2'
+        checkMeta userMeta, user, Rank.MODERATOR
+
+      it 'owner should receive <u f=2', ->
+        checkSignin ownerSignin, user, Rank.MODERATOR
 
       describe 'moderator ban user', ->
         victim = null
