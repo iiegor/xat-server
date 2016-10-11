@@ -1,4 +1,5 @@
 profile = require '../workers/profile'
+builder = require '../utils/builder'
 
 expandPacket = (packet, user, fillType) ->
   packet.append('u', user.id)
@@ -37,3 +38,7 @@ expandPacketWithUserData = (packet, userId, fillType) ->
 
 module.exports =
   expandPacketWithOnlineUserData: expandPacketWithOnlineUserData
+  buildU: (client) ->
+    packet = builder.create('u')
+    expandPacketWithOnlineUserData(packet, client)
+    return packet
