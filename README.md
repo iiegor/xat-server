@@ -36,8 +36,8 @@ Example:
 and run ``$ script/install``.
 
 ## Related projects
-|[xat-www](https://github.com/iiegor/xat-www)|[xat-extractor](https://github.com/iiegor/xat-extractor)|[xat-flash](https://github.com/iiegor/xat-flash)|[xat-client](https://github.com/HuuMaNoID/xat-client)|
-|---|---|---|---|
+|[xat-www](https://github.com/iiegor/xat-www)|[xat-extractor](https://github.com/iiegor/xat-extractor)|[xat-flash](https://github.com/iiegor/xat-flash)|[xat-client](https://github.com/HuuMaNoID/xat-client)|[xat-decompiler](https://github.com/iiegor/xat-decompiler)|
+|---|---|---|---|---|
 
 ## Contributors
 * **Iegor Azuaga** (dextrackmedia@gmail.com)
