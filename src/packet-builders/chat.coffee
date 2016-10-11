@@ -11,7 +11,7 @@ module.exports =
     packet.append('b', "#{client.chat.bg};=#{client.chat.attached.name || ''};=#{client.chat.attached.id || ''};=#{client.chat.language};=#{client.chat.radio};=#{client.chat.button}")
     packet.append('r', client.chat.rank.toNumber()) if client.chat.rank != Rank.GUEST
     packet.append('f', '21233728')
-    packet.append('v', '3')
+    packet.append('v', client.user.registered? && 1 | 0)
     packet.append('cb', '2387')
 
   buildPowers: (client) ->
