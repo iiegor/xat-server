@@ -145,6 +145,6 @@ module.exports =
   sendMessage: (user, message) ->
     @broadcast builder.create('m').append('t', message).append('u', user).compose()
 
-    database.exec('INSERT INTO messages (id, uid, message, name, registered, avatar, time, pool) values (?, ?, ?, ?, ?, ?, ?, ?)', [ @user.chat, @user.id, message, @user.nickname, @user.username || 'unregistered', @user.avatar, math.time(), @chat.onPool ]).then((data) ->
+    database.exec('INSERT INTO messages (id, uid, message, name, registered, avatar, time, pool) values (?, ?, ?, ?, ?, ?, ?, ?)', [@user.chat, @user.id, message, @user.nickname, @user.username || 'unregistered', @user.avatar, math.time(), @chat.onPool]).then((data) ->
       logger.log logger.level.DEBUG, 'New message sent'
     ).catch((err) -> logger.log logger.level.ERROR, 'Failed to send a message to the database', err)

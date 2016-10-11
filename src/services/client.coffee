@@ -48,13 +48,12 @@ class Client
         @spec <y r="1" v="0" u="USER_ID(int)" />
         ###
         loginKey = math.random(10000000, 99999999)
-        loginShift = math.random(2, 5)
         loginTime = math.time()
 
         @send(builder.create('y')
           .append('i', loginKey)
           .append('c', loginTime)
-          .append('p', '100_100_5_102')
+          .append('p', '100_100_5_100')
           .compose())
       when packetTag == "j2"
         ###
@@ -280,6 +279,13 @@ class Client
 
     @socket.on 'data', (buffer) =>
       @read buffer.toString('utf8')
+
+    @socket.on 'error', (err) =>
+      @logger.log @logger.level.ERROR, "Socket exception", err
+
+      # TODO: We need to notify room users that the user is no longer online.
+      #  Calling the method below makes the server entering into an infinite loop causing the server crash.
+      # socket.end()
 
   dispose: ->
     @socket.end()

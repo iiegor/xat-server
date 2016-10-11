@@ -32,7 +32,7 @@ class Server
     config = global.Application.config
 
     clientId = config.guestid.start
-    @server.on 'connection', (socket) =>
+    @server.on 'connection', (socket) => (
       client = new Client
       client.id = clientId++
       clientId = config.guestid.start if clientId == config.guestid.end
@@ -45,7 +45,6 @@ class Server
         @logger.log @logger.level.DEBUG, "A user has been disconnected!"
 
         if @rooms[client.user.chat]
-
           if client.user.authenticated
             client.broadcast(builder.create('l').append('u', client.user.id).compose())
 
@@ -57,9 +56,8 @@ class Server
 
         socket._end()
 
-      socket.on 'error', (err) => @logger.log @logger.level.ERROR, "Socket exception from #{socket.remoteAddress}", err
-
       client.setSocket(socket)
+    )
 
     @server.on 'error', (err) =>
       @logger.log @logger.level.ERROR, "Server exception at server.coffee", err

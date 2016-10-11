@@ -2,7 +2,7 @@ mysql = require 'mysql'
 config = require '../../config/database'
 
 ###
-Package documentation: https://github.com/felixge/node-mysql
+Package documentation: https://github.com/mysqljs/mysql
 ###
 
 Pool = mysql.createPool(
@@ -18,6 +18,7 @@ module.exports =
   initialize: (cb) ->
     Pool.getConnection (err) -> cb err
 
+  # Query execution
   exec: (sql, values) -> new Promise((resolve, reject) ->
     Pool.getConnection (err, connection) ->
       reject(err) if err

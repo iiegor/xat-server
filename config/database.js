@@ -3,6 +3,6 @@ module.exports = {
     'server': 'localhost',
     'database': 'xat',
     'user': 'root',
-    'password': 'test'
+    'password': ''
   }
 }
