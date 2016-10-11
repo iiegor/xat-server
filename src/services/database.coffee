@@ -30,5 +30,5 @@ module.exports =
   # Ping database
   initialize: (cb) ->
     Pool.getConnection (err) -> cb err
-  exec: (sql, values) -> _exec({ sql: sql }, values)
-  execJoin: (sql, values) -> _exec({ sql: sql, nestTables: true}, values)
+  exec: (sql, values) -> _exec({sql: sql}, values)
+  execJoin: (sql, values) -> _exec({sql: sql, nestTables: true}, values)

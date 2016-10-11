@@ -121,7 +121,7 @@ class Client
           when type is '/KEEPALIVE'
             return
           when type.startsWith('/m') or type.startsWith('/e') or type.startsWith('/M') or type.startsWith('/r')
-            Chat.makeUser.call(@, { rank: type[1], userId: destId }).catch((err) =>
+            Chat.makeUser.call(@, {rank: type[1], userId: destId}).catch((err) =>
               @logger.log @logger.level.ERROR, "makeUser error", err)
           else
             @logger.log @logger.level.ERROR, "Unhandled user data update packet", null
