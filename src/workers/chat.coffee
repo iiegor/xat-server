@@ -181,12 +181,12 @@ module.exports =
       newrank = Rank.fromString options?.rank
       chatId = @chat.id
 
-      return reject() if newrank.compareTo(@chat.rank) >= 0
-      return reject() if @chat.rank.compareTo(Rank.MODERATOR) < 0
+      return reject('User can\'t change ranks') if @chat.rank.compareTo(Rank.MODERATOR) < 0
+      return reject('Moderator\'s rank is too low for target rank') if newrank.compareTo(@chat.rank) >= 0
       #return false if @chat.rank.compareTo(Rank.MODERATOR) == 0 and duration > 3600 * 6
 
       database.exec('SELECT f FROM `ranks` WHERE userid = ? AND chatid = ? LIMIT 1', [userId, chatId]).then((data) =>
-        return reject() if data[0]?.f? and @chat.rank.compareTo(Rank.fromNumber(data[0].f & 7)) <= 0
+        return reject('Target user\'s rank is too high') if data[0]?.f? and @chat.rank.compareTo(Rank.fromNumber(data[0].f & 7)) <= 0
 
         if data[0]?
           database.exec('UPDATE `ranks` SET `f` = ? WHERE userid = ? AND chatid = ?', [newrank.toNumber(), userId, chatId])
@@ -207,7 +207,7 @@ module.exports =
           destination.chat.rank = newrank
           packet = builder.create('c')
             .append('u', userId)
-            .append('t', "/#{newrank.toString()}")
+            .append('t', "/m")
           destination.send packet.compose()
 
         resolve()
