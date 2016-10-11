@@ -72,7 +72,7 @@ describe 'ranks', ->
 
     userMeta = null
 
-    checkMake = (packet, object, subject) ->
+    checkMake = (packet, object, subject, rank) ->
       should.exist packet
       packet.should.have.property 'm'
       m = packet.m
@@ -81,6 +81,7 @@ describe 'ranks', ->
       m.attributes.u.should.be.equal subject.todo.w_userno
       m.attributes.d.should.be.equal object.todo.w_userno
       m.attributes.t.should.be.equal '/m'
+      m.attributes.p.should.be.equal rank.toString()
 
     checkMakeMember = (packet, object, subject) ->
       checkMake packet, object, subject
@@ -98,8 +99,17 @@ describe 'ranks', ->
     checkMeta = (packet, user, rank) ->
       should.exist packet
       packet.should.have.property 'i'
-      if rank != Rank.GUEST or u.attributes.r?
+      i = packet.i
+      if rank != Rank.GUEST or i.attributes.r?
         Rank.fromNumber(i.attributes.r).should.be.equal(rank)
+
+    checkControlMake = (packet, user) ->
+      should.exist packet
+      packet.should.have.property 'c'
+      c = packet.c
+      c.attributes.should.contain.keys [ 'u', 't' ]
+      c.attributes.u.should.be.equal user.todo.w_userno
+      c.attributes.t.substr(0, 2).should.be.equal '/m'
 
     before (done) ->
       owner = new XatUser(
@@ -152,18 +162,13 @@ describe 'ranks', ->
         test.delay 100, -> done()
 
       it 'user should receive control', ->
-        should.exist controlMake
-        controlMake.should.have.property 'c'
-        c = controlMake.c
-        c.attributes.should.contain.keys [ 'u', 't' ]
-        c.attributes.u.should.be.equal user.todo.w_userno
-        c.attributes.t.substr(0, 2).should.be.equal '/m'
+        checkControlMake controlMake, user
 
       it 'user should receive notify', ->
-        checkMakeMember userMake, user, owner
+        checkMake userMake, user, owner, Rank.MEMBER
 
       it 'owner should receive notify', ->
-        checkMakeMember ownerMake, user, owner
+        checkMake ownerMake, user, owner, Rank.MEMBER
 
       it 'user should receive <i> again', ->
         checkMeta userMeta, user, Rank.MEMBER
@@ -213,10 +218,27 @@ describe 'ranks', ->
       it 'owner should receive <u f=2', ->
         checkSignin ownerSignin, user, Rank.MODERATOR
 
-      describe 'moderator ban user', ->
+      describe 'moderator makes user a member', ->
         victim = null
 
         victimUser = null
+        victimOwner = null
+
+        victimMeta = null
+        victimMake = null
+        victimControl = null
+        victimSignin = null
+
+        ownerSignin = null
+        ownerMake = null
+        ownerControl = null
+        ownerMeta = null
+
+        userSignin = null
+        userMake = null
+        userControl = null
+        userMeta = null
+
         before (done) ->
           victim = new XatUser(
             todo:
@@ -225,8 +247,50 @@ describe 'ranks', ->
               w_useroom: owner.todo.w_useroom
           ).addExtension('user-actions').addExtension('extended-events')
 
-          vistim.connect()
-          victim.once 'ee-user', (data) ->
+          victim.connect()
+          victim.on 'ee-user', (data) ->
             victimUser = data.xml if not victimUser and data.xml.u?.attributes.u == user.todo.w_userno
+            victimOwner = data.xml if not victimOwner and data.xml.u?.attributes.u == owner.todo.w_userno
 
-          victim.once 'ee-done', -> done()
+          victim.once 'ee-done', ->
+            user.makeMember victim.todo.w_userno
+            userMeta = null
+
+            owner.once 'ee-user-signin', (data) -> ownerSignin = data.xml
+            user.once 'ee-user-signin', (data) -> userSignin = data.xml
+            victim.once 'ee-user-signin', (data) -> victimSignin = data.xml
+
+            victim.once 'ee-chat-meta', (data) -> victimMeta = data.xml
+            owner.once 'ee-chat-meta', (data) -> ownerMeta = data.xml
+            user.once 'ee-chat-meta', (data) -> userMeta = data.xml
+
+            victim.once 'ee-make-user', (data) -> victimMake = data.xml
+            owner.once 'ee-make-user', (data) -> ownerMake = data.xml
+            user.once 'ee-make-user', (data) -> userMake = data.xml
+
+            victim.once 'ee-control-make-user', (data) -> victimControl = data.xml
+            owner.once 'ee-control-make-user', (data) -> ownerControl = data.xml
+            user.once 'ee-control-make-user', (data) -> userControl = data.xml
+
+            test.delay 200, done
+
+        it 'owner should receive <u> <m> and not <c> <i>', ->
+          checkMake ownerMake, victim, user, Rank.MEMBER
+          checkSignin ownerSignin, victim, Rank.MEMBER
+
+          should.not.exist ownerControl
+          should.not.exist ownerMeta
+
+        it 'user should receive <u> <m> and not <c> <i>', ->
+          checkMake userMake, victim, user, Rank.MEMBER
+          checkSignin userSignin, victim, Rank.MEMBER
+
+          should.not.exist userControl
+          should.not.exist userMeta
+
+        it 'victim should receive <m> <c> <i> and not <u>', ->
+          checkMake victimMake, victim, user, Rank.MEMBER
+          checkMeta victimMeta, victim, Rank.MEMBER
+          checkControlMake victimControl, victim
+
+          should.not.exist victimSignin
