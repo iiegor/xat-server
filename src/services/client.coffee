@@ -37,8 +37,8 @@ class Client
     #  Implement <idle />
     return if packetTag is null
 
-    isSlash = parser.getAttribute(packet, 't')?.startsWith('/') || false
     type = parser.getAttribute(packet, 't')
+    isSlash = type?.startsWith('/') || false
 
     switch
       when packetTag == "policy-file-request"

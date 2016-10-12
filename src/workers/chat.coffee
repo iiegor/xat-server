@@ -89,7 +89,6 @@ module.exports =
 
           packet = builder.create('o')
           packet.append('u', message.uid)
-            .append('u', message.uid)
             .append('n', message.name)
             .append('a', message.avatar)
           packet.append('N', message.registered) if message.registered isnt 'unregistered'
