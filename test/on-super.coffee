@@ -86,7 +86,7 @@ describe 'on-super', ->
     describe 'receiver', ->
       it "should receive 'k'-packet in first chat", ->
         messages.receiver2.should.contains.an.item.with.property('k')
-      it "should receive 'k'-packet with appropriate content", ->
+      it.skip "should receive 'k'-packet with appropriate content", ->
         [y] = (_.y for _ in messages.receiver2 when _.y?)
 
         assert.isDefined y

@@ -67,7 +67,7 @@ describe 'message', ->
           messageReceived.should.be.true
           done()
 
-  describe 'evil', ->
+  describe.skip 'evil', ->
     u1 = null
     u2 = null
     message = 'evil uid case ' + new Date().getTime()
