@@ -1,8 +1,9 @@
 {
+  "private": true,
   "name": "xat-server",
   "version": "0.0.67",
   "description": "A Node.js private server for xat.com",
-  "repository": "https://github.com/iiegor/xat-server",
+  "repository": "iiegor/xat-server",
   "license": "MIT",
   "main": "./src/bootstrap",
   "bin": {
@@ -21,8 +22,6 @@
     "xat-client": "huumanoid/xat-client",
     "coffeelint": "^1.15.7"
   },
-  "packageDependencies": {},
-  "private": true,
   "scripts": {
     "start": "node bin/xat",
     "lint": "coffeelint src",
