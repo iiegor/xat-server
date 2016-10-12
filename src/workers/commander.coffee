@@ -11,14 +11,14 @@ Available commands
 ###
 
 module.exports =
-  identifier: '~'
+  identifier: '!'
 
-  process: (@client, user, msg) ->
+  process: (@client, message) ->
     # TODO: Need to check the user rank and probably other details to verify the identity of the user
-    return unless msg.indexOf @identifier is 0
+    return unless message.indexOf @identifier is 0
 
-    switch msg.slice(1)
+    switch message.slice(1)
       when 'hello'
-        @client.send "<m t=\"Hello world\" u=\"#{user}\" />"
+        @client.send "<m t=\"Hello world\" u=\"#{@client.user.id}\" />"
       when 'clear all messages'
-        database.exec('TRUNCATE TABLE messages').then((data) => @client.send "<m t=\"Messages cleared\" u=\"#{user}\" />")
+        database.exec('TRUNCATE TABLE messages').then((data) => @client.send "<m t=\"Messages cleared\" u=\"#{@client.user.id}\" />")

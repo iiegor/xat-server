@@ -96,7 +96,7 @@ class Client
         msg = parser.getAttribute(packet, 't')
 
         if msg.charAt(0) is Commander.identifier
-          Commander.process(@, @user.id, msg)
+          Commander.process(@, msg)
         else if not isSlash
           Chat.sendMessage.call(@, msg)
 
