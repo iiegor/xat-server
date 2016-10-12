@@ -13,6 +13,7 @@ class Rank
 
   ## For internal use.
   constructor: (@_number) ->
+    undefined
 
   toNumber: -> @_number
 
