@@ -98,7 +98,7 @@ class Client
         if msg.charAt(0) is Commander.identifier
           Commander.process(@, @user.id, msg)
         else if not isSlash
-          Chat.sendMessage.call(@, @user.id, msg)
+          Chat.sendMessage.call(@, msg)
 
       when packetTag == "c" and type is "/K2"
         return if not @maySendMessages()
@@ -147,7 +147,7 @@ class Client
 
           # TODO: Show only for friends
           if status[0] == '_'
-            if status.substr(1) == 'NF' and not global.Server.rooms[@user.chat][userProfileId]
+            if status.substr(1) == 'NF'
               status = '/a_NF'
             else
               status = '/a_'
@@ -188,31 +188,31 @@ class Client
         # NOTE: Private message system follows the original xat behavior. Is it required?
         return if not @maySendMessages()
 
-        toID = parser.getAttribute(packet, if packetTag == 'p' then 'u' else 'd')?.split('_')[0]
-        fromID = @user.id
+        targetId = parser.getAttribute(packet, if packetTag == 'p' then 'u' else 'd')?.split('_')[0]
         message = parser.getAttribute(packet, 't')
         s = parseInt(parser.getAttribute(packet, 's')) || 0
 
-        msg = builder.create(packetTag).append('E', "#{Date.now()}").append('u', fromID).append('t', message)
+        msg = builder.create(packetTag).append('E', "#{Date.now()}").append('u', @user.id).append('t', message)
 
-        if s is 2
-          msg.append('s', s)
+        msg.append('s', s) if s is 2
+
         if packetTag == 'z' or s is 2
-          msg.append('d', if packetTag == 'z' then toID else fromID)
+          msg.append('d', if packetTag == 'z' then targetId else @user.id)
 
         msg = msg.compose()
 
         if packetTag == 'p'
-          global.Server.rooms[@user.chat]?[toID]?.send(msg)
+          global.Server.rooms[@user.chat]?[targetId]?.send(msg)
         else
-          @routeZ(msg, toID)
+          @routeZ(msg, targetId)
 
       when packetTag.indexOf('w') is 0
         ###
         Room pools
         @spec <w v="ACTUAL_POOL(int) POOLS(int,int..)"  />
         ###
-        @chat.onPool = packetTag.substr(1)
+        @broadcast builder.create('l').append('u', @user.id).compose()
+        @user.pool = packetTag.substr(1)
 
         Chat.joinRoom.call(@)
       when packetTag == 'x'
@@ -264,7 +264,7 @@ class Client
 
   broadcast: (packet) ->
     for _, client of global.Server.rooms[@user.chat]
-      continue if @user.id == client.user.id or @chat.onPool != client.chat.onPool
+      continue if @user.id == client.user.id or @user.pool != client.user.pool
 
       # NOTE: This must be removed!
       console.log "Broadcasting from #{@user.id} to #{client.id}"

@@ -27,7 +27,7 @@ module.exports =
 
       connection.query(sql, values, (err, rows) ->
         connection.release()
-        reject(err) if err
-        resolve(rows)
+        
+        if err then reject(err) else resolve(rows)
       )
   )
