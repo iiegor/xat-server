@@ -95,6 +95,7 @@ class Client
         user = parser.getAttribute(packet, 'u')
         msg = parser.getAttribute(packet, 't')
 
+        # TODO: Send message if isSlash but don't store it.
         if msg.charAt(0) is Commander.identifier
           Commander.process(@, msg)
         else if not isSlash
